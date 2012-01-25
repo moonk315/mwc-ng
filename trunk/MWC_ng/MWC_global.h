@@ -98,12 +98,23 @@ struct crd_fr {
   int16_t x, y, z; 
 };
 
+typedef struct crd_fr32 crd_fr32_t;
+struct crd_fr32 { 
+  int32_t x, y, z; 
+};
+
 typedef struct crd_eul   crd_eul_t;
 struct crd_eul { 
   int16_t roll, pitch, yaw; 
 };
 
+typedef struct crd_eul32   crd_eul32_t;
+struct crd_eul32 { 
+  int32_t roll, pitch, yaw; 
+};
+
 typedef union {crd_eul_t eul; crd_fr_t fr; int16_t raw[3];} gyro_data_t;
+typedef union {crd_eul32_t eul; crd_fr32_t fr; int32_t raw[3];} gyro_data32_t;
 
 
 typedef struct imu_data imu_data_t;

@@ -392,21 +392,22 @@ void Gyro_getADC () {
 // ************************************************************************************************************
 #if defined(ITG3200)
 void Gyro_init() {
-  __delay_ms(100);
+  __delay_ms(30);
   i2c_write_byte(ITG3200_ADDRESS, 0x3E, 0x80); //register: Power Management  --  value: reset device
-//  __delay_ms(5);
+  __delay_ms(30);
 //  i2c_write_byte(ITG3200_ADDRESS, 0x15, ITG3200_SMPLRT_DIV); //register: Sample Rate Divider  -- default value = 0: OK
-  __delay_ms(5);
+//  __delay_ms(5);
   i2c_write_byte(ITG3200_ADDRESS, 0x16, 0x18 + ITG3200_DLPF_CFG); //register: DLPF_CFG - low pass filter configuration
   __delay_ms(5);
   i2c_write_byte(ITG3200_ADDRESS, 0x3E, 0x03); //register: Power Management  --  value: PLL with Z Gyro reference
-  __delay_ms(100);
+  __delay_ms(30);
 }
 
 static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt,ITG3200_ADDRESS, 0x1D, sensor_buff.raw, 6);}  
 
 void Gyro_getADC() {
   if (!i2c_trn_error()) {
+    //GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x) >> 2, bswap_16(sensor_buff.itg_3200.y) >> 2, bswap_16(sensor_buff.itg_3200.z) >> 2); 
     GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x) >> 2, bswap_16(sensor_buff.itg_3200.y) >> 2, bswap_16(sensor_buff.itg_3200.z) >> 2); 
     gyro_common();
   }  

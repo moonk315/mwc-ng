@@ -151,8 +151,8 @@ void process_frame_mixes() {
   for (uint8_t i = 0; i < NUMBER_MOTOR; i++) {
     if (maxMotor > PWM_ESC_MAX_THROTTLE) // this is a way to still have good gyro corrections if at least one motor reaches its max.
       out.motor[i] -= maxMotor - PWM_ESC_MAX_THROTTLE;
-    if (minMotor < PWM_ESC_IDLE_THROTTLE) // this is a way to still have good gyro corrections if at least one motor reaches its min.
-      out.motor[i] += PWM_ESC_IDLE_THROTTLE - minMotor;
+//    if (minMotor < PWM_ESC_IDLE_THROTTLE) // this is a way to still have good gyro corrections if at least one motor reaches its min.
+//      out.motor[i] += PWM_ESC_IDLE_THROTTLE - minMotor;
     if (out.motors_armed)  
       out.motor[i] = constrain(out.motor[i], PWM_ESC_IDLE_THROTTLE, PWM_ESC_MAX_THROTTLE);    
     else  
@@ -166,7 +166,7 @@ inline void Output_Init() {
   out.servo_cnt = FRAME_SERVOS + CAM_SERVOS;
 }  
 
-inline void Output_loop_100hz() {
+inline void Output_loop_400hz() {
   process_frame_mixes();
 }  
 
