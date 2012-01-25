@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>. 
  */
 
-int32_t calc_pid(int16_t pr_err, int16_t sp_err, pid_terms_t *t, pid_rt_t *rt) {
+int32_t calc_pid(int16_t pr_err, int32_t sp_err, pid_terms_t *t, pid_rt_t *rt) {
   // P term
   int32_t res = sp_err * t->P / 10;
   // I term
@@ -24,7 +24,7 @@ int32_t calc_pid(int16_t pr_err, int16_t sp_err, pid_terms_t *t, pid_rt_t *rt) {
   rt->i_term = constrain(rt->i_term, t->windup_min, t->windup_max);
   res += rt->i_term * t->I / 1000;
   // D term
-  int16_t tmp = pr_err - rt->last_pr_error;
+  int16_t tmp = rt->last_pr_error - pr_err;
   rt->last_pr_error = pr_err;
   rt->d_term_fir[rt->d_term_fir_ptr] = tmp;
   if (rt->d_term_fir_ptr++ >= 3) rt->d_term_fir_ptr = 0;
@@ -63,27 +63,30 @@ void reset_pid_state() {
   memset(&pid.ctrl, 0, sizeof(pid.ctrl));
 };
 
-inline void PID_loop_100hz() {
+inline void PID_loop_400hz() {
   if (pid.locked) return;
   pid.ctrl.throttle = input.ctrl.throttle;
-  pid.ctrl.yaw = input.ctrl.yaw;
-  pid.ctrl.roll  = calc_pid(-imu.gyro.eul.roll, (input.ctrl.roll << 3)  - imu.gyro.eul.roll,  &pid.active_profile->roll,  &pid.rt.roll) >> 3; 
-  pid.ctrl.pitch = calc_pid(-imu.gyro.eul.roll, (input.ctrl.pitch << 3) - imu.gyro.eul.pitch, &pid.active_profile->pitch, &pid.rt.pitch) >> 3; 
+  //pid.ctrl.yaw = input.ctrl.yaw;
+  pid.ctrl.roll  = calc_pid(-imu.gyro.eul.roll,  (input.ctrl.roll << 1)  - imu.gyro.eul.roll,  &pid.active_profile->roll,  &pid.rt.roll) >> 3; 
+  pid.ctrl.pitch = calc_pid(-imu.gyro.eul.pitch, (input.ctrl.pitch << 1) - imu.gyro.eul.pitch, &pid.active_profile->pitch, &pid.rt.pitch) >> 3; 
+  pid.ctrl.yaw   = calc_pid(-imu.gyro.eul.yaw,   (input.ctrl.yaw << 1)   - imu.gyro.eul.yaw,   &pid.active_profile->yaw,   &pid.rt.yaw) >> 3; 
 } 
 
 inline void PID_Init() {
-  pid.setup.profile[0].roll.P = 40;
-  pid.setup.profile[0].roll.I = 30;
-  pid.setup.profile[0].roll.windup_min = -16000;
-  pid.setup.profile[0].roll.windup_max = +16000;
-  pid.setup.profile[0].roll.D = 17;
-  pid.setup.profile[0].pitch.P = 40;
-  pid.setup.profile[0].pitch.I = 30;
-  pid.setup.profile[0].pitch.windup_min = -16000;
-  pid.setup.profile[0].pitch.windup_max = +16000;
-  pid.setup.profile[0].pitch.D = 17;
+  pid.setup.profile[0].roll.P = 70;
+  pid.setup.profile[0].roll.I = 70;
+  pid.setup.profile[0].roll.windup_min = -16000*2;
+  pid.setup.profile[0].roll.windup_max = +16000*2;
+  pid.setup.profile[0].roll.D = 20;
+  pid.setup.profile[0].pitch.P = 70;
+  pid.setup.profile[0].pitch.I = 70;
+  pid.setup.profile[0].pitch.windup_min = -16000*2;
+  pid.setup.profile[0].pitch.windup_max = +16000*2;
+  pid.setup.profile[0].pitch.D = 20;
   pid.setup.profile[0].yaw.P = 80;
-  pid.setup.profile[0].yaw.I = 30;
+  pid.setup.profile[0].yaw.I = 80;
+  pid.setup.profile[0].yaw.windup_min = -16000*2;
+  pid.setup.profile[0].yaw.windup_max = +16000*2;
   pid.active_profile = &pid.setup.profile[0];
 }  
 

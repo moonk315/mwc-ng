@@ -82,19 +82,16 @@ static uint16_t Timer1Ovf = 2020*2;
 // RX input capture
 #if (RX == PPM)
 ISR(PCINT2_vect) {
-  //StatusLEDOn(); 
   uint16_t time = TCNT1;
   uint8_t pin  = PIND;
   static uint8_t PCintLast;
   uint8_t mask = pin ^ PCintLast;
   PCintLast = pin;
-//  sei();
   if (mask & _BV(2)) PPMCallback(RX_CHANNEL_THROTTLE, time, (pin & _BV(2)));
   if (mask & _BV(4)) PPMCallback(RX_CHANNEL_ROLL,     time, (pin & _BV(4)));
   if (mask & _BV(5)) PPMCallback(RX_CHANNEL_PITCH,    time, (pin & _BV(5)));
   if (mask & _BV(6)) PPMCallback(RX_CHANNEL_YAW,      time, (pin & _BV(6)));
   if (mask & _BV(7)) PPMCallback(RX_CHANNEL_AUX1,     time, (pin & _BV(7)));
-  //StatusLEDOff(); 
 } 
 #endif
 
@@ -115,7 +112,6 @@ inline void AttachPPM() {
 }  
 
 inline void AttachPPMSerial() {
-  //attachInterrupt(0, rxInt, RISING);
   EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (3 << ISC00);
   EIMSK |= (1 << INT0);
 }  
@@ -124,31 +120,38 @@ ISR(TIMER1_OVF_vect) {
   timer1_overflow_count++;
 }  
 
+#if defined(PWM_ESC_EXT_RANGE)
 void PWMOut(uint8_t ch, uint16_t val) {
   //val = val >> 3;
   uint8_t __sreg = SREG; 
   cli();
   switch (ch) {
-    /*
-    case 0: OCR0A = val; break;
-    case 1: OCR0B = val; break;
-    case 2: OCR2A = val; break;
-    case 3: OCR2B = val; break;
-
-    case 0: OCR1A = val << 1; break;
-    case 1: OCR1B = val << 1; break;
-    case 2: OCR2A = val >> 3; break;
-    case 3: OCR2B = val >> 3; break;
-    */
     case 0: OCR1A = (val - 1000 + 8) << 2; break;
     case 1: OCR1B = (val - 1000 + 8) << 2; break;
-    case 2: OCR2A = val >> 3; break;
-    case 3: OCR2B = val >> 3; break;
+    case 2: OCR2A = ((val >> 2) - 250) + 2; break;
+    case 3: OCR2B = ((val >> 2) - 250) + 2; break;
   }  
   SREG = __sreg;
 }  
 
+#else
+
+void PWMOut(uint8_t ch, uint16_t val) {
+  //val = val >> 3;
+  cli();
+  switch (ch) {
+    case 0: OCR0A = val; break;
+    case 1: OCR0B = val; break;
+    case 2: OCR2A = val; break;
+    case 3: OCR2B = val; break;
+  }  
+}  
+
+#endif
+
+
 void PWCOut(uint8_t ch, uint16_t val) {
+  /*
   uint8_t __sreg = SREG;
   cli();
   switch (ch) {
@@ -156,6 +159,7 @@ void PWCOut(uint8_t ch, uint16_t val) {
     case 1: OCR1B = val; break;
   }  
   SREG = __sreg;
+  */
 }  
 
 uint32_t __micros() {
@@ -213,7 +217,7 @@ void Board_Idle() {
 inline void Board_Init() {
   PT_SEM_INIT(&i2c_bus_mutex, 1); 
   // Timer0
-  OCR0A = 125; OCR0B = 125;
+  OCR0A = 0; OCR0B = 0;
   TCCR0A |= (_BV(COM0A1) | _BV(COM0B1));
   TIMSK0 = 0;
   pinMode(5, OUTPUT); pinMode(6, OUTPUT);
@@ -224,13 +228,14 @@ inline void Board_Init() {
            _BV(WGM11);
   TCCR1B = _BV(WGM13) | _BV(WGM12) | /* Fast PWM, ICR1 is top */
            _BV(CS11);                /* div 8 clock prescaler */  
-  ICR1 = Timer1Ovf; OCR1A = 2000; OCR1B = 2000;
+  ICR1 = Timer1Ovf; OCR1A = 0; OCR1B = 0;
   TIMSK1 |= _BV(TOIE1);   
   pinMode(9, OUTPUT); pinMode(10, OUTPUT);
 
   // Timer2
   OCR2A = 0; OCR2B = 0;
   TCCR2A |= (_BV(COM2A1) | _BV(COM2B1));
+  pinMode(11, OUTPUT); pinMode(3, OUTPUT);
 
   // TWI init  
   PORTC |= 1<<4; PORTC |= 1<<5;   // PIN A4&A5 (SDA&SCL)

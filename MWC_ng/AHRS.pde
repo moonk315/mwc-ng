@@ -107,7 +107,7 @@ inline void AHRS_loop_50hz() {
   apply_acc_cf();
 }  
 
-inline void  AHRS_loop_100hz() {
+inline void  AHRS_loop_400hz() {
   rotate_vectors();
 }  
 
