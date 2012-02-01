@@ -26,7 +26,7 @@
 
 #define ACC 1
 #define ITG3200
-#define ITG3200_LPF_98HZ
+#define ITG3200_LPF_188HZ
 //#define L3G4200D
 
 /* I2C accelerometer */

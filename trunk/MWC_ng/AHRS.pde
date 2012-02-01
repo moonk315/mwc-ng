@@ -46,13 +46,14 @@
 #define ssin(val) (val)
 #define scos(val) 1.0f
 
-#define GYRO_SCALE ((2000.0f * PI)/((32767.0f / 4.0f ) * 180.0f * 1000000.0f) * 1.155f * 10000.0f)  
+#define GYRO_LSB   14.375f 
+#define GYRO_SCALE ((PI)/(GYRO_LSB * 180.0f * 1000000.0f) * OUTER_CTRL_LOOP_TIME / 256.0)  
 
 void rotate_vectors(){
   float deltaGyroAngle;
   fp_vector_t eg = ahrs.est_grav;
   // Rotate Estimated vector(s), ROLL
-  deltaGyroAngle  = imu.gyro.eul.roll * GYRO_SCALE;
+  deltaGyroAngle  = imu.gyro_ahrs.eul.roll * GYRO_SCALE;
   eg.y =  scos(deltaGyroAngle) * eg.y + ssin(deltaGyroAngle) * eg.z;
   eg.z = -ssin(deltaGyroAngle) * eg.y + scos(deltaGyroAngle) * eg.z;
   #if MAG
@@ -60,7 +61,7 @@ void rotate_vectors(){
     EstM.V.Z = -ssin(deltaGyroAngle) * EstM.V.Y + scos(deltaGyroAngle) * EstM.V.Z;
   #endif 
   // Rotate Estimated vector(s), PITCH
-  deltaGyroAngle  = imu.gyro.eul.pitch * GYRO_SCALE;
+  deltaGyroAngle  = imu.gyro_ahrs.eul.pitch * GYRO_SCALE;
   eg.z =  scos(deltaGyroAngle) * eg.z - ssin(deltaGyroAngle) * eg.x;
   eg.x =  ssin(deltaGyroAngle) * eg.z + scos(deltaGyroAngle) * eg.x;
   #if MAG
@@ -68,7 +69,7 @@ void rotate_vectors(){
     EstM.V.X =  ssin(deltaGyroAngle) * EstM.V.Z + scos(deltaGyroAngle) * EstM.V.X;
   #endif 
   // Rotate Estimated vector(s), YAW
-  deltaGyroAngle  = imu.gyro.eul.yaw * GYRO_SCALE;
+  deltaGyroAngle  = imu.gyro_ahrs.eul.yaw * GYRO_SCALE;
   eg.x =  scos(deltaGyroAngle) * eg.x - ssin(deltaGyroAngle) * eg.y;
   eg.y =  ssin(deltaGyroAngle) * eg.x + scos(deltaGyroAngle) * eg.y;
   #if MAG
@@ -102,12 +103,12 @@ inline void AHRS_Init() {
   ahrs.acc_grav.z = imu.acc_1g;
 }  
 
-inline void AHRS_loop_50hz() {
+inline void AHRS_loop_acc() {
   pre_filter_acc();
   apply_acc_cf();
 }  
 
-inline void  AHRS_loop_400hz() {
+inline void  AHRS_loop_outer() {
   rotate_vectors();
 }  
 

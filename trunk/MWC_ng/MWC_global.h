@@ -31,6 +31,13 @@
 #define STICK_STATE_EXIT_CONF  (_BV(STICK_STATE_TH_LOW) | _BV(STICK_STATE_YAW_LOW)  | _BV(STICK_STATE_PITCH_HIGH))
 
 
+#define INNER_CTRL_LOOP_TIME    4000
+#define OUTER_CTRL_LOOP_TIME    INNER_CTRL_LOOP_TIME * 4
+#define ACC_CTRL_LOOP_TIME      20000
+#define SERVICE_LOOP_TIME       200000
+
+
+
 // Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734 
 #ifdef PROGMEM 
   #undef PROGMEM 
@@ -39,6 +46,7 @@
 
 enum enym_system_states {
     SYS_STATE_IDLE,
+    SYS_STATE_CALIBRATING,
     SYS_STATE_ARM_REQ,
     SYS_STATE_ARMED,
     SYS_STATE_FLIGHT,
@@ -71,6 +79,53 @@ enum enum_control_channels {
 };
 
 #define CTRL_NUMBER_OF_CHANNELS (CTRL_CHANNEL_LAST)
+
+
+enum enum_led_patterns {
+    LED_PATTERN_OFF,
+    LED_PATTERN_FAST_BLINK,
+    LED_PATTERN_SLOW_BLINK,
+    LED_PATTERN_SHORT_BLINK,
+    LED_PATTERN_ON,
+    LED_PATTERN_CALIBRATION_END,
+    LED_PATTERN_CALIBRATION_START,
+    LED_PATTERN_LAST,
+};
+
+#define LED_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
+
+uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
+  0b00000000,
+  0b00000010,
+  0b11001100,
+  0b00000001,
+  0b11111111,
+  0b00010101,
+  0b11011011,
+};  
+
+
+enum enum_beep_patterns {
+    BEEP_PATTERN_OFF,
+    BEEP_PATTERN_FAST_BLINK,
+    BEEP_PATTERN_SLOW_BLINK,
+    BEEP_PATTERN_SHORT_BLINK,
+    BEEP_PATTERN_ON,
+    BEEP_PATTERN_CALIBRATION_END,
+    BEEP_PATTERN_LAST,
+};
+
+#define BEEP_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
+
+uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
+  0b00000000,
+  0b00000010,
+  0b11001100,
+  0b00000001,
+  0b11111111,
+  0b00010101,
+};  
+
 
 //#define ROLL       0
 //#define PITCH      1
@@ -125,9 +180,9 @@ struct imu_data {
   union {crd_eul_t eul; int16_t raw[3];} gyro_offset;
   union {crd_fr_t fr; int16_t raw[3];} acc_offset;
   union {crd_fr_t fr; int16_t raw[3];} mag_offset;
-  gyro_data_t gyro_decim;
+  gyro_data_t gyro_prev;
+  gyro_data32_t gyro_ahrs;
   gyro_data_t gyro;
-  uint8_t decim_cnt;
   uint16_t acc_1g;
   uint16_t acc_off_cal;
   uint16_t gyro_off_cal;
@@ -160,24 +215,26 @@ struct input_control_data {
 input_control_data_t input;
 
 typedef struct pid_terms pid_terms_t;
-struct pid_terms {uint8_t P, I, D; int32_t windup_min, windup_max;};  
+struct pid_terms {uint8_t P, I, D, FF; int32_t windup_min, windup_max;};  
 
 typedef struct pid_rt pid_rt_t;
 struct pid_rt {
   int16_t last_pr_error;
   int32_t i_term;
-  int16_t d_term_fir[3];
+  int16_t d_term_fir[8];
   uint8_t d_term_fir_ptr; 
 };  
 
 typedef struct pid_profile pid_profile_t;
 struct pid_profile {
   union {
-    struct {pid_terms_t vel, roll, pitch, yaw;};
+    struct {pid_terms_t roll, pitch, yaw, throttle;};
     pid_terms_t ch[CTRL_NUMBER_OF_CHANNELS]; 
-  };
-  pid_terms_t mag_hh;
-  pid_terms_t alt_hold; 
+  } inner;
+  union {
+    struct {pid_terms_t roll, pitch, yaw, throttle;};
+    pid_terms_t ch[CTRL_NUMBER_OF_CHANNELS]; 
+  } outer;
 };  
 
 typedef struct pid_control_data pid_control_data_t;
@@ -185,11 +242,14 @@ struct pid_control_data {
   struct {pid_profile_t profile[8];} setup;
   struct {
     union {
-      struct {pid_rt_t vel, roll, pitch, yaw;};
+      struct {pid_rt_t roll, pitch, yaw, throttle;};
       pid_rt_t ch[CTRL_NUMBER_OF_CHANNELS]; 
-    };
-    pid_rt_t mag_hh;
-    pid_rt_t alt_hold; 
+    } inner;
+    union {
+      struct {pid_rt_t roll, pitch, yaw, throttle;};
+      pid_rt_t ch[CTRL_NUMBER_OF_CHANNELS]; 
+    } outer;
+    struct {int16_t roll, pitch, yaw, throttle;} outer_pid;
   } rt;
   control_data_t ctrl;
   pid_profile_t *active_profile;
@@ -213,6 +273,10 @@ typedef struct flight_control_data flight_control_data_t;
 struct flight_control_data {
   uint8_t  sys_state;
   uint8_t  delay_cnt;
+  uint8_t  led_pattern_req;
+  uint8_t  led_pattern;
+  uint8_t  beep_pattern_req;
+  uint8_t  beep_pattern;
 };
 flight_control_data_t flight;
 

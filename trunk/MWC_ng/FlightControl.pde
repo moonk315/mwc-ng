@@ -16,11 +16,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>. 
  */
 
+inline void blink_led(uint8_t pattern) {
+  flight.led_pattern_req = pattern;
+}
+
+inline void beep(uint8_t pattern) {
+  flight.beep_pattern_req = pattern;
+}
+
  inline void process_idle_state() {
    if (input.stick_state == STICK_STATE_ARM) {
      flight.sys_state = SYS_STATE_ARM_REQ;
-     flight.delay_cnt = 10;
-   }  
+     flight.delay_cnt = 5;
+     blink_led(LED_PATTERN_SHORT_BLINK);
+     beep(BEEP_PATTERN_SHORT_BLINK);
+   } 
+  if (imu.acc_off_cal || imu.gyro_off_cal ) {
+     blink_led(LED_PATTERN_CALIBRATION_START);
+     flight.sys_state = SYS_STATE_CALIBRATING;
+  }   
+ }   
+
+ inline void process_calibrating_state() {
+  blink_led(LED_PATTERN_FAST_BLINK); 
+  if ((!imu.acc_off_cal) && (!imu.gyro_off_cal)) {
+     flight.sys_state = SYS_STATE_IDLE;
+     blink_led(LED_PATTERN_CALIBRATION_END);
+     beep(BEEP_PATTERN_CALIBRATION_END);
+  }  
  }   
 
  inline void process_arm_req_state() {
@@ -38,17 +61,20 @@
    if (input.stick_state == STICK_STATE_DISARM) {
      flight.sys_state = SYS_STATE_DISARM_REQ;
      flight.delay_cnt = 10;
+     beep(BEEP_PATTERN_SHORT_BLINK);
    } else if (!(input.stick_state & _BV(STICK_STATE_TH_LOW))) {
      flight.sys_state = SYS_STATE_FLIGHT;
      pid.locked = 0;
-   }    
+   } else blink_led(LED_PATTERN_ON);
  }   
 
  inline void process_disarm_req_state() {
    if (input.stick_state == STICK_STATE_DISARM) {
+     blink_led(LED_PATTERN_ON);
      if (!(flight.delay_cnt--)) {
        flight.sys_state = SYS_STATE_IDLE;
        out.motors_armed = 0;
+       blink_led(LED_PATTERN_OFF);
      } 
    } else flight.sys_state = SYS_STATE_ARMED;
  }   
@@ -64,6 +90,7 @@
  void process_system_states() {
   switch (flight.sys_state) {
     case SYS_STATE_IDLE: process_idle_state(); break;
+    case SYS_STATE_CALIBRATING: process_calibrating_state(); break;
     case SYS_STATE_ARM_REQ: process_arm_req_state(); break;  
     case SYS_STATE_ARMED: process_armed_state(); break;  
     case SYS_STATE_DISARM_REQ: process_disarm_req_state(); break;
@@ -71,9 +98,39 @@
   }  
  }  
  
+void process_led_state() {
+  uint8_t led_pattern = flight.led_pattern;
+  if (!led_pattern) {
+    led_pattern = led_pattern_cfg[flight.led_pattern_req];
+    flight.led_pattern_req = 0;
+  }    
+  if ((led_pattern & 0x01)) 
+    StatusLEDOn();
+  else  
+    StatusLEDOff();
+  led_pattern = (led_pattern >> 1);
+  flight.led_pattern = led_pattern;
+}  
+
+void process_beep_state() {
+  uint8_t beep_pattern = flight.beep_pattern;
+  if (!beep_pattern) {
+    beep_pattern = beep_pattern_cfg[flight.beep_pattern_req];
+    flight.beep_pattern_req = 0;
+  }    
+  if ((beep_pattern & 0x01)) 
+    BeepOn();
+  else  
+    BeepOff();
+  beep_pattern = (beep_pattern >> 1);
+  flight.beep_pattern = beep_pattern;
+}  
+ 
 inline void FlightControl_Init() {
 }  
 
 inline void FlightControl_loop_5hz() {
   process_system_states();
+  process_led_state();
+  process_beep_state();
 }  
