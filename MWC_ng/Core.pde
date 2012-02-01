@@ -210,6 +210,32 @@ inline void StatusLEDToggle() {
   PINB |= _BV(5);
 } 
 
+
+inline void BeepOn() {
+  PORTB |= _BV(0);
+}  
+
+inline void BeepOff() {
+  PORTB &= ~_BV(0);
+}  
+
+inline void BeepToggle() {
+  PINB |= _BV(0);
+} 
+
+inline void DebugLEDOn() {
+  PORTC |= _BV(1);
+}  
+
+inline void DebugLEDOff() {
+  PORTC &= ~_BV(1);
+}  
+
+inline void DebugLEDToggle() {
+  PINC |= _BV(1);
+} 
+
+
 void Board_Idle() {
   avr_UsartPollWrite_0();
 };  
@@ -248,6 +274,10 @@ inline void Board_Init() {
   
   // LED
   pinMode (13, OUTPUT);
+  // Beeper
+  pinMode (8, OUTPUT);
+  // Debug
+  pinMode (A1, OUTPUT);
 }  
 #endif
 

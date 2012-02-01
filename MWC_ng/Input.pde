@@ -65,8 +65,8 @@ void process_stick_states() {
 }  
 
 inline void Input_Init() {
-  input.setup.ctrl_rate = 45;
-  input.setup.ctrl_exp = 65;
+  input.setup.ctrl_rate = 50;
+  input.setup.ctrl_exp = 60;
   build_expo_table();
 }  
 

@@ -133,10 +133,10 @@ void acc_calc_offset() {
   static int32_t a[3];  
   uint16_t acc_off_cal_cache = imu.acc_off_cal;
   for (uint8_t i = 0; i < 3; i++) {
-    if (acc_off_cal_cache == 1024) a[i] = 0;
+    if (acc_off_cal_cache == 100) a[i] = 0;
     a[i] += imu.acc.raw[i];
     if (acc_off_cal_cache == 1)
-      imu.acc_offset.raw[i] = a[i] / 1024;
+      imu.acc_offset.raw[i] = a[i] / 100;
   }  
   if (acc_off_cal_cache == 1) {
     imu.acc_offset.fr.z -= imu.acc_1g; 
@@ -408,9 +408,9 @@ static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt
 void Gyro_getADC() {
   if (!i2c_trn_error()) {
     //GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x) >> 2, bswap_16(sensor_buff.itg_3200.y) >> 2, bswap_16(sensor_buff.itg_3200.z) >> 2); 
-    GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x) >> 2, bswap_16(sensor_buff.itg_3200.y) >> 2, bswap_16(sensor_buff.itg_3200.z) >> 2); 
+    GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x), bswap_16(sensor_buff.itg_3200.y), bswap_16(sensor_buff.itg_3200.z)); 
     gyro_common();
-  }  
+  } else StatusLEDToggle(); 
 }
 #endif
 
