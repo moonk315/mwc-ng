@@ -1,9 +1,9 @@
 #ifndef config_h
 #define config_h
 
-#define FRAME QUADX
-#define RX    PPM_SERIAL
-#define ESC   PWM
+#define FRAME _QUADX_
+#define RX    _PPM_SERIAL_
+#define ESC   _PWM_
 
 #define SERIAL_COM_SPEED 115200
 
@@ -16,7 +16,7 @@
 #define YAW_DIRECTION 1 
 
 #define I2C_SPEED 400000L
-#define BOARD PROMINI
+#define BOARD _PROMINI_
 //#define MWC_DEBUG
 
 #define RC_MINTHROTTLE 1000 
@@ -24,7 +24,11 @@
 #define DEADBAND_RP  2
 #define DEADBAND_YAW 5 
 
-#define ACC 1
+#define ACC  _BMA180_
+#define GYRO _ITG3200_
+#define MAG  _NONE_
+#define BARO _NONE_
+
 #define ITG3200
 #define ITG3200_LPF_188HZ
 //#define L3G4200D

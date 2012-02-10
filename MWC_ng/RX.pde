@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU General Public License 
  * along with this program. If not, see <http://www.gnu.org/licenses/>. 
  */
-static uint16_t raw_ppm_data[RX_NUMBER_OF_CHANNELS];
-static uint16_t ppm_edge_time[RX_NUMBER_OF_CHANNELS];
+uint16_t raw_ppm_data[RX_NUMBER_OF_CHANNELS];
+uint16_t ppm_edge_time[RX_NUMBER_OF_CHANNELS];
 
 #define PPM_HYST 1
 
@@ -45,7 +45,7 @@ inline void init_ppm() {
     raw_ppm_data[i] = 1500*2;
 }    
 
-#if (RX == PPM)
+#if (RX == _PPM_)
 void PPMCallback(uint8_t ch, uint16_t time, uint8_t state) {
   if (state) {
     ppm_edge_time[ch] = time;
@@ -69,7 +69,7 @@ inline void RX_loop_200hz() {
 #endif
 
 
-#if (RX == PPM_SERIAL)
+#if (RX == _PPM_SERIAL_)
 inline void rx_ppm_serial_callback(uint16_t time) {
   static uint16_t last;
   static uint8_t ch;  

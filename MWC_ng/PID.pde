@@ -21,9 +21,9 @@ int32_t calc_pid(int16_t pr_err, int32_t sp_err, pid_terms_t *t, pid_rt_t *rt) {
   int32_t res = sp_err * t->P / 10;
   // I term
   rt->i_term += sp_err;
-  if (rt->i_term < t->windup_min) rt->i_term = t->windup_min;
+  if (rt->i_term < -t->i_windup) rt->i_term = -t->i_windup;
   else
-  if (rt->i_term > t->windup_max) rt->i_term = t->windup_max;
+  if (rt->i_term > t->i_windup) rt->i_term = t->i_windup;
   res += rt->i_term * t->I  / 1000;
   // D term
   int16_t tmp = rt->last_pr_error - pr_err;
@@ -39,9 +39,9 @@ int32_t update_pid16(int16_t sp, int16_t pv, pid_terms_t *t, pid_rt_t *rt) {
   int32_t res = (sp_err * t->P) >> 4;
   // I term
   rt->i_term += sp_err;
-  if (rt->i_term < t->windup_min) rt->i_term = t->windup_min;
+  if (rt->i_term < -t->i_windup) rt->i_term = -t->i_windup;
   else
-  if (rt->i_term > t->windup_max) rt->i_term = t->windup_max;
+  if (rt->i_term > t->i_windup) rt->i_term = t->i_windup;
   res += (rt->i_term * t->I)  >> 10;
   // D term
   int16_t tmp = pv - rt->last_pr_error;
@@ -92,22 +92,19 @@ inline void PID_loop_outer() {
 inline void PID_Init() {
   pid.setup.profile[0].inner.roll.P = P(12.0);
   pid.setup.profile[0].inner.roll.I = I(0.080);
-  pid.setup.profile[0].inner.roll.windup_min = -64000;// -16000*2;
-  pid.setup.profile[0].inner.roll.windup_max =  64000;//+16000*2;
+  pid.setup.profile[0].inner.roll.i_windup = 64000;// -16000*2;
   pid.setup.profile[0].inner.roll.D = D(17);
   pid.setup.profile[0].inner.roll.FF = FF(1.0);
   pid.setup.profile[0].outer.roll.FF = FF(1.0);
   pid.setup.profile[0].inner.pitch.P = P(12.0);
   pid.setup.profile[0].inner.pitch.I = I(0.080);
-  pid.setup.profile[0].inner.pitch.windup_min = -64000;//-16000*2;
-  pid.setup.profile[0].inner.pitch.windup_max =  64000;//+16000*2;
+  pid.setup.profile[0].inner.pitch.i_windup = 64000;//-16000*2;
   pid.setup.profile[0].inner.pitch.D = D(17);
   pid.setup.profile[0].inner.pitch.FF = FF(1.0);
   pid.setup.profile[0].outer.pitch.FF = FF(1.0);
   pid.setup.profile[0].inner.yaw.P = P(8.0);
   pid.setup.profile[0].inner.yaw.I = I(0.080);
-  pid.setup.profile[0].inner.yaw.windup_min = -64000;//-16000*2;
-  pid.setup.profile[0].inner.yaw.windup_max =  64000;//+16000*2;
+  pid.setup.profile[0].inner.yaw.i_windup = 64000;//-16000*2;
   pid.setup.profile[0].inner.yaw.FF = FF(1.0);
   pid.setup.profile[0].outer.yaw.FF = FF(1.0);
   // throttle passthrough

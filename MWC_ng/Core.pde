@@ -1,14 +1,15 @@
 
-#if (BOARD == PROMINI)
+#if (BOARD == _PROMINI_)
 // Arduino Pro Mini 16 Mhz, ATMega328 
 // GUI Serial
 #define AVR_USART_PORT  0
-#define USART_RX_BUFFER_SIZE 2
-#define USART_TX_BUFFER_SIZE 256
+#define USART_RX_BUFFER_SIZE 8
+#define USART_TX_BUFFER_SIZE 8
 #include "avr_usart.h"
 inline void GUI_serial_open(uint32_t baud) {avr_UsartOpen_0(baud);}  
 inline void GUI_serial_close() {avr_UsartClose_0();}  
 inline uint8_t GUI_serial_available() {return avr_UsartAvailable_0();}  
+inline uint8_t GUI_serial_tx_full() {return avr_UsartTXFull_0();}  
 inline uint8_t GUI_serial_read() {return avr_UsartRead_0();}  
 inline void GUI_serial_write(uint8_t c) {avr_UsartWrite_0(c);}  
 
@@ -80,7 +81,7 @@ static uint16_t Timer1Ovf = 2020*2;
 
 
 // RX input capture
-#if (RX == PPM)
+#if (RX == _PPM_)
 ISR(PCINT2_vect) {
   uint16_t time = TCNT1;
   uint8_t pin  = PIND;
@@ -95,7 +96,7 @@ ISR(PCINT2_vect) {
 } 
 #endif
 
-#if (RX == PPM_SERIAL)
+#if (RX == _PPM_SERIAL_)
 ISR(INT0_vect) {
   uint16_t time = TCNT1;
   uint16_t val = timer1_overflow_count;   

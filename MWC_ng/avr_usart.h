@@ -65,3 +65,8 @@ void __NAME__(UsartWrite)(uint8_t c){
   __NAME__(usartHeadTX) = i;
 }
 
+uint8_t __NAME__(UsartTXFull)() {
+  uint8_t i = (__NAME__(usartHeadTX) + 1) % USART_TX_BUFFER_SIZE;
+  return (i == __NAME__(usartTailTX));
+}  
+

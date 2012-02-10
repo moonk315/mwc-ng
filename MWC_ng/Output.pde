@@ -16,22 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>. 
  */
  
-#if (FRAME == GIMBAL) || (FRAME == FLYING_WING)
+#if (FRAME == _GIMBAL_) || (FRAME == _FLYING_WING_)
   #define NUMBER_MOTOR 0
   #define FRAME_SERVOS 9
-#elif (FRAME == BI)
+#elif (FRAME == _BI_)
   #define NUMBER_MOTOR 2
   #define FRAME_SERVOS 2
-#elif (FRAME == TRI)
+#elif (FRAME == _TRI_)
   #define NUMBER_MOTOR 3
   #define FRAME_SERVOS 1
-#elif (FRAME == QUADP) || (FRAME == QUADX) || (FRAME == Y4)
+#elif (FRAME == _QUADP_) || (FRAME == _QUADX_) || (FRAME == _Y4_)
   #define NUMBER_MOTOR 4
   #define FRAME_SERVOS 0
-#elif (FRAME == Y6) || (FRAME == HEX6) || (FRAME == HEX6X)
+#elif (FRAME == _Y6_) || (FRAME == _HEX6_) || (FRAME == _HEX6X_)
   #define NUMBER_MOTOR 6
   #define FRAME_SERVOS 0
-#elif (FRAME == OCTOX8) || (FRAME == OCTOFLATP) || (FRAME == OCTOFLATX)
+#elif (FRAME == _OCTOX8_) || (FRAME == _OCTOFLATP_) || (FRAME == _OCTOFLATX_)
   #define NUMBER_MOTOR 8
   #define FRAME_SERVOS 0
 #endif
@@ -51,37 +51,37 @@ void process_frame_mixes() {
     // !!!! WTF !!!!
     pid.ctrl.yaw = constrain(pid.ctrl.yaw, -100 - abs(input.ctrl.yaw), +100 + abs(input.ctrl.yaw));
   #endif
-  #if (FRAME == BI)
+  #if (FRAME == _BI_)
     out.motor[0] = PIDMIX(+1, 0, 0); //LEFT
     out.motor[1] = PIDMIX(-1, 0, 0); //RIGHT        
     out.servo[0]  = constrain(1500 + YAW_DIRECTION * (axisPID[YAW] + axisPID[PITCH]), 1020, 2000); //LEFT
     out.servo[1]  = constrain(1500 + YAW_DIRECTION * (axisPID[YAW] - axisPID[PITCH]), 1020, 2000); //RIGHT
   #endif
-  #if (FRAME == TRI)
+  #if (FRAME == _TRI_)
     out.motor[0] = PIDMIX( 0,+4/3, 0); //REAR
     out.motor[1] = PIDMIX(-1,-2/3, 0); //RIGHT
     out.motor[2] = PIDMIX(+1,-2/3, 0); //LEFT
     out.servo[0] = constrain(TRI_YAW_MIDDLE + YAW_DIRECTION * axisPID[YAW], TRI_YAW_CONSTRAINT_MIN, TRI_YAW_CONSTRAINT_MAX); //REAR
   #endif
-  #if (FRAME == QUADP)
+  #if (FRAME == _QUADP_)
     out.motor[0] = PIDMIX( 0,+1,-1); //REAR
     out.motor[1] = PIDMIX(-1, 0,+1); //RIGHT
     out.motor[2] = PIDMIX(+1, 0,+1); //LEFT
     out.motor[3] = PIDMIX( 0,-1,-1); //FRONT
   #endif
-  #if (FRAME == QUADX)
+  #if (FRAME == _QUADX_)
     out.motor[0] = PIDMIX(-1,+1,-1); //REAR_R
     out.motor[1] = PIDMIX(-1,-1,+1); //FRONT_R
     out.motor[2] = PIDMIX(+1,+1,+1); //REAR_L
     out.motor[3] = PIDMIX(+1,-1,-1); //FRONT_L
   #endif
-  #if (FRAME == Y4)
+  #if (FRAME == _Y4_)
     out.motor[0] = PIDMIX(+0,+1,-1);   //REAR_1 CW
     out.motor[1] = PIDMIX(-1,-1, 0); //FRONT_R CCW
     out.motor[2] = PIDMIX(+0,+1,+1);   //REAR_2 CCW
     out.motor[3] = PIDMIX(+1,-1, 0); //FRONT_L CW
   #endif
-  #if (FRAME == Y6)
+  #if (FRAME == _Y6_)
     out.motor[0] = PIDMIX(+0,+4/3,+1); //REAR
     out.motor[1] = PIDMIX(-1,-2/3,-1); //RIGHT
     out.motor[2] = PIDMIX(+1,-2/3,-1); //LEFT
@@ -89,7 +89,7 @@ void process_frame_mixes() {
     out.motor[4] = PIDMIX(-1,-2/3,+1); //UNDER_RIGHT
     out.motor[5] = PIDMIX(+1,-2/3,+1); //UNDER_LEFT    
   #endif
-  #if (FRAME == HEX6)
+  #if (FRAME == _HEX6_)
     out.motor[0] = PIDMIX(-1/2,+1/2,+1); //REAR_R
     out.motor[1] = PIDMIX(-1/2,-1/2,-1); //FRONT_R
     out.motor[2] = PIDMIX(+1/2,+1/2,+1); //REAR_L
@@ -97,7 +97,7 @@ void process_frame_mixes() {
     out.motor[4] = PIDMIX(+0  ,-1  ,+1); //FRONT
     out.motor[5] = PIDMIX(+0  ,+1  ,-1); //REAR
   #endif
-  #if (FRAME == HEX6X)
+  #if (FRAME == _HEX6X_)
     out.motor[0] = PIDMIX(-1/2,+1/2,+1); //REAR_R
     out.motor[1] = PIDMIX(-1/2,-1/2,+1); //FRONT_R
     out.motor[2] = PIDMIX(+1/2,+1/2,-1); //REAR_L
@@ -105,7 +105,7 @@ void process_frame_mixes() {
     out.motor[4] = PIDMIX(-1  ,+0  ,-1); //RIGHT
     out.motor[5] = PIDMIX(+1  ,+0  ,+1); //LEFT
   #endif
-  #if (FRAME == OCTOX8)
+  #if (FRAME == _OCTOX8_)
     out.motor[0] = PIDMIX(-1,+1,-1); //REAR_R
     out.motor[1] = PIDMIX(-1,-1,+1); //FRONT_R
     out.motor[2] = PIDMIX(+1,+1,+1); //REAR_L
@@ -115,7 +115,7 @@ void process_frame_mixes() {
     out.motor[6] = PIDMIX(+1,+1,-1); //UNDER_REAR_L
     out.motor[7] = PIDMIX(+1,-1,+1); //UNDER_FRONT_L
   #endif
-  #if (FRAME == OCTOFLATP)
+  #if (FRAME == _OCTOFLATP_)
     out.motor[0] = PIDMIX(+7/10,-7/10,+1); //FRONT_L
     out.motor[1] = PIDMIX(-7/10,-7/10,+1); //FRONT_R
     out.motor[2] = PIDMIX(-7/10,+7/10,+1); //REAR_R
@@ -125,7 +125,7 @@ void process_frame_mixes() {
     out.motor[6] = PIDMIX(+0   ,+1   ,-1); //REAR
     out.motor[7] = PIDMIX(-1   ,+0   ,-1); //LEFT 
   #endif
-  #if (FRAME == OCTOFLATX)
+  #if (FRAME == _OCTOFLATX_)
     out.motor[0] = PIDMIX(+1  ,-1/2,+1); //MIDFRONT_L
     out.motor[1] = PIDMIX(-1/2,-1  ,+1); //FRONT_R
     out.motor[2] = PIDMIX(-1  ,+1/2,+1); //MIDREAR_R
@@ -135,11 +135,11 @@ void process_frame_mixes() {
     out.motor[6] = PIDMIX(-1/2,+1  ,-1); //REAR_R
     out.motor[7] = PIDMIX(+1  ,+1/2,-1); //MIDREAR_L 
   #endif
-  #if (FRAME == GIMBAL)
+  #if (FRAME == _GIMBAL_)
     out.servo[1] = constrain(TILT_PITCH_MIDDLE + TILT_PITCH_PROP * angle[PITCH] /16 + rcCommand[PITCH], TILT_PITCH_MIN, TILT_PITCH_MAX);
     out.servo[2] = constrain(TILT_ROLL_MIDDLE + TILT_ROLL_PROP   * angle[ROLL]  /16 + rcCommand[ROLL], TILT_ROLL_MIN, TILT_ROLL_MAX);
   #endif
-  #if (FRAME == FLYING_WING)
+  #if (FRAME == _FLYING_WING_)
     out.servo[1]  = constrain(1500 + axisPID[PITCH] - axisPID[ROLL], 1020, 2000); //LEFT the direction of the 2 servo can be changed here: invert the sign before axisPID
     out.servo[2]  = constrain(1500 + axisPID[PITCH] + axisPID[ROLL], 1020, 2000); //RIGHT
   #endif

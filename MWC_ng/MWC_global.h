@@ -3,17 +3,20 @@
 
 #include <avr/pgmspace.h>
 
-#define NONE         000 
-#define PROMINI      100
-#define PROMINI_HEX  200
-#define PPM          300
-#define PPM_SERIAL   400
-#define GIMBAL       500
-#define FLYING_WING  600
-#define BI           700
-#define TRI          800
-#define QUADP        900
-#define QUADX       1000
+#define _NONE_         000
+#define _PROMINI_      100
+#define _PROMINI_HEX_  200
+#define _PPM_          300
+#define _PPM_SERIAL_   400
+#define _GIMBAL_       500
+#define _FLYING_WING_  600
+#define _BI_           700
+#define _TRI_          800
+#define _QUADP_        900
+#define _QUADX_       1000
+#define _ITG3200_     1100
+#define _BMA180_      1200
+
 
 #define STICK_STATE_TH_LOW     0
 #define STICK_STATE_TH_HIGH    1
@@ -138,7 +141,7 @@ struct rx_data {
     uint16_t raw[RX_NUMBER_OF_CHANNELS]; 
   }; 
 };
-static rx_data_t rx_data;
+rx_data_t rx_data;
 
 typedef struct control_data control_data_t;
 struct control_data { 
@@ -188,7 +191,7 @@ struct imu_data {
   uint16_t gyro_off_cal;
   uint16_t mag_off_cal;
 };  
-static imu_data_t imu;
+imu_data_t imu;
 
 
 typedef struct {float x, y, z;} fp_vector_t;
@@ -200,7 +203,7 @@ struct ahrs_data {
   fp_vector_t est_mag;
   crd_eul_t eul_ref;
 };  
-static ahrs_data_t ahrs;
+ahrs_data_t ahrs;
 
 typedef struct input_control_data input_control_data_t;
 struct input_control_data {
@@ -215,13 +218,13 @@ struct input_control_data {
 input_control_data_t input;
 
 typedef struct pid_terms pid_terms_t;
-struct pid_terms {uint8_t P, I, D, FF; int32_t windup_min, windup_max;};  
+struct pid_terms {uint8_t P, I, D, FF; int32_t i_windup;};  
 
 typedef struct pid_rt pid_rt_t;
 struct pid_rt {
   int16_t last_pr_error;
   int32_t i_term;
-  int16_t d_term_fir[8];
+  //int16_t d_term_fir[8];
   uint8_t d_term_fir_ptr; 
 };  
 
@@ -239,7 +242,7 @@ struct pid_profile {
 
 typedef struct pid_control_data pid_control_data_t;
 struct pid_control_data {
-  struct {pid_profile_t profile[8];} setup;
+  struct {pid_profile_t profile[4];} setup;
   struct {
     union {
       struct {pid_rt_t roll, pitch, yaw, throttle;};
@@ -281,7 +284,9 @@ struct flight_control_data {
 flight_control_data_t flight;
 
 
-static uint16_t currentTime;
+static uint32_t current_time_us;
+static uint32_t current_time_ms;
+static uint8_t  cpu_util_pct;
 
 // Core Function prototypes
 
