@@ -21,7 +21,6 @@
 #include "config.h"
 #include "MWC_Debug.h"
 
-
 void debug_print_system_state() {
   dprintf("\033[1;1H");
   //dprintf("PPM  (th, r, p, y, aux1): %8d, %8d, %8d, %8d  \n",  get_raw_ppm_data_no_block(RX_CHANNEL_THROTTLE), get_raw_ppm_data_no_block(RX_CHANNEL_ROLL), get_raw_ppm_data_no_block(RX_CHANNEL_PITCH), get_raw_ppm_data_no_block(RX_CHANNEL_YAW), get_raw_ppm_data_no_block(RX_CHANNEL_AUX1));
@@ -31,6 +30,7 @@ void debug_print_system_state() {
   dprintf("ACC f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_grav.x), int16_t(ahrs.acc_grav.y), int16_t(ahrs.acc_grav.z));
   dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_grav.x), int16_t(ahrs.est_grav.y), int16_t(ahrs.est_grav.z));
   dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
+  dprintf("CPU: %8d%%  \n",  cpu_util_pct * 100 / 255);
   //dprintf("Input: (th, r, p, y, st): %8d, %8d, %8d, %8d  %x \n",  input.ctrl.throttle, input.ctrl.roll, input.ctrl.pitch, input.ctrl.yaw, input.stick_state);
   //dprintf("Fl. Ctrl: (st): %x \n",  flight.sys_state);
   //dprintf("PID:   (th, r, p, y): %8d, %8d, %8d, %8d  \n",  pid.ctrl.throttle, pid.ctrl.roll, pid.ctrl.pitch, pid.ctrl.yaw);
@@ -53,6 +53,7 @@ void setup() {
   PID_Init();
   Output_Init();
   FlightControl_Init();
+  MavLink_Init();
   sei();
   imu.acc_off_cal = 100;
   imu.gyro_off_cal = 512;
@@ -72,11 +73,16 @@ static struct pt thread_gyro_read_pt;
 static struct pt thread_acc_read_pt;
 static struct pt_sem i2c_bus_mutex;
 
+#define IDLE_LOOP_PERIOD 33 // measured
+#define IDLE_LOOP_CNT (SERVICE_LOOP_TIME / IDLE_LOOP_PERIOD)
+static uint16_t main_loop_cnt;
 
 static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   PT_BEGIN(pt);
   PT_WAIT_UNTIL(pt, timer_expired(&timer_inner_ctrl, dt));
-  DebugLEDToggle();
+  //DebugLEDToggle();
+  current_time_us += INNER_CTRL_LOOP_TIME;
+  current_time_ms += (INNER_CTRL_LOOP_TIME / 1000);
   PT_SEM_WAIT(pt, &i2c_bus_mutex);
   PT_SPAWN(pt, &thread_gyro_read_pt, ThreadGyro_GetADC_pt(&thread_gyro_read_pt));
   Gyro_getADC();
@@ -87,7 +93,7 @@ static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   PID_loop_inner();
   Output_loop_400hz();
   for (uint8_t i = 0; i < 3; i++)
-    imu.gyro_ahrs.raw[i] += (((int32_t)imu.gyro_raw.raw[i] << 8)  - imu.gyro_ahrs.raw[i]) >> 2;
+    imu.gyro_ahrs.raw[i] += (((int32_t)imu.gyro_raw.raw[i] << 8)  - imu.gyro_ahrs.raw[i]) >> 3;
   PT_END(pt);
 }  
 
@@ -118,23 +124,31 @@ static PT_THREAD(thread_service(struct pt *pt, uint16_t dt)) {
   PT_WAIT_UNTIL(pt, timer_expired(&timer_service, dt));
   Input_loop_5hz();
   FlightControl_loop_5hz();
+  // Calc CPU utilization
+  uint16_t delta = main_loop_cnt;
+  uint8_t idle_pct = ((uint32_t)delta << 8) / IDLE_LOOP_CNT;
+  cpu_util_pct = 255 - idle_pct;
+  main_loop_cnt = 0;
   debug_print_system_state();
   PT_END(pt);
 }  
 
 void loop() __attribute__ ((noreturn));
 void loop() {
+  uint16_t current_tick;
   PT_INIT(&thread_inner_ctrl_pt);
   PT_INIT(&thread_outer_ctrl_pt);
   PT_INIT(&thread_acc_ctrl_pt);
   PT_INIT(&thread_service_pt);
   for (;;) {
+    main_loop_cnt++;
     Board_Idle();
-    currentTime = __systick();
-    PT_SCHEDULE(thread_inner_ctrl(&thread_inner_ctrl_pt, currentTime));
-    PT_SCHEDULE(thread_outer_ctrl(&thread_outer_ctrl_pt, currentTime));
-    PT_SCHEDULE(thread_acc_ctrl(&thread_acc_ctrl_pt, currentTime));
-    PT_SCHEDULE(thread_service(&thread_service_pt, currentTime)); 
+    current_tick = __systick();
+    PT_SCHEDULE(thread_inner_ctrl(&thread_inner_ctrl_pt, current_tick));
+    PT_SCHEDULE(thread_outer_ctrl(&thread_outer_ctrl_pt, current_tick));
+    PT_SCHEDULE(thread_acc_ctrl(&thread_acc_ctrl_pt, current_tick));
+    PT_SCHEDULE(thread_service(&thread_service_pt, current_tick)); 
+    MavLink_Loop(current_tick);
   }
 }
 

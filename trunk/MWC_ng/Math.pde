@@ -12,7 +12,7 @@ float InvSqrt (float x){
 int32_t isq(int32_t x){return x * x;}
 
 int16_t _atan2(float y, float x){
-  #define fp_is_neg(val) ((((byte*)&val)[3] & 0x80) != 0)
+  #define fp_is_neg(val) ((((uint8_t*)&val)[3] & 0x80) != 0)
   float z = y / x;
   int16_t zi = abs(int16_t(z * 100)); 
   int8_t y_neg = fp_is_neg(y);
@@ -27,7 +27,7 @@ int16_t _atan2(float y, float x){
    z = (PI / 2.0f) - z / (z * z + 0.28f);
    if (y_neg) z -= PI;
   }
-  z *= (180.0f / PI * 10); 
+  z *= (180.0f / PI * 100); 
   return z;
 }
 

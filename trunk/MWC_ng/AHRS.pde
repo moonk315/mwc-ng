@@ -46,7 +46,8 @@
 #define ssin(val) (val)
 #define scos(val) 1.0f
 
-#define GYRO_LSB   14.375f 
+//#define GYRO_LSB   14.375f 
+#define GYRO_LSB   13.7f 
 #define GYRO_SCALE ((PI)/(GYRO_LSB * 180.0f * 1000000.0f) * OUTER_CTRL_LOOP_TIME / 256.0)  
 
 void rotate_vectors(){
