@@ -24,17 +24,18 @@
 void debug_print_system_state() {
   dprintf("\033[1;1H");
   //dprintf("PPM  (th, r, p, y, aux1): %8d, %8d, %8d, %8d  \n",  get_raw_ppm_data_no_block(RX_CHANNEL_THROTTLE), get_raw_ppm_data_no_block(RX_CHANNEL_ROLL), get_raw_ppm_data_no_block(RX_CHANNEL_PITCH), get_raw_ppm_data_no_block(RX_CHANNEL_YAW), get_raw_ppm_data_no_block(RX_CHANNEL_AUX1));
-  dprintf("RX:  (th, r, p, y, aux1, aux2, aux3, aux4): %8d, %8d, %8d, %8d, %8d, %8d, %8d, %8d  \n",  rx_data.throttle, rx_data.roll, rx_data.pitch, rx_data.yaw, rx_data.aux1, rx_data.aux2, rx_data.aux3, rx_data.aux4);
-  dprintf("Gyro (r, p, y): %8d, %8d, %8d  \n",  imu.gyro.eul.roll, imu.gyro.eul.pitch, imu.gyro.eul.yaw);
-  dprintf("Acc  (X, Y, Z): %8d, %8d, %8d  \n",  imu.acc.fr.x, imu.acc.fr.y, imu.acc.fr.z);
-  dprintf("ACC f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_grav.x), int16_t(ahrs.acc_grav.y), int16_t(ahrs.acc_grav.z));
-  dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_grav.x), int16_t(ahrs.est_grav.y), int16_t(ahrs.est_grav.z));
-  dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
-  dprintf("CPU: %8d%%  \n",  cpu_util_pct * 100 / 255);
+  //dprintf("RX:  (th, r, p, y, aux1, aux2, aux3, aux4): %8d, %8d, %8d, %8d, %8d, %8d, %8d, %8d  \n",  rx_data.throttle, rx_data.roll, rx_data.pitch, rx_data.yaw, rx_data.aux1, rx_data.aux2, rx_data.aux3, rx_data.aux4);
+  //dprintf("Gyro (r, p, y): %8d, %8d, %8d  \n",  imu.gyro.eul.roll, imu.gyro.eul.pitch, imu.gyro.eul.yaw);
+  //dprintf("Acc  (X, Y, Z): %8d, %8d, %8d  \n",  imu.acc.fr.x, imu.acc.fr.y, imu.acc.fr.z);
+  //dprintf("ACC f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_grav.x), int16_t(ahrs.acc_grav.y), int16_t(ahrs.acc_grav.z));
+  //dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_grav.x), int16_t(ahrs.est_grav.y), int16_t(ahrs.est_grav.z));
+  //dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
+  //dprintf("CPU: %8d%%  \n",  cpu_util_pct * 100 / 255);
   //dprintf("Input: (th, r, p, y, st): %8d, %8d, %8d, %8d  %x \n",  input.ctrl.throttle, input.ctrl.roll, input.ctrl.pitch, input.ctrl.yaw, input.stick_state);
   //dprintf("Fl. Ctrl: (st): %x \n",  flight.sys_state);
   //dprintf("PID:   (th, r, p, y): %8d, %8d, %8d, %8d  \n",  pid.ctrl.throttle, pid.ctrl.roll, pid.ctrl.pitch, pid.ctrl.yaw);
   //dprintf("Out.m[]:(0, 1, 2, 3): %8d, %8d, %8d, %8d  \n",  out.motor[0], out.motor[1], out.motor[2], out.motor[3]);
+  params_build_scalar_list();
 }  
 
 void send_message(uint8_t msg) {
@@ -53,6 +54,7 @@ void setup() {
   PID_Init();
   Output_Init();
   FlightControl_Init();
+  Params_Init();
   MavLink_Init();
   sei();
   imu.acc_off_cal = 100;

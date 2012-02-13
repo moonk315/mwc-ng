@@ -228,6 +228,11 @@ struct pid_rt {
   uint8_t d_term_fir_ptr; 
 };  
 
+typedef struct pid_channels pid_channels_t;
+struct pid_channels {
+  pid_terms_t roll, pitch, yaw, throttle;
+};
+
 typedef struct pid_profile pid_profile_t;
 struct pid_profile {
   union {
@@ -287,6 +292,7 @@ flight_control_data_t flight;
 static uint32_t current_time_us;
 static uint32_t current_time_ms;
 static uint8_t  cpu_util_pct;
+static uint8_t  sys_param_values_cnt;
 
 // Core Function prototypes
 
@@ -372,6 +378,51 @@ uint8_t timer_expired(timer_big_t *t, uint16_t systick = __systick()) {
 
 inline static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt));
 inline static PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt));
+
+typedef struct rtti_type_info rtti_type_info_t;
+typedef struct rtti_member_list rtti_member_list_t;
+typedef struct rtti_type_info rtti_type_info_t;
+typedef struct rtti_struct_member rtti_struct_member_t;
+typedef struct param_data param_data_t;
+typedef struct struct_node_search_rec struct_node_search_rec_t;
+typedef struct param_search_rec param_search_rec_t;
+
+struct rtti_struct_member {
+  char  name[5];
+  rtti_type_info_t *type;
+  uint8_t  encoding;
+};  
+
+struct rtti_member_list {
+  uint8_t  cnt;
+  rtti_struct_member_t *memb;
+};  
+
+struct rtti_type_info {
+  uint8_t  kind;
+  uint8_t  _size;
+  rtti_member_list_t members;
+};  
+
+struct param_data { 
+  char  name[7];
+  rtti_type_info_t *type;
+  void *var; 
+};
+
+struct struct_node_search_rec { 
+  rtti_type_info_t *type;
+  uint8_t idx;
+};
+
+struct param_search_rec { 
+  char  name[14];
+  uint8_t idx: 5;
+  uint8_t level: 3;
+  void *inst; 
+  param_data_t p;
+  struct struct_node_search_rec stack[8];
+};
 
 
 #endif
