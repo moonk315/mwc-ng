@@ -84,10 +84,10 @@ inline void PID_loop_outer() {
   pid.rt.outer_pid.throttle   = update_pid16(input.ctrl.throttle, 0, &pid.active_profile->outer.throttle,  &pid.rt.outer.throttle);
 }  
 
-#define P(x)  ((uint8_t) x * 16)
-#define I(x)  ((uint8_t) x * 1024)
+#define P(x)  ((uint8_t)round(x * 16.0f))
+#define I(x)  ((uint8_t)round(x * 1024.0f))
 #define D(x)  ((uint8_t) x) 
-#define FF(x) ((uint8_t) x * 128)
+#define FF(x) ((uint8_t) round(x * 128.0f))
 
 inline void PID_Init() {
   pid.setup.profile[0].inner.roll.P = P(12.0);
