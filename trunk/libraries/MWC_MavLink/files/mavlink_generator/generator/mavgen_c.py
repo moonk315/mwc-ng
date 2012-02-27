@@ -190,7 +190,7 @@ ${{array_fields:	_mav_put_${type}_array(buf, ${wire_offset}, ${name}, ${array_le
 	mavlink_${name_lower}_t packet;
 ${{scalar_fields:	packet.${name} = ${putname};
 }}
-${{array_fields:	mav_array_memcpy(packet.${name}, ${name}, sizeof(${type})*${array_length});
+${{array_fields:        mav_array_memcpy(packet.${name}, ${name}, sizeof(${type})*${array_length});
 }}
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), &packet, ${wire_length});
 #endif
@@ -216,7 +216,7 @@ static inline uint16_t mavlink_msg_${name_lower}_pack_inline(uint8_t system_id, 
 	mavlink_${name_lower}_t *packet = (mavlink_${name_lower}_t *) _MAV_PAYLOAD_NON_CONST(msg);
 ${{scalar_fields:	packet->${name} = ${putname};
 }}
-${{array_fields:	mav_array_memcpy(packet.${name}, ${name}, sizeof(${type})*${array_length});
+${{array_fields:        mav_array_memcpy(packet->${name}, ${name}, sizeof(${type})*${array_length});
 }}
 	msg->msgid = MAVLINK_MSG_ID_${name};
 	return mavlink_finalize_message(msg, system_id, component_id, ${wire_length}${crc_extra_arg});

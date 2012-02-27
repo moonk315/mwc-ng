@@ -870,6 +870,36 @@
                <field type="uint16_t" name="errors_count3">Autopilot-specific errors</field>
                <field type="uint16_t" name="errors_count4">Autopilot-specific errors</field>
           </message>
+
+          <message id="20" name="PARAM_REQUEST_READ">
+               <description>Request to read the onboard parameter with the param_id string id. Onboard parameters are stored as key[const char*] -> value[float]. This allows to send a parameter to any other component (such as the GCS) without the need of previous knowledge of possible parameter names. Thus the same GCS can store different parameters for different autopilots. See also http://qgroundcontrol.org/parameter_interface for a full documentation of QGroundControl and IMU code.</description>
+               <field type="uint8_t" name="target_system">System ID</field>
+               <field type="uint8_t" name="target_component">Component ID</field>
+               <field type="char[16]" name="param_id">Onboard parameter id</field>
+               <field type="int16_t" name="param_index">Parameter index. Send -1 to use the param ID field as identifier</field>
+          </message>
+          <message id="21" name="PARAM_REQUEST_LIST">
+               <description>Request all parameters of this component. After his request, all parameters are emitted.</description>
+               <field type="uint8_t" name="target_system">System ID</field>
+               <field type="uint8_t" name="target_component">Component ID</field>
+          </message>
+          <message id="22" name="PARAM_VALUE">
+               <description>Emit the value of a onboard parameter. The inclusion of param_count and param_index in the message allows the recipient to keep track of received parameters and allows him to re-request missing parameters after a loss or timeout.</description>
+               <field type="char[16]" name="param_id">Onboard parameter id</field>
+               <field type="float" name="param_value">Onboard parameter value</field>
+               <field type="uint8_t" name="param_type">Onboard parameter type: see MAV_VAR enum</field>
+               <field type="uint16_t" name="param_count">Total number of onboard parameters</field>
+               <field type="uint16_t" name="param_index">Index of this onboard parameter</field>
+          </message>
+          <message id="23" name="PARAM_SET">
+               <description>Set a parameter value TEMPORARILY to RAM. It will be reset to default on system reboot. Send the ACTION MAV_ACTION_STORAGE_WRITE to PERMANENTLY write the RAM contents to EEPROM. IMPORTANT: The receiving component should acknowledge the new parameter value by sending a param_value message to all communication partners. This will also ensure that multiple GCS all have an up-to-date list of all parameters. If the sending GCS did not receive a PARAM_VALUE message within its timeout time, it should re-send the PARAM_SET message.</description>
+               <field type="uint8_t" name="target_system">System ID</field>
+               <field type="uint8_t" name="target_component">Component ID</field>
+               <field type="char[16]" name="param_id">Onboard parameter id</field>
+               <field type="float" name="param_value">Onboard parameter value</field>
+               <field type="uint8_t" name="param_type">Onboard parameter type: see MAV_VAR enum</field>
+          </message>
+
           <message id="27" name="RAW_IMU">
                <description>The RAW IMU readings for the usual 9DOF sensor setup. This message should always contain the true raw values without any scaling to allow data capture and system debugging.</description>
                <field type="uint64_t" name="time_usec">Timestamp (microseconds since UNIX epoch or microseconds since system boot)</field>
@@ -907,6 +937,82 @@
                <field type="float" name="rollspeed">Roll angular speed (rad/s)</field>
                <field type="float" name="pitchspeed">Pitch angular speed (rad/s)</field>
                <field type="float" name="yawspeed">Yaw angular speed (rad/s)</field>
+          </message>
+          <message id="34" name="RC_CHANNELS_SCALED">
+               <description>The scaled values of the RC channels received. (-100%) -10000, (0%) 0, (100%) 10000</description>
+               <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
+               <field type="uint8_t" name="port">Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.</field>
+               <field type="int16_t" name="chan1_scaled">RC channel 1 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan2_scaled">RC channel 2 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan3_scaled">RC channel 3 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan4_scaled">RC channel 4 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan5_scaled">RC channel 5 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan6_scaled">RC channel 6 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan7_scaled">RC channel 7 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="int16_t" name="chan8_scaled">RC channel 8 value scaled, (-100%) -10000, (0%) 0, (100%) 10000</field>
+               <field type="uint8_t" name="rssi">Receive signal strength indicator, 0: 0%, 255: 100%</field>
+          </message>
+          <message id="35" name="RC_CHANNELS_RAW">
+               <description>The RAW values of the RC channels received. The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%. Individual receivers/transmitters might violate this specification.</description>
+               <field type="uint32_t" name="time_boot_ms">Timestamp (milliseconds since system boot)</field>
+               <field type="uint8_t" name="port">Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.</field>
+               <field type="uint16_t" name="chan1_raw">RC channel 1 value, in microseconds</field>
+               <field type="uint16_t" name="chan2_raw">RC channel 2 value, in microseconds</field>
+               <field type="uint16_t" name="chan3_raw">RC channel 3 value, in microseconds</field>
+               <field type="uint16_t" name="chan4_raw">RC channel 4 value, in microseconds</field>
+               <field type="uint16_t" name="chan5_raw">RC channel 5 value, in microseconds</field>
+               <field type="uint16_t" name="chan6_raw">RC channel 6 value, in microseconds</field>
+               <field type="uint16_t" name="chan7_raw">RC channel 7 value, in microseconds</field>
+               <field type="uint16_t" name="chan8_raw">RC channel 8 value, in microseconds</field>
+               <field type="uint8_t" name="rssi">Receive signal strength indicator, 0: 0%, 255: 100%</field>
+          </message>
+          <message id="36" name="SERVO_OUTPUT_RAW">
+               <description>The RAW values of the servo outputs (for RC input from the remote, use the RC_CHANNELS messages). The standard PPM modulation is as follows: 1000 microseconds: 0%, 2000 microseconds: 100%.</description>
+               <field type="uint32_t" name="time_usec">Timestamp (since UNIX epoch or microseconds since system boot)</field>
+               <field type="uint8_t" name="port">Servo output port (set of 8 outputs = 1 port). Most MAVs will just use one, but this allows to encode more than 8 servos.</field>
+               <field type="uint16_t" name="servo1_raw">Servo output 1 value, in microseconds</field>
+               <field type="uint16_t" name="servo2_raw">Servo output 2 value, in microseconds</field>
+               <field type="uint16_t" name="servo3_raw">Servo output 3 value, in microseconds</field>
+               <field type="uint16_t" name="servo4_raw">Servo output 4 value, in microseconds</field>
+               <field type="uint16_t" name="servo5_raw">Servo output 5 value, in microseconds</field>
+               <field type="uint16_t" name="servo6_raw">Servo output 6 value, in microseconds</field>
+               <field type="uint16_t" name="servo7_raw">Servo output 7 value, in microseconds</field>
+               <field type="uint16_t" name="servo8_raw">Servo output 8 value, in microseconds</field>
+          </message>
+          <message id="66" name="REQUEST_DATA_STREAM">
+               <field type="uint8_t" name="target_system">The target requested to send the message stream.</field>
+               <field type="uint8_t" name="target_component">The target requested to send the message stream.</field>
+               <field type="uint8_t" name="req_stream_id">The ID of the requested data stream</field>
+               <field type="uint16_t" name="req_message_rate">The requested interval between two messages of this type</field>
+               <field type="uint8_t" name="start_stop">1 to start sending, 0 to stop sending.</field>
+          </message>
+          <message id="74" name="VFR_HUD">
+               <description>Metrics typically displayed on a HUD for fixed wing aircraft</description>
+               <field type="float" name="airspeed">Current airspeed in m/s</field>
+               <field type="float" name="groundspeed">Current ground speed in m/s</field>
+               <field type="int16_t" name="heading">Current heading in degrees, in compass units (0..360, 0=north)</field>
+               <field type="uint16_t" name="throttle">Current throttle setting in integer percent, 0 to 100</field>
+               <field type="float" name="alt">Current altitude (MSL), in meters</field>
+               <field type="float" name="climb">Current climb rate in meters/second</field>
+          </message>
+          <message id="76" name="COMMAND_LONG">
+               <description>Send a command with up to four parameters to the MAV</description>
+               <field type="uint8_t" name="target_system">System which should execute the command</field>
+               <field type="uint8_t" name="target_component">Component which should execute the command, 0 for all components</field>
+               <field type="uint16_t" name="command">Command ID, as defined by MAV_CMD enum.</field>
+               <field type="uint8_t" name="confirmation">0: First transmission of this command. 1-255: Confirmation transmissions (e.g. for kill command)</field>
+               <field type="float" name="param1">Parameter 1, as defined by MAV_CMD enum.</field>
+               <field type="float" name="param2">Parameter 2, as defined by MAV_CMD enum.</field>
+               <field type="float" name="param3">Parameter 3, as defined by MAV_CMD enum.</field>
+               <field type="float" name="param4">Parameter 4, as defined by MAV_CMD enum.</field>
+               <field type="float" name="param5">Parameter 5, as defined by MAV_CMD enum.</field>
+               <field type="float" name="param6">Parameter 6, as defined by MAV_CMD enum.</field>
+               <field type="float" name="param7">Parameter 7, as defined by MAV_CMD enum.</field>
+          </message>
+          <message id="77" name="COMMAND_ACK">
+               <description>Report status of a command. Includes feedback wether the command was executed</description>
+               <field type="uint16_t" name="command">Command ID, as defined by MAV_CMD enum.</field>
+               <field type="uint8_t" name="result">See MAV_RESULT enum</field>
           </message>
     </messages>
 </mavlink>
