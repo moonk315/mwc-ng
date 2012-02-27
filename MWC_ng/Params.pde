@@ -16,23 +16,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>. 
  */
 
-enum enum_param_type_kind {
-    PARAM_TYPE_KIND_U8,
-    PARAM_TYPE_KIND_U16,
-    PARAM_TYPE_KIND_I16,
-    PARAM_TYPE_KIND_U32,
-    PARAM_TYPE_KIND_I32,
-    PARAM_TYPE_KIND_STRUCT,
-    PARAM_TYPE_KIND_ARRAY,
-};
-
-enum enum_param_type_encoding {
-    PARAM_TYPE_ENC_GENERIC,
-    PARAM_TYPE_ENC_FP_4x4,
-    PARAM_TYPE_ENC_FP_0x10,
-    PARAM_TYPE_ENC_FP_1x7,
-};
-
 // Scalar types
 rtti_type_info_t rtti_u8  = {PARAM_TYPE_KIND_U8,  1,  {0, 0},};  
 rtti_type_info_t rtti_u16 = {PARAM_TYPE_KIND_U16, 2,  {0, 0},};  
@@ -68,11 +51,11 @@ rtti_struct_member_t rtti_pid_profile_list_members[] PROGMEM = {
   {"2",   &rtti_pid_profile, PARAM_TYPE_ENC_GENERIC},
   {"3",   &rtti_pid_profile, PARAM_TYPE_ENC_GENERIC},
 };  
-rtti_type_info_t rtti_pid_profile_list = {PARAM_TYPE_KIND_ARRAY, sizeof(pid.setup.profile), {4 , rtti_pid_profile_list_members},};  
+rtti_type_info_t rtti_pid_profile_list = {PARAM_TYPE_KIND_ARRAY, /*sizeof(pid.setup.profile)*/0, {4 , rtti_pid_profile_list_members},};  
 
 // RC Params
 rtti_struct_member_t rtti_input_setup_members[] PROGMEM = { 
-  {"RATE",   &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
+  {"RATE",   &rtti_u8, PARAM_TYPE_ENC_RCR}, 
   {"EXPO",   &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
 };  
 rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup), {sizeof(rtti_input_setup_members)/sizeof(rtti_struct_member_t ), rtti_input_setup_members},};  
@@ -81,6 +64,7 @@ rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup)
 param_data_t sys_rtti_info[] PROGMEM = {
   {"PID" ,  &rtti_pid_profile_list, pid.setup.profile},
   {"RC" ,   &rtti_input_setup,      &input.setup},
+  {"BVSCAL",&rtti_u8 ,              &batt_voltage_scaler},
   {"SYSID", &rtti_u8 ,              &mavlink_system.sysid},
 };
 const uint8_t sys_rtti_info_cnt = sizeof(sys_rtti_info) / sizeof(param_data_t);
@@ -93,31 +77,35 @@ uint8_t param_search_first(param_search_rec_t *sr) {
   memcpy_P(&sr->p, &sys_rtti_info[0], sizeof(sr->p));
   sr->inst = sr->p.var;
   sr->stack[0].type = sr->p.type;
+  sr->stack[0].encoding = PARAM_TYPE_ENC_GENERIC;
   strcpy(sr->name, sr->p.name);
-  if (i_scalar(sr->stack[0].type)) return 1;
+  if (is_scalar(sr->stack[0].type)) return 1;
   return param_search_next(sr);
 }  
 
 uint8_t param_search_next(param_search_rec_t *sr) {
   rtti_struct_member_t memb;
+  struct struct_node_search_rec *st;
   // move pointer in case last member was scalar
-  if (i_scalar(sr->stack[sr->level].type)) {
-    // TODO: Check code and fix hack
+  if (is_scalar(sr->stack[sr->level].type)) {
     char *ptr = (char *)sr->inst;
     ptr += sr->stack[sr->level].type->_size;
     sr->inst = ptr;
   }  
   for (;;) {
     // scan members
-    if (sr->stack[sr->level].idx < sr->stack[sr->level].type->members.cnt) {
-      memcpy_P(&memb, &sr->stack[sr->level].type->members.memb[sr->stack[sr->level].idx], sizeof(rtti_struct_member_t));
-      if (sr->stack[sr->level].type->kind != PARAM_TYPE_KIND_ARRAY) strcat(sr->name, "_"); 
+    st = &sr->stack[sr->level]; 
+    if (st->idx < st->type->members.cnt) {
+      memcpy_P(&memb, &st->type->members.memb[st->idx], sizeof(rtti_struct_member_t));
+      if (st->type->kind != PARAM_TYPE_KIND_ARRAY) strcat_P(sr->name, PSTR("_")); 
       strcat(sr->name, memb.name);
       sr->stack[sr->level].idx++;
       sr->level++;
-      sr->stack[sr->level].type = memb.type;
-      sr->stack[sr->level].idx = 0;
-      if (i_scalar(sr->stack[sr->level].type)) return 1;
+      st = &sr->stack[sr->level]; 
+      st->type = memb.type;
+      st->idx = 0;
+      st->encoding = memb.encoding;
+      if (is_scalar(st->type)) return 1;
     } else {
       if (sr->level == 0) {
         // next parameter
@@ -126,18 +114,21 @@ uint8_t param_search_next(param_search_rec_t *sr) {
         memset(sr->name, 0, sizeof(sr->name));
         memcpy_P(&sr->p, &sys_rtti_info[sr->idx], sizeof(sr->p));
         sr->inst = sr->p.var;
-        sr->stack[0].type = sr->p.type;
-        sr->stack[0].idx = 0;
+        st = &sr->stack[0]; 
+        st->type = sr->p.type;
+        st->idx = 0;
+        st->encoding = PARAM_TYPE_ENC_GENERIC;
         strcpy(sr->name, sr->p.name);
-        if (i_scalar(sr->stack[0].type)) return 1;
+        if (is_scalar(st->type)) return 1;
       } else {
         sr->level--;
         // regenerate name from stack
         memset(sr->name, 0, sizeof(sr->name));
         strcpy(sr->name, sr->p.name);
         for (uint8_t i = 0; i < sr->level; i ++) {
-          memcpy_P(&memb, &sr->stack[i].type->members.memb[sr->stack[i].idx - 1], sizeof(rtti_struct_member_t));
-          if (sr->stack[i].type->kind != PARAM_TYPE_KIND_ARRAY) strcat(sr->name, "_"); 
+          st = &sr->stack[i];
+          memcpy_P(&memb, &st->type->members.memb[st->idx - 1], sizeof(rtti_struct_member_t));
+          if (st->type->kind != PARAM_TYPE_KIND_ARRAY) strcat_P(sr->name, PSTR("_")); 
           strcat(sr->name, memb.name);
         }
       }  
@@ -145,44 +136,96 @@ uint8_t param_search_next(param_search_rec_t *sr) {
   }  
 }  
 
-float scalar_to_float(rtti_type_info_t *t, void *inst) {
-  switch (t->kind) {
-    case PARAM_TYPE_KIND_U8:  return *(uint8_t *)inst;
-    case PARAM_TYPE_KIND_I32: return *(int32_t *)inst;
+inline uint8_t param_get_encoding(param_search_rec_t *sr) {
+  return sr->stack[sr->level].encoding;
+}
+
+inline rtti_type_info_t *param_get_type(param_search_rec_t *sr) {
+  return sr->stack[sr->level].type;
+}
+
+inline void *param_get_inst(param_search_rec_t *sr) {
+  return sr->inst;
+}  
+
+inline float param_get_val(param_search_rec_t *sr) {
+  return scalar_to_float(param_get_type(sr), param_get_encoding(sr), param_get_inst(sr)); 
+}  
+
+inline void param_set_val(param_search_rec_t *sr, float val) {
+  float_to_scalar(param_get_type(sr), val, param_get_encoding(sr), param_get_inst(sr)); 
+}  
+
+inline uint8_t param_get_type_kind(param_search_rec_t *sr) {
+  return param_get_type(sr)->kind;
+}
+
+inline uint8_t param_is_float(param_search_rec_t *sr) {
+  return (param_get_encoding(sr) != PARAM_TYPE_ENC_GENERIC);
+}
+
+uint8_t param_search_by_name(param_search_rec_t *sr, char *name) {
+  if (param_search_first(sr)) {
+    if (strcmp(sr->name, name) == 0) return 1;
+    while (param_search_next(sr)) {
+      if (strcmp(sr->name, name) == 0) return 1;
+    }  
+  } 
+  return 0;
+}  
+
+uint8_t param_search_by_idx(param_search_rec_t *sr, uint8_t idx) {
+  uint8_t cnt = 0;
+  if (param_search_first(sr)) {
+    if (cnt == idx) return 1;
+    cnt++;
+    while (param_search_next(sr)) {
+      if (cnt == idx) return 1;
+      cnt++;
+    }  
   }  
-  return 0.0f;
+  return 0;
 }  
 
-inline uint8_t i_scalar(rtti_type_info_t *t) {
-  if ((t->kind != PARAM_TYPE_KIND_STRUCT) && (t->kind != PARAM_TYPE_KIND_ARRAY)) 
-    return 1;
-  else
-   return 0;  
+float scalar_to_float(rtti_type_info_t *t, uint8_t encoding, void *inst) {
+  float res;
+  switch (t->kind) {
+    case PARAM_TYPE_KIND_U8:  res = *(uint8_t *)inst; break;
+    case PARAM_TYPE_KIND_I32: res = *(int32_t *)inst; break;
+    default: res = 0.0f;
+  }  
+  switch (encoding) {
+    case PARAM_TYPE_ENC_FP_4x4:  res /= 16.0f;   break;
+    case PARAM_TYPE_ENC_FP_0x10: res /= 1024.0f; break;
+    case PARAM_TYPE_ENC_FP_1x7:  res /= 128.0f;  break;
+    case PARAM_TYPE_ENC_RCR:     res /= 0.5f;    break;
+  }  
+ return res; 
 }  
 
-void params_expand(char *cont, rtti_type_info_t *t, void *inst) {
-  if (i_scalar(t)) dprintf("value: %d \n", round(scalar_to_float(t, inst)));
+void float_to_scalar(rtti_type_info_t *t, float val, uint8_t encoding, void *inst) {
+  float tmp = 1.0f;
+  switch (encoding) {
+    case PARAM_TYPE_ENC_FP_4x4:  tmp = 16.0f; break;
+    case PARAM_TYPE_ENC_FP_0x10: tmp = 1024.0f; break;
+    case PARAM_TYPE_ENC_FP_1x7:  tmp = 128.0f; break; 
+    case PARAM_TYPE_ENC_RCR:     tmp = 0.5f; break; 
+  }  
+  val = round(val * tmp);
+  switch (t->kind) {
+    case PARAM_TYPE_KIND_U8:  *(uint8_t *)inst = val; break;
+    case PARAM_TYPE_KIND_I32: *(int32_t *)inst = val; break;
+  }  
 }  
 
-void params_build_scalar_list() {
-  /*
-  for (uint8_t i = 0; i < sys_rtti_info_cnt; i++) {
-    param_data_t p;
-    memcpy_P(&p, &sys_rtti_info[i], sizeof(p));
-    dprintf("instance: %s \n", p.name);
-    params_expand(p.name, p.type, p.var);
-  } */
-  param_search_rec_t sr;
-  param_search_first(&sr);  
-  dprintf("Param: %s = %ld \n", sr.name, (int32_t)round(scalar_to_float(sr.stack[sr.level].type, sr.inst)));
-  while (param_search_next(&sr))
-    dprintf("Param: %s = %ld \n", sr.name, (int32_t)round(scalar_to_float(sr.stack[sr.level].type, sr.inst)));
+uint8_t is_scalar(rtti_type_info_t *t) {
+  return ((t->kind != PARAM_TYPE_KIND_STRUCT) && (t->kind != PARAM_TYPE_KIND_ARRAY));
 }  
 
 inline void Params_Init() {
   param_search_rec_t sr;
   uint8_t cnt = 0;
-  if (param_search_next(&sr)) {
+  if (param_search_first(&sr)) {
     cnt++;
     while (param_search_next(&sr))
       cnt++;

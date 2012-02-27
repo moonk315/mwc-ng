@@ -3,8 +3,8 @@
 // Arduino Pro Mini 16 Mhz, ATMega328 
 // GUI Serial
 #define AVR_USART_PORT  0
-#define USART_RX_BUFFER_SIZE 8
-#define USART_TX_BUFFER_SIZE 8
+#define USART_RX_BUFFER_SIZE 32
+#define USART_TX_BUFFER_SIZE 32
 #include "avr_usart.h"
 inline void GUI_serial_open(uint32_t baud) {avr_UsartOpen_0(baud);}  
 inline void GUI_serial_close() {avr_UsartClose_0();}  
@@ -76,7 +76,7 @@ inline void __delay_us(double __us) {_delay_us(__us);};
 
 // Timers
 volatile uint16_t timer1_overflow_count = 0;
-static uint16_t Timer1Ovf = 2020*2;
+static uint16_t Timer1Ovf = 2048*2;//2020*2;
 //*22500*2;//*2020*2;
 
 
@@ -113,6 +113,7 @@ inline void AttachPPM() {
 }  
 
 inline void AttachPPMSerial() {
+  PORTD  |= _BV(2);
   EICRA = (EICRA & ~((1 << ISC00) | (1 << ISC01))) | (3 << ISC00);
   EIMSK |= (1 << INT0);
 }  
@@ -236,6 +237,23 @@ inline void DebugLEDToggle() {
   PINC |= _BV(1);
 } 
 
+inline void StartBatteryVoltageMeasurement() {
+  ADMUX = _BV(REFS0);
+  ADCSRA |= _BV(ADSC);
+}
+
+inline uint8_t IsBatteryVoltageMeasurementFinished(){
+  return !bit_is_set(ADCSRA, ADSC);
+}  
+
+int16_t GetBatteryVoltage(){
+  static int16_t lpf;
+  uint8_t low, high;
+  low  = ADCL;  high = ADCH;
+  int16_t val = (((high << 8) | low) << 4);
+  lpf += (val -  lpf) >> 2;
+  return lpf;
+}  
 
 void Board_Idle() {
   avr_UsartPollWrite_0();
@@ -263,6 +281,10 @@ inline void Board_Init() {
   OCR2A = 0; OCR2B = 0;
   TCCR2A |= (_BV(COM2A1) | _BV(COM2B1));
   pinMode(11, OUTPUT); pinMode(3, OUTPUT);
+  // Sync Timers
+  TCNT0 = 0;
+  TCNT1 = 0;
+  TCNT2 = 0;
 
   // TWI init  
   PORTC |= 1<<4; PORTC |= 1<<5;   // PIN A4&A5 (SDA&SCL)
@@ -279,6 +301,11 @@ inline void Board_Init() {
   pinMode (8, OUTPUT);
   // Debug
   pinMode (A1, OUTPUT);
+  // Battery Monitor 
+  pinMode (A0, INPUT); 
+  DIDR0 |= _BV(ADC0D);
+  ADCSRA |= _BV(ADEN);
+  ADCSRA |= _BV(ADSC);
 }  
 #endif
 

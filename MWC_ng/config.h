@@ -24,23 +24,18 @@
 #define DEADBAND_RP  2
 #define DEADBAND_YAW 5 
 
-#define ACC  _BMA180_
+#define ACC  _ADXL345_
 #define GYRO _ITG3200_
 #define MAG  _NONE_
 #define BARO _NONE_
 
-#define ITG3200
 #define ITG3200_LPF_188HZ
-//#define L3G4200D
-
-/* I2C accelerometer */
-//#define ADXL345
-//#define BMA020
-#define BMA180
+#define ADXL345_ADDRESS 0xA6
 
 #define MIDRC 1500
 
-#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  X; imu.acc.fr.y  = -Y; imu.acc.fr.z  = Z;}
+//#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  X; imu.acc.fr.y  = -Y; imu.acc.fr.z  = Z;}
+#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  -X; imu.acc.fr.y  = Y; imu.acc.fr.z  = Z;}
 #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = X; imu.gyro_raw.eul.pitch =  Y; imu.gyro_raw.eul.yaw = -Z;}
 #define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  = -Y; magADC[PITCH]  = X; magADC[YAW]  = -Z;}
 

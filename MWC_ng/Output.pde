@@ -45,7 +45,7 @@
 #define PIDMIX(X,Y,Z) (PWM_ESC_IDLE_THROTTLE + pid.ctrl.throttle + pid.ctrl.roll*X + pid.ctrl.pitch*Y + YAW_DIRECTION * pid.ctrl.yaw*Z)
 
 void process_frame_mixes() {
-  int16_t maxMotor, minMotor,a;
+  uint16_t maxMotor, minMotor;
   #if NUMBER_MOTOR > 3
     //prevent "yaw jump" during yaw correction
     // !!!! WTF !!!!
