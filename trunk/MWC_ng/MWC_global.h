@@ -1,8 +1,49 @@
+/**
+ * MultiWii NG 0.1 - 2012
+ * Global definitions
+ *
+ * This program is free software: you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation, either version 3 of the License, or 
+ * (at your option) any later version. 
+ *
+ * This program is distributed in the hope that it will be useful, 
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+ * GNU General Public License for more details. 
+ *
+ * You should have received a copy of the GNU General Public License 
+ * along with this program. If not, see <http://www.gnu.org/licenses/>. 
+ */
+
 #ifndef WMC_global_h
 #define WMC_global_h
 
 #include <avr/pgmspace.h>
 
+////////////////////////////////////////////////////////////////////////////////
+/// Setup GCC environment
+//  Turn on/off warnings of interest.
+//
+// These warnings are normally suppressed by the Arduino IDE,
+// but with some minor hacks it's possible to have warnings
+// emitted.  This helps greatly when diagnosing subtle issues.
+//
+#pragma GCC diagnostic warning "-Wall"
+#pragma GCC diagnostic warning "-Wextra"
+#pragma GCC diagnostic warning "-Wlogical-op"
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+
+// Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734 
+#ifdef PROGMEM 
+  #undef PROGMEM 
+  #define PROGMEM __attribute__((section(".progmem.data"))) 
+#endif 
+
+////////////////////////////////////////////////////////////////////////////////
+/// 
+//  Preprocessor constants
+//
 #define _NONE_         000
 #define _PROMINI_      100
 #define _PROMINI_HEX_  200
@@ -16,6 +57,7 @@
 #define _QUADX_       1000
 #define _ITG3200_     1100
 #define _BMA180_      1200
+#define _ADXL345_     1300
 
 
 #define STICK_STATE_TH_LOW     0
@@ -34,18 +76,10 @@
 #define STICK_STATE_EXIT_CONF  (_BV(STICK_STATE_TH_LOW) | _BV(STICK_STATE_YAW_LOW)  | _BV(STICK_STATE_PITCH_HIGH))
 
 
-#define INNER_CTRL_LOOP_TIME    4000
-#define OUTER_CTRL_LOOP_TIME    INNER_CTRL_LOOP_TIME * 4
-#define ACC_CTRL_LOOP_TIME      20000
-#define SERVICE_LOOP_TIME       200000
-
-
-
-// Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734 
-#ifdef PROGMEM 
-  #undef PROGMEM 
-  #define PROGMEM __attribute__((section(".progmem.data"))) 
-#endif 
+#define INNER_CTRL_LOOP_TIME    (4000L)
+#define OUTER_CTRL_LOOP_TIME    (INNER_CTRL_LOOP_TIME * 3)
+#define ACC_CTRL_LOOP_TIME      (20000L)
+#define SERVICE_LOOP_TIME       (200000L)
 
 enum enym_system_states {
     SYS_STATE_IDLE,
@@ -80,9 +114,7 @@ enum enum_control_channels {
     CTRL_CHANNEL_YAW,
     CTRL_CHANNEL_LAST,
 };
-
 #define CTRL_NUMBER_OF_CHANNELS (CTRL_CHANNEL_LAST)
-
 
 enum enum_led_patterns {
     LED_PATTERN_OFF,
@@ -94,7 +126,6 @@ enum enum_led_patterns {
     LED_PATTERN_CALIBRATION_START,
     LED_PATTERN_LAST,
 };
-
 #define LED_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
 
 uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
@@ -107,7 +138,6 @@ uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
   0b11011011,
 };  
 
-
 enum enum_beep_patterns {
     BEEP_PATTERN_OFF,
     BEEP_PATTERN_FAST_BLINK,
@@ -117,7 +147,6 @@ enum enum_beep_patterns {
     BEEP_PATTERN_CALIBRATION_END,
     BEEP_PATTERN_LAST,
 };
-
 #define BEEP_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
 
 uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
@@ -128,11 +157,6 @@ uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
   0b11111111,
   0b00010101,
 };  
-
-
-//#define ROLL       0
-//#define PITCH      1
-//#define YAW        2
 
 typedef struct rx_data rx_data_t;
 struct rx_data { 
@@ -192,7 +216,6 @@ struct imu_data {
   uint16_t mag_off_cal;
 };  
 imu_data_t imu;
-
 
 typedef struct {float x, y, z;} fp_vector_t;
 
@@ -293,6 +316,8 @@ static uint32_t current_time_us;
 static uint32_t current_time_ms;
 static uint8_t  cpu_util_pct;
 static uint8_t  sys_param_values_cnt;
+static uint8_t  batt_voltage_scaler;
+static int16_t batt_voltage;
 
 // Core Function prototypes
 
@@ -379,6 +404,24 @@ uint8_t timer_expired(timer_big_t *t, uint16_t systick = __systick()) {
 inline static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt));
 inline static PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt));
 
+enum enum_param_type_kind {
+    PARAM_TYPE_KIND_U8,
+    PARAM_TYPE_KIND_U16,
+    PARAM_TYPE_KIND_I16,
+    PARAM_TYPE_KIND_U32,
+    PARAM_TYPE_KIND_I32,
+    PARAM_TYPE_KIND_STRUCT,
+    PARAM_TYPE_KIND_ARRAY,
+};
+
+enum enum_param_type_encoding {
+    PARAM_TYPE_ENC_GENERIC,
+    PARAM_TYPE_ENC_FP_4x4,
+    PARAM_TYPE_ENC_FP_0x10,
+    PARAM_TYPE_ENC_FP_1x7,
+    PARAM_TYPE_ENC_RCR,
+};
+
 typedef struct rtti_type_info rtti_type_info_t;
 typedef struct rtti_member_list rtti_member_list_t;
 typedef struct rtti_type_info rtti_type_info_t;
@@ -413,17 +456,17 @@ struct param_data {
 struct struct_node_search_rec { 
   rtti_type_info_t *type;
   uint8_t idx;
+  uint8_t encoding;
 };
 
 struct param_search_rec { 
-  char  name[14];
+  char  name[16];
   uint8_t idx: 5;
   uint8_t level: 3;
   void *inst; 
   param_data_t p;
   struct struct_node_search_rec stack[8];
 };
-
 
 #endif
 

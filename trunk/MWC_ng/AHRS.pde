@@ -21,7 +21,7 @@
 /* Increasing this value would reduce ACC noise (visible in GUI), but would increase ACC lag time*/
 /* Comment this if  you do not want filter at all.*/
 /* Default WMC value: 8*/
-#define ACC_LPF_FACTOR 8
+#define ACC_LPF_FACTOR 16
 
 /* Set the Low Pass Filter factor for Magnetometer */
 /* Increasing this value would reduce Magnetometer noise (not visible in GUI), but would increase Magnetometer lag time*/
@@ -32,7 +32,7 @@
 /* Set the Gyro Weight for Gyro/Acc complementary filter */
 /* Increasing this value would reduce and delay Acc influence on the output of the filter*/
 /* Default WMC value: 300*/
-#define GYR_CMPF_FACTOR 75.0f
+#define GYR_CMPF_FACTOR 210.0f
 
 /* Set the Gyro Weight for Gyro/Magnetometer complementary filter */
 /* Increasing this value would reduce and delay Magnetometer influence on the output of the filter*/
@@ -46,8 +46,8 @@
 #define ssin(val) (val)
 #define scos(val) 1.0f
 
-//#define GYRO_LSB   14.375f 
-#define GYRO_LSB   13.7f 
+#define GYRO_LSB   14.375f 
+//#define GYRO_LSB   13.7f 
 #define GYRO_SCALE ((PI)/(GYRO_LSB * 180.0f * 1000000.0f) * OUTER_CTRL_LOOP_TIME / 256.0)  
 
 void rotate_vectors(){
@@ -70,7 +70,7 @@ void rotate_vectors(){
     EstM.V.X =  ssin(deltaGyroAngle) * EstM.V.Z + scos(deltaGyroAngle) * EstM.V.X;
   #endif 
   // Rotate Estimated vector(s), YAW
-  deltaGyroAngle  = imu.gyro_ahrs.eul.yaw * GYRO_SCALE;
+  deltaGyroAngle  = -imu.gyro_ahrs.eul.yaw * GYRO_SCALE;
   eg.x =  scos(deltaGyroAngle) * eg.x - ssin(deltaGyroAngle) * eg.y;
   eg.y =  ssin(deltaGyroAngle) * eg.x + scos(deltaGyroAngle) * eg.y;
   #if MAG
@@ -94,14 +94,18 @@ void pre_filter_acc(){
   ahrs.acc_grav.z = ahrs.acc_grav.z * (1.0f - INV_LPF_CONST) + imu.acc.fr.z * INV_LPF_CONST;
 }  
 
-
-inline void AHRS_Init() {
+void ahrs_reset() __attribute__ ((noinline));
+void ahrs_reset() {
   ahrs.est_grav.x = 0;
   ahrs.est_grav.y = 0;
   ahrs.est_grav.z = imu.acc_1g;
   ahrs.acc_grav.x = 0;
   ahrs.acc_grav.y = 0;
   ahrs.acc_grav.z = imu.acc_1g;
+}  
+
+inline void AHRS_Init() {
+  ahrs_reset();
 }  
 
 inline void AHRS_loop_acc() {

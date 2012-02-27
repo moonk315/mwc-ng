@@ -40,6 +40,7 @@ inline void beep(uint8_t pattern) {
  inline void process_calibrating_state() {
   blink_led(LED_PATTERN_FAST_BLINK); 
   if ((!imu.acc_off_cal) && (!imu.gyro_off_cal)) {
+     ahrs_reset();
      flight.sys_state = SYS_STATE_IDLE;
      blink_led(LED_PATTERN_CALIBRATION_END);
      beep(BEEP_PATTERN_CALIBRATION_END);

@@ -22,7 +22,7 @@
 #include "MWC_Debug.h"
 
 void debug_print_system_state() {
-  dprintf("\033[1;1H");
+  //dprintf("\033[1;1H");
   //dprintf("PPM  (th, r, p, y, aux1): %8d, %8d, %8d, %8d  \n",  get_raw_ppm_data_no_block(RX_CHANNEL_THROTTLE), get_raw_ppm_data_no_block(RX_CHANNEL_ROLL), get_raw_ppm_data_no_block(RX_CHANNEL_PITCH), get_raw_ppm_data_no_block(RX_CHANNEL_YAW), get_raw_ppm_data_no_block(RX_CHANNEL_AUX1));
   //dprintf("RX:  (th, r, p, y, aux1, aux2, aux3, aux4): %8d, %8d, %8d, %8d, %8d, %8d, %8d, %8d  \n",  rx_data.throttle, rx_data.roll, rx_data.pitch, rx_data.yaw, rx_data.aux1, rx_data.aux2, rx_data.aux3, rx_data.aux4);
   //dprintf("Gyro (r, p, y): %8d, %8d, %8d  \n",  imu.gyro.eul.roll, imu.gyro.eul.pitch, imu.gyro.eul.yaw);
@@ -35,8 +35,8 @@ void debug_print_system_state() {
   //dprintf("Fl. Ctrl: (st): %x \n",  flight.sys_state);
   //dprintf("PID:   (th, r, p, y): %8d, %8d, %8d, %8d  \n",  pid.ctrl.throttle, pid.ctrl.roll, pid.ctrl.pitch, pid.ctrl.yaw);
   //dprintf("Out.m[]:(0, 1, 2, 3): %8d, %8d, %8d, %8d  \n",  out.motor[0], out.motor[1], out.motor[2], out.motor[3]);
-  params_build_scalar_list();
 }  
+
 
 void send_message(uint8_t msg) {
   
@@ -45,6 +45,7 @@ void send_message(uint8_t msg) {
 
 void setup() { 
   cli();  
+  batt_voltage_scaler = 127;
   Board_Init();
   Debug_Init();
   RX_Init();
@@ -56,9 +57,9 @@ void setup() {
   FlightControl_Init();
   Params_Init();
   MavLink_Init();
+  Storage_Init();
   sei();
-  imu.acc_off_cal = 100;
-  imu.gyro_off_cal = 512;
+  imu_calibrate_gyro();
 }
 
 static struct timer_small timer_inner_ctrl = {0, INNER_CTRL_LOOP_TIME * 2};  
@@ -131,6 +132,11 @@ static PT_THREAD(thread_service(struct pt *pt, uint16_t dt)) {
   uint8_t idle_pct = ((uint32_t)delta << 8) / IDLE_LOOP_CNT;
   cpu_util_pct = 255 - idle_pct;
   main_loop_cnt = 0;
+  // Battery Monitor
+  if (IsBatteryVoltageMeasurementFinished()) {
+    batt_voltage =  ((int32_t) GetBatteryVoltage() * batt_voltage_scaler) >> 7;
+    StartBatteryVoltageMeasurement();
+  }  
   debug_print_system_state();
   PT_END(pt);
 }  

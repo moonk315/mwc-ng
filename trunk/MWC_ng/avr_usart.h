@@ -48,7 +48,7 @@ uint8_t __NAME__(UsartRead)() {
 }
 
 uint8_t __NAME__(UsartAvailable)() {
-  return (USART_RX_BUFFER_SIZE + __NAME__(usartHeadRX) - __NAME__(usartTailRX)) % USART_RX_BUFFER_SIZE;
+  return (uint8_t)(USART_RX_BUFFER_SIZE + __NAME__(usartHeadRX) - __NAME__(usartTailRX)) % USART_RX_BUFFER_SIZE;
 }
 
 void __NAME__(UsartPollWrite)(){
