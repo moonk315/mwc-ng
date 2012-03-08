@@ -76,7 +76,7 @@ inline void __delay_us(double __us) {_delay_us(__us);};
 
 // Timers
 volatile uint16_t timer1_overflow_count = 0;
-static uint16_t Timer1Ovf = 2048*2;//2020*2;
+static uint16_t Timer1Ovf = 2040*2-1;//2020*2;
 //*22500*2;//*2020*2;
 
 
@@ -261,11 +261,12 @@ void Board_Idle() {
 
 inline void Board_Init() {
   PT_SEM_INIT(&i2c_bus_mutex, 1); 
+
   // Timer0
-  OCR0A = 0; OCR0B = 0;
-  TCCR0A |= (_BV(COM0A1) | _BV(COM0B1));
+  OCR0A = 2; OCR0B = 2;
+  TCCR0A = (_BV(COM0A1) | _BV(COM0B1) | _BV(WGM00));
   TIMSK0 = 0;
-  pinMode(5, OUTPUT); pinMode(6, OUTPUT);
+  DDRD |= _BV(5) | _BV(6);
   
   // Timer1
   TCCR1A = _BV(COM1A1) | 
@@ -275,16 +276,15 @@ inline void Board_Init() {
            _BV(CS11);                /* div 8 clock prescaler */  
   ICR1 = Timer1Ovf; OCR1A = 0; OCR1B = 0;
   TIMSK1 |= _BV(TOIE1);   
-  pinMode(9, OUTPUT); pinMode(10, OUTPUT);
+  DDRB |= _BV(1) | _BV(2);
 
   // Timer2
   OCR2A = 0; OCR2B = 0;
   TCCR2A |= (_BV(COM2A1) | _BV(COM2B1));
-  pinMode(11, OUTPUT); pinMode(3, OUTPUT);
+  DDRD |= _BV(3); DDRB |= _BV(3);
   // Sync Timers
-  TCNT0 = 0;
-  TCNT1 = 0;
-  TCNT2 = 0;
+  GTCCR |= _BV(PSRSYNC);
+  TCNT0 = 1; TCNT2 = 0; TCNT1 = 16;
 
   // TWI init  
   PORTC |= 1<<4; PORTC |= 1<<5;   // PIN A4&A5 (SDA&SCL)
