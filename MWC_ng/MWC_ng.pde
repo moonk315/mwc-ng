@@ -76,7 +76,7 @@ static struct pt thread_gyro_read_pt;
 static struct pt thread_acc_read_pt;
 static struct pt_sem i2c_bus_mutex;
 
-#define IDLE_LOOP_PERIOD 33 // measured
+#define IDLE_LOOP_PERIOD 20 // measured
 #define IDLE_LOOP_CNT (SERVICE_LOOP_TIME / IDLE_LOOP_PERIOD)
 static uint16_t main_loop_cnt;
 
