@@ -124,6 +124,7 @@ enum enum_led_patterns {
     LED_PATTERN_ON,
     LED_PATTERN_CALIBRATION_END,
     LED_PATTERN_CALIBRATION_START,
+    LED_PATTERN_SHORT_BANK,
     LED_PATTERN_LAST,
 };
 #define LED_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
@@ -136,6 +137,7 @@ uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
   0b11111111,
   0b00010101,
   0b11011011,
+  0b11100111,
 };  
 
 enum enum_beep_patterns {
@@ -145,9 +147,11 @@ enum enum_beep_patterns {
     BEEP_PATTERN_SHORT_BLINK,
     BEEP_PATTERN_ON,
     BEEP_PATTERN_CALIBRATION_END,
+    BEEP_PATTERN_VBAT_W1,
+    BEEP_PATTERN_VBAT_W2,
     BEEP_PATTERN_LAST,
 };
-#define BEEP_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
+#define BEEP_NUMBER_OF_PATTERNS (BEEP_PATTERN_LAST)
 
 uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
   0b00000000,
@@ -156,6 +160,8 @@ uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
   0b00000001,
   0b11111111,
   0b00010101,
+  0b01001001,
+  0b01010101,
 };  
 
 typedef struct rx_data rx_data_t;
@@ -300,14 +306,26 @@ struct out_control_data {
 };
 out_control_data_t out;
 
+typedef struct vbat_data vbat_data_t;
+struct vbat_data {
+  uint8_t  voltage_scaler;
+  int16_t  voltage_warn1;
+  int16_t  voltage_warn2;
+};  
+
+
 typedef struct flight_control_data flight_control_data_t;
 struct flight_control_data {
+  struct {
+    vbat_data_t vbat;
+  } setup;
   uint8_t  sys_state;
   uint8_t  delay_cnt;
   uint8_t  led_pattern_req;
   uint8_t  led_pattern;
   uint8_t  beep_pattern_req;
   uint8_t  beep_pattern;
+  
 };
 flight_control_data_t flight;
 
@@ -316,8 +334,7 @@ static uint32_t current_time_us;
 static uint32_t current_time_ms;
 static uint8_t  cpu_util_pct;
 static uint8_t  sys_param_values_cnt;
-static uint8_t  batt_voltage_scaler;
-static int16_t batt_voltage;
+static int16_t  batt_voltage;
 
 // Core Function prototypes
 
@@ -420,6 +437,7 @@ enum enum_param_type_encoding {
     PARAM_TYPE_ENC_FP_0x10,
     PARAM_TYPE_ENC_FP_1x7,
     PARAM_TYPE_ENC_RCR,
+    PARAM_TYPE_ENC_FPD_1000,
 };
 
 typedef struct rtti_type_info rtti_type_info_t;

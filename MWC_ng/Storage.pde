@@ -33,7 +33,7 @@ eep_entry_t eep_entry[] = {
   {&mavlink_system.sysid, sizeof(mavlink_system.sysid)}, 
   {&imu.acc_offset, sizeof(imu.acc_offset)}, 
   {&imu.mag_offset, sizeof(imu.mag_offset)}, 
-  {&batt_voltage_scaler, sizeof(batt_voltage_scaler)}, 
+  {&flight.setup, sizeof(flight.setup)}, 
 };  
 const uint8_t eep_entry_cnt = sizeof(eep_entry) / sizeof(eep_entry_t);
 

@@ -18,6 +18,7 @@
 
 // Scalar types
 rtti_type_info_t rtti_u8  = {PARAM_TYPE_KIND_U8,  1,  {0, 0},};  
+rtti_type_info_t rtti_i16 = {PARAM_TYPE_KIND_I16, 2,  {0, 0},};  
 rtti_type_info_t rtti_u16 = {PARAM_TYPE_KIND_U16, 2,  {0, 0},};  
 rtti_type_info_t rtti_i32 = {PARAM_TYPE_KIND_I32, 4,  {0, 0},};  
 
@@ -60,11 +61,19 @@ rtti_struct_member_t rtti_input_setup_members[] PROGMEM = {
 };  
 rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup), {sizeof(rtti_input_setup_members)/sizeof(rtti_struct_member_t ), rtti_input_setup_members},};  
 
+// Voltage monitor
+rtti_struct_member_t rtti_vbat_setup_members[] PROGMEM = { 
+  {"SCAL",   &rtti_u8,  PARAM_TYPE_ENC_GENERIC}, 
+  {"W1",  &rtti_i16, PARAM_TYPE_ENC_FPD_1000}, 
+  {"W2",  &rtti_i16, PARAM_TYPE_ENC_FPD_1000}, 
+};  
+rtti_type_info_t rtti_vbat_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(flight.setup.vbat), {sizeof(rtti_vbat_setup_members)/sizeof(rtti_struct_member_t ), rtti_vbat_setup_members},};  
+
 // Global RTTI info (named type instances)
 param_data_t sys_rtti_info[] PROGMEM = {
   {"PID" ,  &rtti_pid_profile_list, pid.setup.profile},
   {"RC" ,   &rtti_input_setup,      &input.setup},
-  {"BVSCAL",&rtti_u8 ,              &batt_voltage_scaler},
+  {"VBAT",  &rtti_vbat_setup,       &flight.setup.vbat},
   {"SYSID", &rtti_u8 ,              &mavlink_system.sysid},
 };
 const uint8_t sys_rtti_info_cnt = sizeof(sys_rtti_info) / sizeof(param_data_t);
@@ -191,6 +200,7 @@ float scalar_to_float(rtti_type_info_t *t, uint8_t encoding, void *inst) {
   float res;
   switch (t->kind) {
     case PARAM_TYPE_KIND_U8:  res = *(uint8_t *)inst; break;
+    case PARAM_TYPE_KIND_I16: res = *(int16_t *)inst; break;
     case PARAM_TYPE_KIND_I32: res = *(int32_t *)inst; break;
     default: res = 0.0f;
   }  
@@ -199,6 +209,7 @@ float scalar_to_float(rtti_type_info_t *t, uint8_t encoding, void *inst) {
     case PARAM_TYPE_ENC_FP_0x10: res /= 1024.0f; break;
     case PARAM_TYPE_ENC_FP_1x7:  res /= 128.0f;  break;
     case PARAM_TYPE_ENC_RCR:     res /= 0.5f;    break;
+    case PARAM_TYPE_ENC_FPD_1000:res /= 1000.0f; break;
   }  
  return res; 
 }  
@@ -210,10 +221,12 @@ void float_to_scalar(rtti_type_info_t *t, float val, uint8_t encoding, void *ins
     case PARAM_TYPE_ENC_FP_0x10: tmp = 1024.0f; break;
     case PARAM_TYPE_ENC_FP_1x7:  tmp = 128.0f; break; 
     case PARAM_TYPE_ENC_RCR:     tmp = 0.5f; break; 
+    case PARAM_TYPE_ENC_FPD_1000:tmp = 1000.0f; break; 
   }  
   val = round(val * tmp);
   switch (t->kind) {
     case PARAM_TYPE_KIND_U8:  *(uint8_t *)inst = val; break;
+    case PARAM_TYPE_KIND_I16: *(int16_t *)inst = val; break;
     case PARAM_TYPE_KIND_I32: *(int32_t *)inst = val; break;
   }  
 }  

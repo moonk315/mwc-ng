@@ -45,7 +45,6 @@ void send_message(uint8_t msg) {
 
 void setup() { 
   cli();  
-  batt_voltage_scaler = 127;
   Board_Init();
   Debug_Init();
   RX_Init();
@@ -134,7 +133,7 @@ static PT_THREAD(thread_service(struct pt *pt, uint16_t dt)) {
   main_loop_cnt = 0;
   // Battery Monitor
   if (IsBatteryVoltageMeasurementFinished()) {
-    batt_voltage =  ((int32_t) GetBatteryVoltage() * batt_voltage_scaler) >> 7;
+    batt_voltage =  ((int32_t) GetBatteryVoltage() * flight.setup.vbat.voltage_scaler) >> 7;
     StartBatteryVoltageMeasurement();
   }  
   debug_print_system_state();
