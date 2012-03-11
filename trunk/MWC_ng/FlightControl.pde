@@ -85,7 +85,16 @@ inline void beep(uint8_t pattern) {
      pid.locked = 1;
      reset_pid_state();
      flight.sys_state = SYS_STATE_ARMED;
-   }  
+   } else {
+     if (batt_voltage < flight.setup.vbat.voltage_warn2) {
+       blink_led(LED_PATTERN_SHORT_BANK); 
+       beep(BEEP_PATTERN_VBAT_W2);
+     } else 
+     if (batt_voltage < flight.setup.vbat.voltage_warn1) {
+       blink_led(LED_PATTERN_SHORT_BANK); 
+       beep(BEEP_PATTERN_VBAT_W1);
+     } else blink_led(LED_PATTERN_ON); 
+   }
  }   
  
  void process_system_states() {
@@ -128,6 +137,9 @@ void process_beep_state() {
 }  
  
 inline void FlightControl_Init() {
+  flight.setup.vbat.voltage_scaler = 127;
+  flight.setup.vbat.voltage_warn1  = round((10.5f) * 1000);
+  flight.setup.vbat.voltage_warn2  = round((9.9f)  * 1000);
 }  
 
 inline void FlightControl_loop_5hz() {
