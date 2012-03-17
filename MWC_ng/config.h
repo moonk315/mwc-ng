@@ -29,7 +29,7 @@
 #define MAG  _NONE_
 #define BARO _NONE_
 
-#define ITG3200_LPF_188HZ
+#define ITG3200_LPF_98HZ
 #define ADXL345_ADDRESS 0xA6
 
 #define MIDRC 1500
