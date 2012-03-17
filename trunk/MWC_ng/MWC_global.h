@@ -231,6 +231,7 @@ struct ahrs_data {
   fp_vector_t est_grav;
   fp_vector_t est_mag;
   crd_eul_t eul_ref;
+  crd_eul_t ctrl_ref;
 };  
 ahrs_data_t ahrs;
 

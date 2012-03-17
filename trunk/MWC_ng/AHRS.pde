@@ -79,6 +79,9 @@ void rotate_vectors(){
   #endif 
   ahrs.eul_ref.roll  = _atan2(eg.y, eg.z);
   ahrs.eul_ref.pitch = _atan2(eg.x, eg.z);
+  float inv_mag = InvSqrt(eg.x * eg.x + eg.y * eg.y + eg.z * eg.z);
+  ahrs.ctrl_ref.roll  = eg.y * inv_mag * 2000.0f;
+  ahrs.ctrl_ref.pitch = eg.x * inv_mag * 2000.0f;
   ahrs.est_grav = eg;
 }
 
