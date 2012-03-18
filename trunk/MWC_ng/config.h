@@ -5,7 +5,8 @@
 #define RX    _PPM_SERIAL_
 #define ESC   _PWM_
 
-#define SERIAL_COM_SPEED 115200
+//#define SERIAL_COM_SPEED 115200
+#define SERIAL_COM_SPEED 57600
 
 // PPM ESC configuration
 #define PWM_ESC_IDLE_THROTTLE 1080 

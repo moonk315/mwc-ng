@@ -55,9 +55,21 @@ rtti_struct_member_t rtti_pid_profile_list_members[] PROGMEM = {
 rtti_type_info_t rtti_pid_profile_list = {PARAM_TYPE_KIND_ARRAY, /*sizeof(pid.setup.profile)*/0, {4 , rtti_pid_profile_list_members},};  
 
 // RC Params
+rtti_struct_member_t rtti_rc_map_list_members[] PROGMEM = { 
+  {"0",   &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
+  {"1",   &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
+  {"2",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
+  {"3",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
+};  
+rtti_type_info_t rtti_map_list = {PARAM_TYPE_KIND_ARRAY, 0, {4 , rtti_rc_map_list_members},};  
+
 rtti_struct_member_t rtti_input_setup_members[] PROGMEM = { 
   {"RATE",   &rtti_u8, PARAM_TYPE_ENC_RCR}, 
   {"EXPO",   &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
+  {"PSW",    &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
+  {"MSW",    &rtti_u8, PARAM_TYPE_ENC_GENERIC}, 
+  {"PMAP",   &rtti_map_list, PARAM_TYPE_ENC_GENERIC}, 
+  {"MMAP",   &rtti_map_list, PARAM_TYPE_ENC_GENERIC}, 
 };  
 rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup), {sizeof(rtti_input_setup_members)/sizeof(rtti_struct_member_t ), rtti_input_setup_members},};  
 

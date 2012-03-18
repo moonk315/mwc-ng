@@ -293,7 +293,7 @@ inline void Board_Init() {
   TWCR = _BV(TWEN);  // enable twi module, no interrupt
 
   // Serial Init
-  GUI_serial_open(115200);
+  GUI_serial_open(SERIAL_COM_SPEED);
   
   // LED
   pinMode (13, OUTPUT);

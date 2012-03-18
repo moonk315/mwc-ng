@@ -64,9 +64,34 @@ void process_stick_states() {
   input.stick_state = tmp; 
 }  
 
+void process_mode_switches() {
+  uint8_t ch = input.setup.profile_switch;
+  ch &= 0x07;
+  uint8_t val = (rx_data.raw[ch] >> 8);
+  if (val >= 4) val -= 4; else val = 0;
+  val &= 0x03;
+  val = input.setup.profile_map[val] & 0x03;
+  if (input.profile_val != val) {
+    pid.active_profile = &pid.setup.profile[val];
+    reset_pid_state();
+    beep(BEEP_PATTERN_SHORT_BLINK);
+    input.profile_val = val;
+  }  
+  ch = input.setup.mode_switch;
+  ch &= 0x07;
+  val = (rx_data.raw[ch] >> 8);
+  if (val >= 4) val -= 4; else val = 0;
+  val &= 0x03;
+  val = input.setup.mode_map[val];
+  input.mode_val = val;
+}  
+
+
 inline void Input_Init() {
   input.setup.ctrl_rate = 50;
   input.setup.ctrl_exp = 60;
+  input.setup.profile_switch = 5;
+  input.setup.mode_switch = 5;
   build_expo_table();
 }  
 
@@ -76,5 +101,6 @@ inline void Input_loop_50hz() {
 
 inline void Input_loop_5hz() {
   process_stick_states();
+  process_mode_switches();
 }  
 
