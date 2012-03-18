@@ -18,7 +18,7 @@
 
 #include <avr/eeprom.h>
 
-static uint8_t ver_magic = 10;
+static uint8_t ver_magic = 11;
 
 typedef struct eep_entry eep_entry_t;
 struct eep_entry{
