@@ -1,11 +1,5 @@
-#Derived from Atollic True Studio Makefile by Prof. Greg Egan 2012
-
-#SHELL=bash
-
 # System configuration - UNCOMMENT AS DESIRED
 
-#Code Sourcery current gcc 4.6.x
-#Specify full path below including trailing / to your arm-gcc toolchain unless it's in PATH
 TCHAIN=
 CC  = $(TCHAIN)avr-gcc
 CCP = $(TCHAIN)avr-g++
@@ -13,21 +7,25 @@ OPT = -Os
 OBJCOPY = $(TCHAIN)avr-objcopy
 AR = $(TCHAIN)avr-ar
 RM = rm -rf
+SIZE = $(TCHAIN)avr-size
+AVRDUDE = c:/bin/avrdude
+COMPORT = com5
 
-# Add .d to Make's recognized suffixes. 
-SUFFIXES += .d 
-#We don't need to clean up when we're making these targets 
-NODEPS:=clean tags svn 
-
+# Add .d to Make's recognized suffixes.
+SUFFIXES += .d
+#We don't need to clean up when we're making these targets
+NODEPS:=clean tags svn
 
 # Define output directory
-OBJECT_DIR = obj
-BIN_DIR = $(OBJECT_DIR)
+OBJECT_DIR = obj/avr
+BIN_DIR = bin/avr
+OUT_FILE = mwc_ng
+MCU=atmega328p
 
 # Assembler, Compiler and Linker flags and linker script settings
-LINKER_FLAGS=-mmcu=atmega168 $(OPT) -Wl,--relax,--gc-sections "-Wl,-Map=$(BIN_DIR)/blink.map" 
-ASSEMBLER_FLAGS=-c $(OPT) -mmcu=atmega168 -x assembler-with-cpp -Isrc -Ilib-avr/arduino
-COMPILER_FLAGS=-c -g -mmcu=atmega168 $(OPT) -ffunction-sections -fdata-sections -fno-exceptions -DF_CPU=16000000L -DARDUINO=22 -Isrc -Ilib-avr/arduino -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-avr
+LINKER_FLAGS=-mmcu=$(MCU) $(OPT) -Wl,--relax,--gc-sections "-Wl,-Map=$(BIN_DIR)/$(OUT_FILE).map"
+ASSEMBLER_FLAGS=-c $(OPT) -mmcu=$(MCU) -x assembler-with-cpp -Isrc -Ilib-avr/arduino
+COMPILER_FLAGS=-c -g -mmcu=$(MCU) $(OPT) -ffunction-sections -fdata-sections -fno-exceptions -DF_CPU=16000000L -DARDUINO=22 -Isrc -Ilib-avr/arduino -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-avr
 
 # Define sources and objects
 LSRC := $(wildcard  lib-avr/*/*/*/*/*/*/*.c) \
@@ -47,57 +45,62 @@ LSRCP:= $(wildcard  lib-avr/*/*/*/*/*/*/*.cpp) \
 	$(wildcard lib-arm/*.cpp) \
 
 LOBJS := $(LSRC:%.c=$(OBJECT_DIR)/%.o) $(LSRCP:%.cpp=$(OBJECT_DIR)/%.o) $(LSRCSASM:%.s=$(OBJECT_DIR)/%.o)
-LOBJS := $(LOBJS:%.S=$(OBJECT_DIR)/%.o)  
-LDEPS :=$(patsubst %.o,%.d,$(LOBJS)) 
+LOBJS := $(LOBJS:%.S=$(OBJECT_DIR)/%.o)
+LDEPS :=$(patsubst %.o,%.d,$(LOBJS))
 
-PDE:=$(wildcard src/*.pde) 
+PDE:=$(wildcard src/*.pde)
 PDESRC:=obj/__main_pde.cpp
 
-
-SRC := $(wildcard  src/*.c) 
-SRCP:= $(wildcard  src/*.cpp) 
+SRC := $(wildcard  src/*.c)
+SRCP:= $(wildcard  src/*.cpp)
 
 OBJS := $(SRC:%.c=$(OBJECT_DIR)/%.o) $(SRCP:%.cpp=$(OBJECT_DIR)/%.o) $(SRCSASM:%.s=$(OBJECT_DIR)/%.o)
-OBJS := $(OBJS:%.S=$(OBJECT_DIR)/%.o)  
-DEPS := $(patsubst %.o,%.d,$(OBJS)) 
+OBJS := $(OBJS:%.S=$(OBJECT_DIR)/%.o)
+DEPS := $(patsubst %.o,%.d,$(OBJS))
 
-all: $(BIN_DIR)/blink.elf
-	$(OBJCOPY) -O ihex -R .eeprom "$(BIN_DIR)/blink.elf" "$(BIN_DIR)/blink.hex"
-	avr-size.exe -C "$(BIN_DIR)/blink.elf"
+all: $(BIN_DIR)/$(OUT_FILE).elf
+	@mkdir -p $(dir $@)
+	$(OBJCOPY) -O ihex -R .eeprom "$(BIN_DIR)/$(OUT_FILE).elf" "$(BIN_DIR)/$(OUT_FILE).hex"
+	$(SIZE) -C "$(BIN_DIR)/$(OUT_FILE).elf"
 
-#Don't create dependencies when we're cleaning, for instance 
-ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS)))) 
-    #Chances are, these files don't exist.  GMake will create them and 
-    #clean up automatically afterwards 
+upload: all
+	$(AVRDUDE) -q -q -p atmega328p -c arduino -P $(COMPORT) -b 57600 -D -Uflash:w:$(BIN_DIR)/$(OUT_FILE).hex:i
+
+#Don't create dependencies when we're cleaning, for instance
+ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
+    #Chances are, these files don't exist.  GMake will create them and
+    #clean up automatically afterwards
     -include $(DEPS)
     -include $(LDEPS)
-endif 
+endif
 
-$(BIN_DIR)/blink.elf: $(OBJECT_DIR)/core.a $(OBJS)
-	$(CC) -o "$(BIN_DIR)/blink.elf" $(LINKER_FLAGS) $(OBJS) $(OBJECT_DIR)/core.a -lm
-        
-$(OBJECT_DIR)/core.a: $(LOBJS) 
+$(BIN_DIR)/$(OUT_FILE).elf: $(OBJECT_DIR)/core.a $(OBJS)
+	@mkdir -p $(dir $@)
+	$(CC) -o "$(BIN_DIR)/$(OUT_FILE).elf" $(LINKER_FLAGS) $(OBJS) $(OBJECT_DIR)/core.a -lm
+
+$(OBJECT_DIR)/core.a: $(LOBJS)
 	$(AR) -rcs $@ $^
-        
+
 clean:
-	$(RM) $(LOBJS) 
+	$(RM) $(LOBJS)
 	$(RM) $(LDEPS)
 	$(RM) $(OBJS)
 	$(RM) $(DEPS)
 	$(RM) $(BIN_DIR)/*
+	$(RM) $(BIN_DIR)/*
 
-$(OBJECT_DIR)/%.o: %.c 
-	@mkdir -p $(dir $@) 
+$(OBJECT_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) -MD $(COMPILER_FLAGS) $< -o $@
 
-$(OBJECT_DIR)/%.o: %.cpp 
-	@mkdir -p $(dir $@) 
+$(OBJECT_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
 	$(CCP) -MD $(COMPILER_FLAGS) $< -o $@
 
 $(OBJECT_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
 	$(CC) -MD $(ASSEMBLER_FLAGS) $< -o $@
-	
+
 $(OBJECT_DIR)/%.o: %.S
-	@mkdir -p $(dir $@) 
+	@mkdir -p $(dir $@)
 	$(CC) -MD $(ASSEMBLER_FLAGS) $< -o $@
