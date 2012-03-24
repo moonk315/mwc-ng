@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="avr-upload" />
+	<File name="Makefile.avr" open="1" top="0" tabpos="2">
+		<Cursor position="2952" topLine="53" />
+	</File>
+	<File name="Makefile.stm" open="1" top="0" tabpos="1">
+		<Cursor position="3147" topLine="55" />
+	</File>
+	<File name="src\AHRS.h" open="0" top="0" tabpos="0">
+		<Cursor position="2248" topLine="41" />
+	</File>
+	<File name="src\Core.h" open="0" top="0" tabpos="0">
+		<Cursor position="89" topLine="0" />
+	</File>
+	<File name="src\FlightControl.h" open="0" top="0" tabpos="0">
+		<Cursor position="4131" topLine="116" />
+	</File>
+	<File name="src\Input.h" open="0" top="0" tabpos="0">
+		<Cursor position="1919" topLine="63" />
+	</File>
+	<File name="src\MWC_Math.h" open="0" top="0" tabpos="0">
+		<Cursor position="407" topLine="0" />
+	</File>
+	<File name="src\MWC_global.h" open="0" top="0" tabpos="0">
+		<Cursor position="10440" topLine="392" />
+	</File>
+	<File name="src\MWC_ng.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="5596" topLine="134" />
+	</File>
+	<File name="src\MavLink.h" open="0" top="0" tabpos="0">
+		<Cursor position="8008" topLine="226" />
+	</File>
+	<File name="src\Output.h" open="0" top="0" tabpos="0">
+		<Cursor position="1724" topLine="36" />
+	</File>
+	<File name="src\Params.h" open="0" top="0" tabpos="0">
+		<Cursor position="7752" topLine="174" />
+	</File>
+	<File name="src\Storage.h" open="0" top="0" tabpos="0">
+		<Cursor position="2090" topLine="56" />
+	</File>
+	<File name="src\config.h" open="1" top="1" tabpos="3">
+		<Cursor position="721" topLine="0" />
+	</File>
+	<File name="src\hal\afroflight32.h" open="0" top="0" tabpos="0">
+		<Cursor position="126" topLine="0" />
+	</File>
+	<File name="src\hal\drv_uart.h" open="0" top="0" tabpos="0">
+		<Cursor position="4962" topLine="112" />
+	</File>
+	<File name="src\hal\promini.h" open="0" top="0" tabpos="0">
+		<Cursor position="6097" topLine="181" />
+	</File>
+</CodeBlocks_layout_file>
