@@ -2,24 +2,22 @@
  * MultiWii NG 0.1 - 2012
  * Global definitions
  *
- * This program is free software: you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation, either version 3 of the License, or 
- * (at your option) any later version. 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program. If not, see <http://www.gnu.org/licenses/>. 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef WMC_global_h
 #define WMC_global_h
-
-#include <avr/pgmspace.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Setup GCC environment
@@ -34,18 +32,13 @@
 #pragma GCC diagnostic warning "-Wlogical-op"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
 
-// Workaround for http://gcc.gnu.org/bugzilla/show_bug.cgi?id=34734 
-#ifdef PROGMEM 
-  #undef PROGMEM 
-  #define PROGMEM __attribute__((section(".progmem.data"))) 
-#endif 
-
 ////////////////////////////////////////////////////////////////////////////////
-/// 
+///
 //  Preprocessor constants
 //
 #define _NONE_         000
 #define _PROMINI_      100
+#define _AFROFLIGHT32_ 110
 #define _PROMINI_HEX_  200
 #define _PPM_          300
 #define _PPM_SERIAL_   400
@@ -90,7 +83,7 @@ enum enym_system_states {
     SYS_STATE_DISARM_REQ,
     SYS_STATE_CONFIG,
     SYS_STATE_FAILSAFE,
-    SYS_STATE_LAST 
+    SYS_STATE_LAST
 };
 
 enum enum_rx_channels {
@@ -138,7 +131,7 @@ uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
   0b00010101,
   0b11011011,
   0b11100111,
-};  
+};
 
 enum enum_beep_patterns {
     BEEP_PATTERN_OFF,
@@ -162,43 +155,43 @@ uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
   0b00010101,
   0b01001001,
   0b01010101,
-};  
+};
 
 typedef struct rx_data rx_data_t;
-struct rx_data { 
+struct rx_data {
   union {
     struct {uint16_t throttle, roll, pitch, yaw, aux1, aux2, aux3, aux4;};
-    uint16_t raw[RX_NUMBER_OF_CHANNELS]; 
-  }; 
+    uint16_t raw[RX_NUMBER_OF_CHANNELS];
+  };
 };
 rx_data_t rx_data;
 
 typedef struct control_data control_data_t;
-struct control_data { 
+struct control_data {
   union {
     struct {int16_t throttle, roll, pitch, yaw;};
-    int16_t raw[CTRL_NUMBER_OF_CHANNELS]; 
-  }; 
+    int16_t raw[CTRL_NUMBER_OF_CHANNELS];
+  };
 };
 
 typedef struct crd_fr crd_fr_t;
-struct crd_fr { 
-  int16_t x, y, z; 
+struct crd_fr {
+  int16_t x, y, z;
 };
 
 typedef struct crd_fr32 crd_fr32_t;
-struct crd_fr32 { 
-  int32_t x, y, z; 
+struct crd_fr32 {
+  int32_t x, y, z;
 };
 
 typedef struct crd_eul   crd_eul_t;
-struct crd_eul { 
-  int16_t roll, pitch, yaw; 
+struct crd_eul {
+  int16_t roll, pitch, yaw;
 };
 
 typedef struct crd_eul32   crd_eul32_t;
-struct crd_eul32 { 
-  int32_t roll, pitch, yaw; 
+struct crd_eul32 {
+  int32_t roll, pitch, yaw;
 };
 
 typedef union {crd_eul_t eul; crd_fr_t fr; int16_t raw[3];} gyro_data_t;
@@ -220,7 +213,7 @@ struct imu_data {
   uint16_t acc_off_cal;
   uint16_t gyro_off_cal;
   uint16_t mag_off_cal;
-};  
+};
 imu_data_t imu;
 
 typedef struct {float x, y, z;} fp_vector_t;
@@ -232,13 +225,13 @@ struct ahrs_data {
   fp_vector_t est_mag;
   crd_eul_t eul_ref;
   crd_eul_t ctrl_ref;
-};  
+};
 ahrs_data_t ahrs;
 
 typedef struct input_control_data input_control_data_t;
 struct input_control_data {
   struct {
-    uint8_t ctrl_rate; 
+    uint8_t ctrl_rate;
     uint8_t ctrl_exp;
     uint8_t profile_switch;
     uint8_t mode_switch;
@@ -252,20 +245,20 @@ struct input_control_data {
   uint8_t mode_val;
   //unsigned level_mode:1;
   //unsigned mag_hh_mode:1;
-  //unsigned alt_hold_mode:1; 
-};  
+  //unsigned alt_hold_mode:1;
+};
 input_control_data_t input;
 
 typedef struct pid_terms pid_terms_t;
-struct pid_terms {uint8_t P, I, D, FF; int32_t i_windup;};  
+struct pid_terms {uint8_t P, I, D, FF; int32_t i_windup;};
 
 typedef struct pid_rt pid_rt_t;
 struct pid_rt {
   int16_t last_pr_error;
   int32_t i_term;
   //int16_t d_term_fir[8];
-  //uint8_t d_term_fir_ptr; 
-};  
+  //uint8_t d_term_fir_ptr;
+};
 
 typedef struct pid_channels pid_channels_t;
 struct pid_channels {
@@ -276,13 +269,13 @@ typedef struct pid_profile pid_profile_t;
 struct pid_profile {
   union {
     struct {pid_terms_t roll, pitch, yaw, throttle;};
-    pid_terms_t ch[CTRL_NUMBER_OF_CHANNELS]; 
+    pid_terms_t ch[CTRL_NUMBER_OF_CHANNELS];
   } inner;
   union {
     struct {pid_terms_t roll, pitch, yaw, throttle;};
-    pid_terms_t ch[CTRL_NUMBER_OF_CHANNELS]; 
+    pid_terms_t ch[CTRL_NUMBER_OF_CHANNELS];
   } outer;
-};  
+};
 
 typedef struct pid_control_data pid_control_data_t;
 struct pid_control_data {
@@ -290,11 +283,11 @@ struct pid_control_data {
   struct {
     union {
       struct {pid_rt_t roll, pitch, yaw, throttle;};
-      pid_rt_t ch[CTRL_NUMBER_OF_CHANNELS]; 
+      pid_rt_t ch[CTRL_NUMBER_OF_CHANNELS];
     } inner;
     union {
       struct {pid_rt_t roll, pitch, yaw, throttle;};
-      pid_rt_t ch[CTRL_NUMBER_OF_CHANNELS]; 
+      pid_rt_t ch[CTRL_NUMBER_OF_CHANNELS];
     } outer;
     struct {int16_t roll, pitch, yaw, throttle;} outer_pid;
   } rt;
@@ -321,7 +314,7 @@ struct vbat_data {
   uint8_t  voltage_scaler;
   int16_t  voltage_warn1;
   int16_t  voltage_warn2;
-};  
+};
 
 
 typedef struct flight_control_data flight_control_data_t;
@@ -335,7 +328,7 @@ struct flight_control_data {
   uint8_t  led_pattern;
   uint8_t  beep_pattern_req;
   uint8_t  beep_pattern;
-  
+
 };
 flight_control_data_t flight;
 
@@ -389,8 +382,8 @@ void AttachPPM();
 void AttachPPMSerial();
 inline void rx_ppm_serial_callback(uint16_t time);
 
-void __delay_ms(double __ms);
-void __delay_us(double __us);
+//void __delay_ms(double __ms);
+//void __delay_us(double __us);
 
 // SysTick
 uint32_t __micros();
@@ -408,7 +401,7 @@ typedef struct timer_big timer_big_t;
 struct timer_big   { uint32_t elapsed, interval; uint16_t last_systick;};
 
 uint8_t timer_expired(timer_small_t *t, uint16_t systick = __systick()) {
-  uint16_t dt = __interval(t->last_systick, systick); 
+  uint16_t dt = __interval(t->last_systick, systick);
   t->last_systick = systick;
   if (t->elapsed < dt) {
     t->elapsed = t->interval;
@@ -419,7 +412,7 @@ uint8_t timer_expired(timer_small_t *t, uint16_t systick = __systick()) {
 };
 
 uint8_t timer_expired(timer_big_t *t, uint16_t systick = __systick()) {
-  uint16_t dt = __interval(t->last_systick, systick); 
+  uint16_t dt = __interval(t->last_systick, systick);
   t->last_systick = systick;
   if (t->elapsed < dt) {
     t->elapsed = t->interval;
@@ -463,36 +456,36 @@ struct rtti_struct_member {
   char  name[5];
   rtti_type_info_t *type;
   uint8_t  encoding;
-};  
+};
 
 struct rtti_member_list {
   uint8_t  cnt;
   rtti_struct_member_t *memb;
-};  
+};
 
 struct rtti_type_info {
   uint8_t  kind;
   uint8_t  _size;
   rtti_member_list_t members;
-};  
-
-struct param_data { 
-  char  name[7];
-  rtti_type_info_t *type;
-  void *var; 
 };
 
-struct struct_node_search_rec { 
+struct param_data {
+  char  name[7];
+  rtti_type_info_t *type;
+  void *var;
+};
+
+struct struct_node_search_rec {
   rtti_type_info_t *type;
   uint8_t idx;
   uint8_t encoding;
 };
 
-struct param_search_rec { 
+struct param_search_rec {
   char  name[16];
   uint8_t idx: 5;
   uint8_t level: 3;
-  void *inst; 
+  void *inst;
   param_data_t p;
   struct struct_node_search_rec stack[8];
 };
