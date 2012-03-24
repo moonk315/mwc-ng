@@ -43,16 +43,37 @@
 #define BARO_OFF                 digitalLo(BARO_GPIO, BARO_PIN);
 #define BARO_ON                  digitalHi(BARO_GPIO, BARO_PIN);
 
+#define _BV(bit) (1 << (bit))
+
+#define DEG_TO_RAD 0.017453292519943295769236907684886
+#define RAD_TO_DEG 57.295779513082320876798154814105
+#define PI M_PI
+#define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
+#define radians(deg) ((deg)*DEG_TO_RAD)
+#define degrees(rad) ((rad)*RAD_TO_DEG)
+
+typedef const unsigned char prog_uchar;
+#define pgm_read_byte_near(x) (*(prog_uchar*)x)
+#define pgm_read_byte(x) (*(prog_uchar*)x)
+#define __attr_flash __attribute__((section (".USER_FLASH")))
+#define PROGMEM __attr_flash
+#define memcpy_P memcpy
+#define PSTR(x) x
+#define strcat_P strcat
+
 #include "drv_uart.h"
 
-inline void i2c_write_byte(uint8_t add, uint8_t reg, uint8_t val) {}  
-inline uint8_t i2c_read_byte(uint8_t add, uint8_t reg) {return 0;}  
-static struct pt_sem i2c_bus_mutex;
+uint16_t twi_err_cnt;
 
-static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uint8_t *buff, uint8_t size)) {  
+inline void i2c_write_byte(uint8_t add, uint8_t reg, uint8_t val) {}
+inline uint8_t i2c_read_byte(uint8_t add, uint8_t reg) {
+  return 0;
+}
+
+static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uint8_t *buff, uint8_t size)) {
   PT_BEGIN(pt);
   PT_SEM_WAIT(pt, &i2c_bus_mutex);
-  PT_SEM_SIGNAL(pt, &i2c_bus_mutex);  
+  PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
   PT_END(pt);
 }
 
@@ -65,27 +86,27 @@ inline void __delay_ms(uint32_t __ms) {
 }
 
 static struct TIM_Channel {
-    TIM_TypeDef *tim;
-    uint16_t channel;
-    uint16_t cc;
+  TIM_TypeDef *tim;
+  uint16_t channel;
+  uint16_t cc;
 } Channels[] = {
-    { TIM2, TIM_Channel_1, TIM_IT_CC1 },
-    { TIM2, TIM_Channel_2, TIM_IT_CC2 },
-    { TIM2, TIM_Channel_3, TIM_IT_CC3 },
-    { TIM2, TIM_Channel_4, TIM_IT_CC4 },
-    { TIM3, TIM_Channel_1, TIM_IT_CC1 },
-    { TIM3, TIM_Channel_2, TIM_IT_CC2 },
-    { TIM3, TIM_Channel_3, TIM_IT_CC3 },
-    { TIM3, TIM_Channel_4, TIM_IT_CC4 },
+  { TIM2, TIM_Channel_1, TIM_IT_CC1 },
+  { TIM2, TIM_Channel_2, TIM_IT_CC2 },
+  { TIM2, TIM_Channel_3, TIM_IT_CC3 },
+  { TIM2, TIM_Channel_4, TIM_IT_CC4 },
+  { TIM3, TIM_Channel_1, TIM_IT_CC1 },
+  { TIM3, TIM_Channel_2, TIM_IT_CC2 },
+  { TIM3, TIM_Channel_3, TIM_IT_CC3 },
+  { TIM3, TIM_Channel_4, TIM_IT_CC4 },
 };
 
 static volatile uint16_t *OutputChannels[] = {
-    &(TIM1->CCR1),
-    &(TIM1->CCR4),
-    &(TIM4->CCR1),
-    &(TIM4->CCR2),
-    &(TIM4->CCR3),
-    &(TIM4->CCR4),
+  &(TIM1->CCR1),
+  &(TIM1->CCR4),
+  &(TIM4->CCR1),
+  &(TIM4->CCR2),
+  &(TIM4->CCR3),
+  &(TIM4->CCR4),
 };
 
 TIM_ICInitTypeDef TIM_ICInitStructure = { 0, };
@@ -123,14 +144,14 @@ inline void AttachPPM() {
   TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
   TIM_ICInitStructure.TIM_ICFilter = 0x0;
   for (i = 0; i < 8; i++) {
-      TIM_ICInitStructure.TIM_Channel = Channels[i].channel;
-      TIM_ICInit(Channels[i].tim, &TIM_ICInitStructure);
+    TIM_ICInitStructure.TIM_Channel = Channels[i].channel;
+    TIM_ICInit(Channels[i].tim, &TIM_ICInitStructure);
   }
   TIM_ITConfig(TIM2, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4, ENABLE);
   TIM_ITConfig(TIM3, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4, ENABLE);
   TIM_Cmd(TIM2, ENABLE);
   TIM_Cmd(TIM3, ENABLE);
-}  
+}
 
 inline void AttachPPMSerial() {
   // Configure TIM2_CH1 for PPM input
@@ -160,29 +181,38 @@ inline void AttachPPMSerial() {
   // TIM2_CH1 capture compare interrupt enable
   TIM_ITConfig(TIM2, TIM_IT_CC1, ENABLE);
   TIM_Cmd(TIM2, ENABLE);
-}  
+}
 
 void PWMOut(uint8_t ch, uint16_t val) {
-}  
+}
 
 void PWCOut(uint8_t ch, uint16_t val) {
-}  
+}
 
 // SysTick
 void SysTick_Handler(void) {
 }
 
 uint16_t __systick() {
- return SysTick->VAL;
-}  
+  return SysTick->VAL;
+}
 
 uint8_t __systick8() {
- return SysTick->VAL;
-}  
+  return SysTick->VAL;
+}
+
+inline uint16_t __interval(uint16_t i_start) {
+  return __interval(i_start, __systick());
+}
+
+uint16_t __interval(uint16_t i_start, uint16_t i_end) {
+  //if (i_end < i_start) i_end +=  Timer1Ovf;
+  return (i_end - i_start);
+}
 
 uint8_t i2c_trn_error() {
   return 0;
-}  
+}
 
 inline void cli() {
   __disable_irq();
@@ -194,18 +224,30 @@ inline void sei() {
 
 inline void StatusLEDOn() {
   LED0_ON
-}  
+}
 
 inline void StatusLEDOff() {
   LED0_OFF
-}  
+}
 
 inline void StatusLEDToggle() {
   LED0_TOGGLE
-}  
+}
+
+inline void BeepOn() {
+  BEEP_ON
+}
+
+inline void BeepOff() {
+  BEEP_OFF
+}
+
+inline void BeepToggle() {
+  BEEP_TOGGLE
+}
 
 void Board_Idle() {
-};  
+};
 
 inline void Board_Init() {
   // Turn on clocks for stuff we use
@@ -255,3 +297,19 @@ int main(void) {
   for (;;) loop();
   return 0;
 }
+
+inline void __eeprom_write_byte(uint8_t *__p, uint8_t __value) {}
+inline uint8_t __eeprom_read_byte(const uint8_t *__p) {return 0;}
+inline void __eeprom_read_block (void *__dst, const void *__src, size_t __n) {}
+
+inline void StartBatteryVoltageMeasurement() {
+}
+
+inline uint8_t IsBatteryVoltageMeasurementFinished(){
+  return 1;
+}
+
+int16_t GetBatteryVoltage(){
+  return 0;
+}
+

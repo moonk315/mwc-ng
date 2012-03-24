@@ -7,27 +7,25 @@ volatile uint8_t txBuffer[UART_BUFFER_SIZE];
 uint32_t txBufferTail = 0;
 uint32_t txBufferHead = 0;
 
-static void uartTxDMA(void)
-{
-    DMA1_Channel4->CMAR = (uint32_t)&txBuffer[txBufferTail];
-    if (txBufferHead > txBufferTail) {
-	    DMA1_Channel4->CNDTR = txBufferHead - txBufferTail;
-	    txBufferTail = txBufferHead;
-    } else {
-	    DMA1_Channel4->CNDTR = UART_BUFFER_SIZE - txBufferTail;
-	    txBufferTail = 0;
-    }
+static void uartTxDMA(void) {
+  DMA1_Channel4->CMAR = (uint32_t)&txBuffer[txBufferTail];
+  if (txBufferHead > txBufferTail) {
+    DMA1_Channel4->CNDTR = txBufferHead - txBufferTail;
+    txBufferTail = txBufferHead;
+  } else {
+    DMA1_Channel4->CNDTR = UART_BUFFER_SIZE - txBufferTail;
+    txBufferTail = 0;
+  }
 
-    DMA_Cmd(DMA1_Channel4, ENABLE);
+  DMA_Cmd(DMA1_Channel4, ENABLE);
 }
 
-void DMA1_Channel4_IRQHandler(void)
-{
-    DMA_ClearITPendingBit(DMA1_IT_TC4);
-    DMA_Cmd(DMA1_Channel4, DISABLE);
+void DMA1_Channel4_IRQHandler(void) {
+  DMA_ClearITPendingBit(DMA1_IT_TC4);
+  DMA_Cmd(DMA1_Channel4, DISABLE);
 
-    if (txBufferHead != txBufferTail)
-	    uartTxDMA();
+  if (txBufferHead != txBufferTail)
+    uartTxDMA();
 }
 
 void uartInit(uint32_t baud) {
@@ -39,7 +37,7 @@ void uartInit(uint32_t baud) {
   // UART
   // USART1_TX    PA9
   // USART1_RX    PA10
-  
+
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
@@ -63,7 +61,7 @@ void uartInit(uint32_t baud) {
   USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
   USART_Init(USART1, &USART_InitStructure);
-  
+
   // Receive DMA into a circular buffer
   DMA_DeInit(DMA1_Channel5);
   DMA_InitStructure.DMA_Priority = DMA_Priority_Medium;
@@ -126,14 +124,33 @@ void uartWrite(uint8_t ch) {
     uartTxDMA();
 }
 
-inline void GUI_serial_open(uint32_t baud) {uartInit(baud);}  
-inline void GUI_serial_close() {}  
-inline uint8_t GUI_serial_available() {return uartAvailable();}  
-inline uint8_t GUI_serial_read() {return uartRead();}  
-inline void GUI_serial_write(uint8_t c) {uartWrite(c);}  
+inline void GUI_serial_open(uint32_t baud) {
+  uartInit(baud);
+}
+inline void GUI_serial_close() {}
+inline uint8_t GUI_serial_available() {
+  return uartAvailable();
+}
+inline uint8_t GUI_serial_read() {
+  return uartRead();
+}
+inline void GUI_serial_write(uint8_t c) {
+  uartWrite(c);
+}
 
-inline void CLI_serial_open(uint32_t baud) {uartInit(baud);}  
-inline void CLI_serial_close() {}  
-inline uint8_t CLI_serial_available() {return uartAvailable();}  
-inline uint8_t CLI_serial_read() {return uartRead();}  
-inline void CLI_serial_write(uint8_t c) {uartWrite(c);}  
+inline void CLI_serial_open(uint32_t baud) {
+  uartInit(baud);
+}
+inline void CLI_serial_close() {}
+inline uint8_t CLI_serial_available() {
+  return uartAvailable();
+}
+inline uint8_t CLI_serial_read() {
+  return uartRead();
+}
+inline void CLI_serial_write(uint8_t c) {
+  uartWrite(c);
+}
+inline uint8_t GUI_serial_tx_full() {
+  return 0;
+}
