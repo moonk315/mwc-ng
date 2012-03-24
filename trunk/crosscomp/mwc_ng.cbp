@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="mwc_ng" />
+		<Option makefile_is_custom="1" />
+		<Option pch_mode="2" />
+		<Option compiler="armelfgcc" />
+		<Option virtualFolders="Misc\;Core\;Subsystems\;Config\;HAL\;HAL\afroflight32\;lib-avr\;Makefiles\;" />
+		<Build>
+			<Target title="avr">
+				<Option output="obj\blink.hex" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="" />
+				<Option object_output="C:\Ziss\mwc-ng\trunk\crosscomp\.objs" />
+				<Option type="5" />
+				<Option compiler="avrgcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<MakeCommands>
+					<Build command="$make -f $makefile.avr " />
+					<CompileFile command="$make -f $makefile.avr $file" />
+					<Clean command="$make -f $makefile.avr clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.avr $target" />
+					<SilentBuild command="$make -f $makefile.avr " />
+				</MakeCommands>
+			</Target>
+			<Target title="avr-upload">
+				<Option output="obj\blink.hex" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="" />
+				<Option object_output="C:\Ziss\mwc-ng\trunk\crosscomp\.objs" />
+				<Option type="5" />
+				<Option compiler="avrgcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+				<MakeCommands>
+					<Build command="$make -f $makefile.avr upload" />
+					<CompileFile command="$make -f $makefile.avr $file" />
+					<Clean command="$make -f $makefile.avr clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.avr $target" />
+					<SilentBuild command="$make -f $makefile.avr upload" />
+				</MakeCommands>
+			</Target>
+			<Target title="stm32">
+				<Option type="4" />
+				<Option compiler="armelfgcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile.stm " />
+					<CompileFile command="$make -f $makefile.stm $file" />
+					<Clean command="$make -f $makefile.stm clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.stm " />
+					<SilentBuild command="$make  -f $makefile.stm " />
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Makefile.avr">
+			<Option virtualFolder="Makefiles\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="Makefile.stm">
+			<Option virtualFolder="Makefiles\" />
+			<Option target="stm32" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\HardwareSerial.cpp">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\HardwareSerial.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\Print.cpp">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\Print.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\Stream.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\Tone.cpp">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WCharacter.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WConstants.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WInterrupts.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WMath.cpp">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WProgram.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WString.cpp">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\WString.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\binary.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\main.cpp">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\pins_arduino.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\pins_arduino.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring_analog.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring_digital.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring_private.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring_pulse.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\arduino\wiring_shift.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\avr_twi.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="lib-avr\avr_usart.h">
+			<Option virtualFolder="lib-avr\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Unit filename="src\AHRS.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\Core.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\FlightControl.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\Input.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\MWC_Debug.h">
+			<Option virtualFolder="Misc\" />
+		</Unit>
+		<Unit filename="src\MWC_Math.h">
+			<Option virtualFolder="Misc\" />
+		</Unit>
+		<Unit filename="src\MWC_global.h">
+			<Option virtualFolder="Core\" />
+		</Unit>
+		<Unit filename="src\MWC_ng.cpp">
+			<Option virtualFolder="Core\" />
+		</Unit>
+		<Unit filename="src\MavLink.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\Output.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\PID.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\Params.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\RX.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\Sensors.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\Storage.h">
+			<Option virtualFolder="Subsystems\" />
+		</Unit>
+		<Unit filename="src\config.h">
+			<Option virtualFolder="Config\" />
+		</Unit>
+		<Unit filename="src\hal\afroflight32.h">
+			<Option virtualFolder="HAL\afroflight32\" />
+		</Unit>
+		<Unit filename="src\hal\baseflight_startups\startup_stm32f10x_md.s">
+			<Option virtualFolder="HAL\afroflight32\" />
+		</Unit>
+		<Unit filename="src\hal\baseflight_startups\startup_stm32f10x_md_gcc.s">
+			<Option virtualFolder="HAL\afroflight32\" />
+		</Unit>
+		<Unit filename="src\hal\drv_uart.h">
+			<Option virtualFolder="HAL\afroflight32\" />
+		</Unit>
+		<Unit filename="src\hal\promini.h">
+			<Option virtualFolder="HAL\" />
+			<Option target="avr" />
+			<Option target="avr-upload" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
