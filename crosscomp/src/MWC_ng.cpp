@@ -40,14 +40,14 @@
 
 void debug_print_system_state() {
   dprintf("\033[1;1H");
-  dprintf("PPM  (th, r, p, y, aux1): %8d, %8d, %8d, %8d  \n",  get_raw_ppm_data_no_block(RX_CHANNEL_THROTTLE), get_raw_ppm_data_no_block(RX_CHANNEL_ROLL), get_raw_ppm_data_no_block(RX_CHANNEL_PITCH), get_raw_ppm_data_no_block(RX_CHANNEL_YAW), get_raw_ppm_data_no_block(RX_CHANNEL_AUX1));
-  dprintf("RX:  (th, r, p, y, aux1, aux2, aux3, aux4): %8d, %8d, %8d, %8d, %8d, %8d, %8d, %8d  \n",  rx_data.throttle, rx_data.roll, rx_data.pitch, rx_data.yaw, rx_data.aux1, rx_data.aux2, rx_data.aux3, rx_data.aux4);
+  dprintf("PPM  (th, r, p, y): %8d, %8d, %8d, %8d \n",  get_raw_ppm_data_no_block(RX_CHANNEL_THROTTLE), get_raw_ppm_data_no_block(RX_CHANNEL_ROLL), get_raw_ppm_data_no_block(RX_CHANNEL_PITCH), get_raw_ppm_data_no_block(RX_CHANNEL_YAW));
+  //dprintf("RX:  (th, r, p, y, aux1, aux2, aux3, aux4): %8d, %8d, %8d, %8d, %8d, %8d, %8d, %8d  \n",  rx_data.throttle, rx_data.roll, rx_data.pitch, rx_data.yaw, rx_data.aux1, rx_data.aux2, rx_data.aux3, rx_data.aux4);
   dprintf("Gyro (r, p, y): %8d, %8d, %8d  \n",  imu.gyro.eul.roll, imu.gyro.eul.pitch, imu.gyro.eul.yaw);
   dprintf("Acc  (X, Y, Z): %8d, %8d, %8d  \n",  imu.acc.fr.x, imu.acc.fr.y, imu.acc.fr.z);
   //dprintf("ACC f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_grav.x), int16_t(ahrs.acc_grav.y), int16_t(ahrs.acc_grav.z));
   //dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_grav.x), int16_t(ahrs.est_grav.y), int16_t(ahrs.est_grav.z));
   //dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
-  //dprintf("CPU: %8d%%  \n",  cpu_util_pct * 100 / 255);
+  dprintf("CPU: %8d%%  \n",  cpu_util_pct * 100 / 255);
   //dprintf("Input: (th, r, p, y, st): %8d, %8d, %8d, %8d  %x \n",  input.ctrl.throttle, input.ctrl.roll, input.ctrl.pitch, input.ctrl.yaw, input.stick_state);
   //dprintf("Fl. Ctrl: (st): %x \n",  flight.sys_state);
   //dprintf("PID:   (th, r, p, y): %8d, %8d, %8d, %8d  \n",  pid.ctrl.throttle, pid.ctrl.roll, pid.ctrl.pitch, pid.ctrl.yaw);
@@ -58,7 +58,6 @@ void debug_print_system_state() {
 void send_message(uint8_t msg) {
 
 }
-
 
 void setup() {
   cli();
@@ -99,9 +98,9 @@ static uint16_t main_loop_cnt;
 static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   PT_BEGIN(pt);
   PT_WAIT_UNTIL(pt, timer_expired(&timer_inner_ctrl, dt));
-  //DebugLEDToggle();
   current_time_us += INNER_CTRL_LOOP_TIME;
   current_time_ms += (INNER_CTRL_LOOP_TIME / 1000);
+  DebugLEDToggle();
   PT_SEM_WAIT(pt, &i2c_bus_mutex);
   PT_SPAWN(pt, &thread_gyro_read_pt, ThreadGyro_GetADC_pt(&thread_gyro_read_pt));
   Gyro_getADC();
@@ -164,6 +163,7 @@ void loop() {
   PT_INIT(&thread_outer_ctrl_pt);
   PT_INIT(&thread_acc_ctrl_pt);
   PT_INIT(&thread_service_pt);
+  PT_SEM_INIT(&i2c_bus_mutex, 1);
   for (;;) {
     main_loop_cnt++;
     Board_Idle();
