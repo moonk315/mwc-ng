@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="avr-upload" />
+	<ActiveTarget name="stm32-upload" />
 	<File name="Makefile.avr" open="0" top="0" tabpos="2">
 		<Cursor position="2362" topLine="53" />
 	</File>
 	<File name="Makefile.stm" open="0" top="0" tabpos="1">
 		<Cursor position="2746" topLine="55" />
+	</File>
+	<File name="lib-avr\avr_twi.h" open="0" top="0" tabpos="0">
+		<Cursor position="3265" topLine="103" />
 	</File>
 	<File name="src\AHRS.h" open="0" top="0" tabpos="0">
 		<Cursor position="2248" topLine="41" />
@@ -19,17 +22,17 @@
 	<File name="src\Input.h" open="0" top="0" tabpos="0">
 		<Cursor position="1060" topLine="12" />
 	</File>
-	<File name="src\MWC_Debug.h" open="1" top="0" tabpos="8">
+	<File name="src\MWC_Debug.h" open="0" top="0" tabpos="8">
 		<Cursor position="568" topLine="0" />
 	</File>
 	<File name="src\MWC_Math.h" open="0" top="0" tabpos="0">
 		<Cursor position="407" topLine="0" />
 	</File>
-	<File name="src\MWC_global.h" open="1" top="0" tabpos="6">
+	<File name="src\MWC_global.h" open="0" top="0" tabpos="6">
 		<Cursor position="9673" topLine="360" />
 	</File>
-	<File name="src\MWC_ng.cpp" open="1" top="0" tabpos="4">
-		<Cursor position="1235" topLine="23" />
+	<File name="src\MWC_ng.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="2782" topLine="23" />
 	</File>
 	<File name="src\MavLink.h" open="0" top="0" tabpos="0">
 		<Cursor position="8008" topLine="226" />
@@ -37,25 +40,31 @@
 	<File name="src\Output.h" open="0" top="0" tabpos="0">
 		<Cursor position="1724" topLine="36" />
 	</File>
-	<File name="src\Params.h" open="1" top="0" tabpos="5">
+	<File name="src\Params.h" open="0" top="0" tabpos="5">
 		<Cursor position="1064" topLine="6" />
 	</File>
-	<File name="src\RX.h" open="1" top="0" tabpos="9">
+	<File name="src\RX.h" open="0" top="0" tabpos="9">
 		<Cursor position="1695" topLine="48" />
+	</File>
+	<File name="src\Sensors.h" open="1" top="0" tabpos="4">
+		<Cursor position="11924" topLine="287" />
 	</File>
 	<File name="src\Storage.h" open="0" top="0" tabpos="0">
 		<Cursor position="2090" topLine="56" />
 	</File>
 	<File name="src\config.h" open="1" top="1" tabpos="1">
-		<Cursor position="57" topLine="3" />
+		<Cursor position="461" topLine="3" />
 	</File>
 	<File name="src\hal\afroflight32.h" open="1" top="0" tabpos="2">
-		<Cursor position="8735" topLine="245" />
+		<Cursor position="8801" topLine="248" />
 	</File>
-	<File name="src\hal\drv_uart.h" open="1" top="0" tabpos="3">
+	<File name="src\hal\drv_i2c.h" open="1" top="0" tabpos="3">
+		<Cursor position="3111" topLine="68" />
+	</File>
+	<File name="src\hal\drv_uart.h" open="0" top="0" tabpos="3">
 		<Cursor position="4920" topLine="97" />
 	</File>
-	<File name="src\hal\promini.h" open="1" top="0" tabpos="7">
-		<Cursor position="7908" topLine="273" />
+	<File name="src\hal\promini.h" open="0" top="0" tabpos="7">
+		<Cursor position="41" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>
