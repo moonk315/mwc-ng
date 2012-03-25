@@ -71,18 +71,6 @@ typedef const unsigned char prog_uchar;
 
 #include "drv_uart.h"
 
-uint16_t twi_err_cnt;
-
-inline void i2c_write_byte(uint8_t add, uint8_t reg, uint8_t val) {}
-inline uint8_t i2c_read_byte(uint8_t add, uint8_t reg) {
-  return 0;
-}
-
-static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uint8_t *buff, uint8_t size)) {
-  PT_BEGIN(pt);
-  PT_END(pt);
-}
-
 static struct TIM_Channel {
   TIM_TypeDef *tim;
   uint16_t channel;
@@ -98,8 +86,6 @@ static struct TIM_Channel {
   { TIM3, TIM_Channel_4, TIM_IT_CC4 },
 };
 
-static uint32_t pwm_state[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-
 static volatile uint16_t *OutputChannels[] = {
   &(TIM1->CCR1),
   &(TIM1->CCR4),
@@ -107,6 +93,11 @@ static volatile uint16_t *OutputChannels[] = {
   &(TIM4->CCR2),
   &(TIM4->CCR3),
   &(TIM4->CCR4),
+// Extended use during CPPM input
+  &(TIM3->CCR1),
+  &(TIM3->CCR2),
+  &(TIM3->CCR3),
+  &(TIM3->CCR4),
 };
 
 
@@ -114,10 +105,12 @@ TIM_ICInitTypeDef TIM_ICInitStructure = { 0, };
 GPIO_InitTypeDef GPIO_InitStructure = { 0, };
 TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure = { 0, };
 NVIC_InitTypeDef NVIC_InitStructure = { 0, };
+TIM_OCInitTypeDef TIM_OCInitStructure = { 0, };
 
 #if (RX == _PPM_)
 static void TIMXX_IRQHandler(TIM_TypeDef *tim) {
   uint16_t val;
+  static uint32_t pwm_state[8] = {1, 1, 1, 1, 1, 1, 1, 1};
   for (uint8_t i = 0; i < 8; i++) {
     if ((Channels[i].tim == tim) && (TIM_GetITStatus(tim, Channels[i].cc) == SET)) {
       switch (Channels[i].channel) {
@@ -240,6 +233,7 @@ inline void AttachPPMSerial() {
 }
 
 void PWMOut(uint8_t ch, uint16_t val) {
+  if (ch < 6) *OutputChannels[ch] = (val << 1);
 }
 
 void PWCOut(uint8_t ch, uint16_t val) {
@@ -274,16 +268,12 @@ inline void __delay_ms(uint32_t __ms) {
   while (__ms--) __delay_us(1000);
 }
 
-uint8_t i2c_trn_error() {
-  return 0;
-}
-
 inline void cli() {
-  __disable_irq();
+  //__disable_irq();
 }
 
 inline void sei() {
-  __enable_irq();
+  //__enable_irq();
 }
 
 inline void StatusLEDOn() {
@@ -325,6 +315,81 @@ inline void BeepToggle() {
 void Board_Idle() {
 };
 
+#define PULSE_1MS       (1000) // 1ms pulse width
+#define PULSE_PERIOD    (2500) // pulse period (400Hz)
+#define PULSE_PERIOD_SERVO_DIGITAL  (5000) // pulse period for digital servo (200Hz)
+#define PULSE_PERIOD_SERVO_ANALOG  (20000) // pulse period for analog servo (50Hz)
+
+inline void PWM_Init(bool useServos) {
+  // Output pins
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_11;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9;
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+  // Output timers
+  TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+  TIM_TimeBaseStructure.TIM_Prescaler = ((72 / 2) - 1);
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  if (useServos) {
+    // 50Hz/200Hz period on ch1, 2 for servo
+    TIM_TimeBaseStructure.TIM_Period = PULSE_PERIOD_SERVO_ANALOG*2 - 1;
+    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
+    TIM_TimeBaseStructure.TIM_Period = PULSE_PERIOD*2 - 1;
+    TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+  } else {
+    TIM_TimeBaseStructure.TIM_Period = PULSE_PERIOD*2 - 1;
+    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
+    TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+  }
+  TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;
+  TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+  TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;
+  TIM_OCInitStructure.TIM_Pulse = PULSE_1MS*2;
+  TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;
+  TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
+  // PWM1,2
+  TIM_OC1Init(TIM1, &TIM_OCInitStructure);
+  TIM_OC4Init(TIM1, &TIM_OCInitStructure);
+  // PWM3,4,5,6
+  TIM_OC1Init(TIM4, &TIM_OCInitStructure);
+  TIM_OC2Init(TIM4, &TIM_OCInitStructure);
+  TIM_OC3Init(TIM4, &TIM_OCInitStructure);
+  TIM_OC4Init(TIM4, &TIM_OCInitStructure);
+  //
+  TIM_Cmd(TIM1, ENABLE);
+  TIM_Cmd(TIM4, ENABLE);
+  TIM_CtrlPWMOutputs(TIM1, ENABLE);
+  TIM_CtrlPWMOutputs(TIM4, ENABLE);
+}
+
+#include "drv_i2c.h"
+
+uint16_t twi_err_cnt;
+
+inline void i2c_write_byte(uint8_t add, uint8_t reg, uint8_t val) {
+  error = !i2cWrite(add, reg, val);
+}
+
+inline uint8_t i2c_read_byte(uint8_t add, uint8_t reg) {
+  uint8_t buff;
+  i2cReadBuffer_start(add, reg, 1, &buff);
+  i2cReadBuffer_wait();
+  return buff;
+}
+
+inline uint8_t i2c_trn_error() {
+  return error;
+}
+
+static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uint8_t *buff, uint8_t size)) {
+  PT_BEGIN(pt);
+  i2cReadBuffer_start(add, reg, size, buff);
+  PT_WAIT_WHILE(pt, i2cReadBuffer_busy());
+  PT_END(pt);
+}
+
 inline void Board_Init() {
   // Turn on clocks for stuff we use
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
@@ -364,9 +429,10 @@ inline void Board_Init() {
   SysTick_Config(SysTickOvf);
   //
   CLI_serial_open(SERIAL_COM_SPEED);
-  sei();
-  //LED1_TOGGLE
-  StatusLEDToggle();
+  // Output PWM
+  PWM_Init(false);
+  // i2c
+  i2cInit(I2C2);
 }
 
 void setup();
