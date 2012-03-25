@@ -2,49 +2,49 @@
  * MultiWii NG 0.1 - 2012
  * Sensors support. ->(imu)
  *
- * This program is free software: you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation, either version 3 of the License, or 
- * (at your option) any later version. 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
- * GNU General Public License for more details. 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program. If not, see <http://www.gnu.org/licenses/>. 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 // ************************************************************************************************************
 // board orientation and setup
 // ************************************************************************************************************
 //default board orientation
-#if !defined(ACC_ORIENTATION) 
+#if !defined(ACC_ORIENTATION)
   #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.world.x  = X; imu.acc.world.y  = Y; imu.acc.world.z  = Z;}
 #endif
-#if !defined(GYRO_ORIENTATION) 
+#if !defined(GYRO_ORIENTATION)
   #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.world.x  = X; imu.gyro_raw.world.y  = Y; imu.gyro_raw.world.z  = Z;}
 #endif
-#if !defined(MAG_ORIENTATION) 
+#if !defined(MAG_ORIENTATION)
   #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.world.x  = X; imu.mag.world.y  = Y; imu.mag.world.z  = Z;}
 #endif
 
 /*** I2C address ***/
-#if !defined(ADXL345_ADDRESS) 
+#if !defined(ADXL345_ADDRESS)
   #define ADXL345_ADDRESS 0x3A
 #endif
 
-#if !defined(BMA180_ADDRESS) 
+#if !defined(BMA180_ADDRESS)
   #define BMA180_ADDRESS 0x80
 #endif
 
-#if !defined(ITG3200_ADDRESS) 
+#if !defined(ITG3200_ADDRESS)
   #define ITG3200_ADDRESS 0XD0
 #endif
 
-#if !defined(MS561101BA_ADDRESS) 
-  #define MS561101BA_ADDRESS 0xEE 
+#if !defined(MS561101BA_ADDRESS)
+  #define MS561101BA_ADDRESS 0xEE
 #endif
 
 //ITG3200 and ITG3205 Gyro LPF setting
@@ -101,11 +101,11 @@ static inline int16_t bswap_16(int16_t x) {
 
 inline void imu_calibrate_gyro() {
   imu.gyro_off_cal = 512;
-}  
+}
 
 inline void imu_calibrate_acc() {
   imu.acc_off_cal = 512;
-}  
+}
 
 // ****************
 // GYRO common part
@@ -127,27 +127,27 @@ void gyro_calc_offset() {
 inline void gyro_correct_offset() {
   for (uint8_t i = 0; i < 3; i++)
     imu.gyro_raw.raw[i]  -= imu.gyro_offset.raw[i];
-}  
+}
 
 inline void gyro_common() {
   if (imu.gyro_off_cal) gyro_calc_offset();
   gyro_correct_offset();
-}  
+}
 
 // ****************
 // ACC common part
 // ****************
 void acc_calc_offset() {
-  static int32_t a[3];  
+  static int32_t a[3];
   uint16_t acc_off_cal_cache = imu.acc_off_cal;
   for (uint8_t i = 0; i < 3; i++) {
     if (acc_off_cal_cache == 512) a[i] = 0;
     a[i] += imu.acc.raw[i];
     if (acc_off_cal_cache == 1)
       imu.acc_offset.raw[i] = a[i] / 512;
-  }  
+  }
   if (acc_off_cal_cache == 1) {
-    imu.acc_offset.fr.z -= imu.acc_1g; 
+    imu.acc_offset.fr.z -= imu.acc_1g;
   }
   acc_off_cal_cache--;
   imu.acc_off_cal = acc_off_cal_cache;
@@ -156,16 +156,16 @@ void acc_calc_offset() {
 inline void acc_correct_offset() {
   for (uint8_t i = 0; i < 3; i++)
     imu.acc.raw[i]  -= imu.acc_offset.raw[i];
-}  
+}
 
 inline void acc_common() {
   if (imu.acc_off_cal) acc_calc_offset();
   acc_correct_offset();
-}  
+}
 
 
 // ************************************************************************************************************
-// I2C Accelerometer ADXL345 
+// I2C Accelerometer ADXL345
 // ************************************************************************************************************
 // I2C adress: 0x3A (8bit)    0x1D (7bit)
 // Resolution: 10bit (Full range - 14bit, but this is autoscaling 10bit ADC to the range +- 16g)
@@ -186,7 +186,7 @@ void ACC_init () {
   imu.acc_1g = 256;
 }
 
-inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, ADXL345_ADDRESS, 0x32, sensor_buff.raw, 6);}  
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, ADXL345_ADDRESS, 0x32, sensor_buff.raw, 6);}
 
 void ACC_getADC () {
   if (!i2c_trn_error()) {
@@ -203,7 +203,7 @@ void ACC_getADC () {
 // contribution from ToLuSe (Jully 2011)
 // I2C Accelerometer BMA180
 // ************************************************************************************************************
-// I2C adress: 0x80 (8bit)    0x40 (7bit) (SDO connection to VCC) 
+// I2C adress: 0x80 (8bit)    0x40 (7bit) (SDO connection to VCC)
 // I2C adress: 0x82 (8bit)    0x41 (7bit) (SDO connection to VDDIO)
 // Resolution: 14bit
 //
@@ -218,24 +218,24 @@ void ACC_init () {
   __delay_ms(5);
   uint8_t control = i2c_read_byte(BMA180_ADDRESS, 0x20);
   control = control & 0x0F; // register: bw_tcs reg: bits 4-7 to set bw -- value: set low pass filter to 10Hz (bits value = 0000xxxx)
-  control = control | 0x00; 
+  control = control | 0x00;
   i2c_write_byte(BMA180_ADDRESS, 0x20, control);
-  __delay_ms(5); 
+  __delay_ms(5);
   control = i2c_read_byte(BMA180_ADDRESS, 0x30);
-  control = control & 0xFC; 
-  control = control | 0x00; 
+  control = control & 0xFC;
+  control = control | 0x00;
   i2c_write_byte(BMA180_ADDRESS, 0x30, control);
-  __delay_ms(5); 
+  __delay_ms(5);
   // Set range
   // Note: 2g is the default range on startup (If the EEPROM content was not changed)
   control = i2c_read_byte(BMA180_ADDRESS, 0x35);
   control &= 0xF1; // Mask offset_x calibration bits, smp_skip and clear range
   control |= (0x05 << 1); // Set range to 8g
-  i2c_write_byte(BMA180_ADDRESS, 0x35, control);  
+  i2c_write_byte(BMA180_ADDRESS, 0x35, control);
   imu.acc_1g = 1024;
 }
 
-inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, BMA180_ADDRESS, 0x02, sensor_buff.raw, 6);}  
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, BMA180_ADDRESS, 0x02, sensor_buff.raw, 6);}
 
 void ACC_getADC(){
   if (!i2c_trn_error()) {
@@ -273,11 +273,11 @@ void ACC_init(){
 //  control = control | (0x00 << 3); //Range 2G
   control = control | (0x03 << 3); //Range 8G
   control = control | 0x06;        //Bandwidth 1500 Hz
-  i2c_write_byte(0x70,0x14,control); 
+  i2c_write_byte(0x70,0x14,control);
   acc_1G = 255;
 }
 
-inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, 0x70, 0x02, sensor_buff.raw, 6);}  
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, 0x70, 0x02, sensor_buff.raw, 6);}
 
 void ACC_getADC(){
   i2c_getSixRawADC(0x70,0x02);
@@ -290,7 +290,7 @@ void ACC_getADC(){
 
 
 // ************************************************************************************************************
-// I2C Gyroscope ITG3200 
+// I2C Gyroscope ITG3200
 // ************************************************************************************************************
 // I2C adress: 0xD2 (8bit)   0x69 (7bit)
 // I2C adress: 0xD0 (8bit)   0x68 (7bit)
@@ -313,13 +313,13 @@ void Gyro_init() {
   __delay_ms(30);
 }
 
-static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt,ITG3200_ADDRESS, 0x1D, sensor_buff.raw, 6);}  
+static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt,ITG3200_ADDRESS, 0x1D, sensor_buff.raw, 6);}
 
 void Gyro_getADC() {
   if (!i2c_trn_error()) {
-    GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x), bswap_16(sensor_buff.itg_3200.y), bswap_16(sensor_buff.itg_3200.z)); 
+    GYRO_ORIENTATION(bswap_16(sensor_buff.itg_3200.x), bswap_16(sensor_buff.itg_3200.y), bswap_16(sensor_buff.itg_3200.z));
     gyro_common();
-  } else StatusLEDToggle(); 
+  } else StatusLEDToggle();
 }
 #endif
 
