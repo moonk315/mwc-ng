@@ -288,6 +288,11 @@
 		<Unit filename="src\hal\baseflight_startups\startup_stm32f10x_md_gcc.s">
 			<Option virtualFolder="HAL\afroflight32\" />
 		</Unit>
+		<Unit filename="src\hal\drv_i2c.h">
+			<Option virtualFolder="HAL\afroflight32\" />
+			<Option target="stm32" />
+			<Option target="stm32-upload" />
+		</Unit>
 		<Unit filename="src\hal\drv_uart.h">
 			<Option virtualFolder="HAL\afroflight32\" />
 		</Unit>
