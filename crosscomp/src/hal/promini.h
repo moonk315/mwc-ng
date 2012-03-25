@@ -98,6 +98,9 @@ static uint16_t Timer1Ovf = 2040*2-1;//2020*2;
 #if (RX == _PPM_)
 ISR(PCINT2_vect) {
   uint16_t time = TCNT1;
+  uint16_t val = timer1_overflow_count;
+  if ((TIFR1 & _BV(TOV1)) && (time < Timer1Ovf)) val++;
+  time += val*Timer1Ovf;
   uint8_t pin  = PIND;
   static uint8_t PCintLast;
   uint8_t mask = pin ^ PCintLast;
@@ -274,8 +277,6 @@ void Board_Idle() {
 };
 
 inline void Board_Init() {
-  PT_SEM_INIT(&i2c_bus_mutex, 1);
-
   // Timer0
   OCR0A = 2; OCR0B = 2;
   TCCR0A = (_BV(COM0A1) | _BV(COM0B1) | _BV(WGM00));
