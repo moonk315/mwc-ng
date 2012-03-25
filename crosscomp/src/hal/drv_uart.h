@@ -20,10 +20,9 @@ static void uartTxDMA(void) {
   DMA_Cmd(DMA1_Channel4, ENABLE);
 }
 
-void DMA1_Channel4_IRQHandler(void) {
+ISR(DMA1_Channel4_IRQHandler) {
   DMA_ClearITPendingBit(DMA1_IT_TC4);
   DMA_Cmd(DMA1_Channel4, DISABLE);
-
   if (txBufferHead != txBufferTail)
     uartTxDMA();
 }
