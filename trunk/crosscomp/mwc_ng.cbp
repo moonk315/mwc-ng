@@ -65,6 +65,21 @@
 					<SilentBuild command="$make  -f $makefile.stm " />
 				</MakeCommands>
 			</Target>
+			<Target title="stm32-upload">
+				<Option type="4" />
+				<Option compiler="armelfgcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile.stm upload" />
+					<CompileFile command="$make -f $makefile.stm $file" />
+					<Clean command="$make -f $makefile.stm clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.stm " />
+					<SilentBuild command="$make  -f $makefile.stm upload" />
+				</MakeCommands>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
@@ -77,6 +92,7 @@
 		<Unit filename="Makefile.stm">
 			<Option virtualFolder="Makefiles\" />
 			<Option target="stm32" />
+			<Option target="stm32-upload" />
 		</Unit>
 		<Unit filename="lib-avr\arduino\HardwareSerial.cpp">
 			<Option virtualFolder="lib-avr\" />
