@@ -381,6 +381,7 @@ void PWCOut(uint8_t ch, uint16_t val); // Servos
 void AttachPPM();
 void AttachPPMSerial();
 inline void rx_ppm_serial_callback(uint16_t time);
+inline void PPMCallback(uint8_t ch, uint16_t time, uint8_t state);
 
 //void __delay_ms(double __ms);
 //void __delay_us(double __us);
