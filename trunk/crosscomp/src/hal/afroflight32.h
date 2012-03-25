@@ -43,6 +43,12 @@
 #define BARO_OFF                 digitalLo(BARO_GPIO, BARO_PIN);
 #define BARO_ON                  digitalHi(BARO_GPIO, BARO_PIN);
 
+#ifdef __cplusplus
+#define ISR(x) extern "C" void x(void)
+#else
+#define ISR(x) void x(void)
+#endif
+
 #define _BV(bit) (1 << (bit))
 
 #define DEG_TO_RAD 0.017453292519943295769236907684886
@@ -55,11 +61,13 @@
 typedef const unsigned char prog_uchar;
 #define pgm_read_byte_near(x) (*(prog_uchar*)x)
 #define pgm_read_byte(x) (*(prog_uchar*)x)
-#define __attr_flash __attribute__((section (".USER_FLASH")))
-#define PROGMEM __attr_flash
+#define __attr_flash __attribute__((section ("FLASH")))
+#define PROGMEM
+//__attr_flash
 #define memcpy_P memcpy
 #define PSTR(x) x
 #define strcat_P strcat
+#define printf_P printf
 
 #include "drv_uart.h"
 
@@ -72,24 +80,14 @@ inline uint8_t i2c_read_byte(uint8_t add, uint8_t reg) {
 
 static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uint8_t *buff, uint8_t size)) {
   PT_BEGIN(pt);
-  PT_SEM_WAIT(pt, &i2c_bus_mutex);
-  PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
   PT_END(pt);
-}
-
-
-inline void __delay_us(uint32_t __us) {
-};
-
-inline void __delay_ms(uint32_t __ms) {
-  while (__ms--) __delay_us(1000);
 }
 
 static struct TIM_Channel {
   TIM_TypeDef *tim;
   uint16_t channel;
   uint16_t cc;
-} Channels[] = {
+} Channels[8] = {
   { TIM2, TIM_Channel_1, TIM_IT_CC1 },
   { TIM2, TIM_Channel_2, TIM_IT_CC2 },
   { TIM2, TIM_Channel_3, TIM_IT_CC3 },
@@ -100,6 +98,8 @@ static struct TIM_Channel {
   { TIM3, TIM_Channel_4, TIM_IT_CC4 },
 };
 
+static uint32_t pwm_state[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+
 static volatile uint16_t *OutputChannels[] = {
   &(TIM1->CCR1),
   &(TIM1->CCR4),
@@ -109,10 +109,56 @@ static volatile uint16_t *OutputChannels[] = {
   &(TIM4->CCR4),
 };
 
+
 TIM_ICInitTypeDef TIM_ICInitStructure = { 0, };
 GPIO_InitTypeDef GPIO_InitStructure = { 0, };
 TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure = { 0, };
 NVIC_InitTypeDef NVIC_InitStructure = { 0, };
+
+#if (RX == _PPM_)
+static void TIMXX_IRQHandler(TIM_TypeDef *tim) {
+  uint16_t val;
+  for (uint8_t i = 0; i < 8; i++) {
+    if ((Channels[i].tim == tim) && (TIM_GetITStatus(tim, Channels[i].cc) == SET)) {
+      switch (Channels[i].channel) {
+      case TIM_Channel_1:
+        val = TIM_GetCapture1(tim);
+        break;
+      case TIM_Channel_2:
+        val = TIM_GetCapture2(tim);
+        break;
+      case TIM_Channel_3:
+        val = TIM_GetCapture3(tim);
+        break;
+      case TIM_Channel_4:
+        val = TIM_GetCapture4(tim);
+        break;
+      default:
+        val = 0;
+      }
+      TIM_ClearITPendingBit(tim, Channels[i].cc);
+      //if ((val > 750 * 2) && (val < 2250 * 2))
+      PPMCallback(i, val, pwm_state[i]);
+      pwm_state[i] = !pwm_state[i];
+      if (pwm_state[i])
+        TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+      else
+        TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
+      TIM_ICInitStructure.TIM_Channel = Channels[i].channel;
+      TIM_ICInit(tim, &TIM_ICInitStructure);
+    }
+  }
+}
+
+ISR(TIM2_IRQHandler) {
+  TIMXX_IRQHandler(TIM2);
+}
+
+ISR(TIM3_IRQHandler) {
+  TIMXX_IRQHandler(TIM3);
+}
+#endif
+
 
 inline void AttachPPM() {
   uint32_t i;
@@ -133,7 +179,7 @@ inline void AttachPPM() {
   NVIC_Init(&NVIC_InitStructure);
   // TIM2 and TIM3 timebase
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-  TIM_TimeBaseStructure.TIM_Prescaler = (72 - 1);
+  TIM_TimeBaseStructure.TIM_Prescaler = ((72 / 2) - 1);
   TIM_TimeBaseStructure.TIM_Period = 0xffff;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
@@ -153,6 +199,16 @@ inline void AttachPPM() {
   TIM_Cmd(TIM3, ENABLE);
 }
 
+#if (RX == _PPM_SERIAL_)
+ISR(TIM2_IRQHandler) {
+  if (TIM_GetITStatus(TIM2, TIM_IT_CC1) == SET) {
+    rx_ppm_serial_callback(TIM_GetCapture1(TIM2));
+    TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
+  }
+}
+#endif
+
+
 inline void AttachPPMSerial() {
   // Configure TIM2_CH1 for PPM input
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
@@ -167,7 +223,7 @@ inline void AttachPPMSerial() {
   NVIC_Init(&NVIC_InitStructure);
   // TIM2 timebase
   TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-  TIM_TimeBaseStructure.TIM_Prescaler = (72 - 1);
+  TIM_TimeBaseStructure.TIM_Prescaler = ((72 / 2) - 1);
   TIM_TimeBaseStructure.TIM_Period = 0xffff;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
@@ -189,16 +245,14 @@ void PWMOut(uint8_t ch, uint16_t val) {
 void PWCOut(uint8_t ch, uint16_t val) {
 }
 
+static uint32_t SysTickOvf;
+
 // SysTick
-void SysTick_Handler(void) {
+ISR(SysTick_Handler) {
 }
 
 uint16_t __systick() {
-  return SysTick->VAL;
-}
-
-uint8_t __systick8() {
-  return SysTick->VAL;
+  return (SysTickOvf - SysTick->VAL) / (72 / 2);
 }
 
 inline uint16_t __interval(uint16_t i_start) {
@@ -206,8 +260,18 @@ inline uint16_t __interval(uint16_t i_start) {
 }
 
 uint16_t __interval(uint16_t i_start, uint16_t i_end) {
-  //if (i_end < i_start) i_end +=  Timer1Ovf;
+  if (i_end < i_start) i_end +=  (SysTickOvf / (72 / 2));
   return (i_end - i_start);
+}
+
+inline void __delay_us(uint32_t __us) {
+  __us -= 4;
+  uint16_t i_start = __systick();
+  while (__interval(i_start) < __us) {};
+};
+
+inline void __delay_ms(uint32_t __ms) {
+  while (__ms--) __delay_us(1000);
 }
 
 uint8_t i2c_trn_error() {
@@ -232,6 +296,18 @@ inline void StatusLEDOff() {
 
 inline void StatusLEDToggle() {
   LED0_TOGGLE
+}
+
+inline void DebugLEDOn() {
+  LED1_ON
+}
+
+inline void DebugLEDOff() {
+  LED1_OFF
+}
+
+inline void DebugLEDToggle() {
+  LED1_TOGGLE
 }
 
 inline void BeepOn() {
@@ -284,9 +360,13 @@ inline void Board_Init() {
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   BEEP_OFF;
-  SysTick_Config(SystemCoreClock);
+  SysTickOvf = SystemCoreClock >> 5;
+  SysTick_Config(SysTickOvf);
   //
   CLI_serial_open(SERIAL_COM_SPEED);
+  sei();
+  //LED1_TOGGLE
+  StatusLEDToggle();
 }
 
 void setup();
@@ -299,17 +379,47 @@ int main(void) {
 }
 
 inline void __eeprom_write_byte(uint8_t *__p, uint8_t __value) {}
-inline uint8_t __eeprom_read_byte(const uint8_t *__p) {return 0;}
+inline uint8_t __eeprom_read_byte(const uint8_t *__p) {
+  return 0;
+}
 inline void __eeprom_read_block (void *__dst, const void *__src, size_t __n) {}
 
 inline void StartBatteryVoltageMeasurement() {
 }
 
-inline uint8_t IsBatteryVoltageMeasurementFinished(){
+inline uint8_t IsBatteryVoltageMeasurementFinished() {
   return 1;
 }
 
-int16_t GetBatteryVoltage(){
+int16_t GetBatteryVoltage() {
   return 0;
+}
+
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/unistd.h>
+
+/*
+ write
+ Write a character to a file. `libc' subroutines will use this system routine for output to all files, including stdout
+ Returns -1 on error or number of bytes sent
+ */
+extern "C" int _write(int file, char *ptr, int len) {
+  int n;
+  switch (file) {
+  case STDOUT_FILENO: /*stdout*/
+    for (n = 0; n < len; n++)
+      CLI_serial_write((*ptr++ & (uint16_t)0x01FF));
+    break;
+  case STDERR_FILENO: /* stderr */
+    for (n = 0; n < len; n++)
+      CLI_serial_write((*ptr++ & (uint16_t)0x01FF));
+    break;
+  default:
+    errno = EBADF;
+    return -1;
+  }
+  return len;
 }
 
