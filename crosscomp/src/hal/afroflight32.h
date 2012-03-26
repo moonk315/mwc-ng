@@ -428,6 +428,7 @@ inline void Board_Init() {
   BEEP_OFF;
   SysTickOvf = SystemCoreClock >> 5;
   SysTick_Config(SysTickOvf);
+  SysTick->CTRL &= ~(SysTick_CTRL_TICKINT_Msk);
   //
   CLI_serial_open(SERIAL_COM_SPEED);
   // Output PWM
