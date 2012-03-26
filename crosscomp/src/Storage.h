@@ -18,13 +18,13 @@
 
 static uint8_t ver_magic = 11;
 
-typedef struct eep_entry eep_entry_t;
-struct eep_entry{
+typedef struct nvr_entry nvr_entry_t;
+struct nvr_entry{
   void *var;
   size_t size;
 };
 
-eep_entry_t eep_entry[] = {
+const nvr_entry_t nvr_entry[] = {
   {&ver_magic, sizeof(ver_magic)},
   {&pid.setup, sizeof(pid.setup)},
   {&input.setup, sizeof(input.setup)},
@@ -33,36 +33,26 @@ eep_entry_t eep_entry[] = {
   {&imu.mag_offset, sizeof(imu.mag_offset)},
   {&flight.setup, sizeof(flight.setup)},
 };
-const uint8_t eep_entry_cnt = sizeof(eep_entry) / sizeof(eep_entry_t);
-
-void eeprom_update_block (const void *__src, void *__dst, size_t __n) {
-  char *_dst_ptr = (char *)__dst;
-  char *_src_ptr = (char *)__src;
-  while (__n--) {
-    uint8_t b = __eeprom_read_byte((const uint8_t *)_dst_ptr);
-    if (b != *_src_ptr) __eeprom_write_byte((uint8_t *)_dst_ptr, *_src_ptr);
-    _dst_ptr++;
-    _src_ptr++;
-  }
-}
+const uint8_t nvr_entry_cnt = sizeof(nvr_entry) / sizeof(nvr_entry_t);
 
 void read_storage() {
-  uint16_t _address = eep_entry[0].size;
-  for(uint8_t i = 1; i < eep_entry_cnt; i++) {
-    __eeprom_read_block(eep_entry[i].var, (void*)(_address), eep_entry[i].size); _address += eep_entry[i].size;
-  }
+  nvram_open(NVRAM_MODE_READ);
+  for(uint8_t i = 0; i < nvr_entry_cnt; i++)
+    nvram_read(nvr_entry[i].var, nvr_entry[i].size);
+  nvram_close();
   build_expo_table();
 }
 
 void write_storage() {
-  uint16_t _address = 0;
-  for(uint8_t i=0; i<eep_entry_cnt; i++) {
-    eeprom_update_block(eep_entry[i].var, (void*)(_address), eep_entry[i].size); _address += eep_entry[i].size;
-  }
+  nvram_open(NVRAM_MODE_WRITE);
+  for(uint8_t i = 0; i < nvr_entry_cnt; i++)
+    nvram_write(nvr_entry[i].var, nvr_entry[i].size);
+  nvram_close();
 }
 
 void Storage_Init() {
-  uint8_t test_val = 0; __eeprom_read_block((void*)&test_val, (void*)(0), sizeof(test_val));
+  uint8_t test_val = ver_magic;
+  nvram_open(NVRAM_MODE_READ); nvram_read(&test_val, 1); nvram_close();
   if (test_val != ver_magic)
     write_storage();
   else
