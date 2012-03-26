@@ -26,7 +26,7 @@ ISR(I2C2_EV_IRQHandler) {
 }
 
 #define I2C_DEFAULT_TIMEOUT 30000
-static volatile uint16_t i2cErrorCount = 0;
+volatile uint16_t i2cErrorCount = 0;
 
 static volatile bool error = false;
 static volatile bool busy;
