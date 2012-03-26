@@ -258,7 +258,7 @@ uint16_t __interval(uint16_t i_start, uint16_t i_end) {
   return (i_end - i_start);
 }
 
-inline void __delay_us(uint32_t __us) {
+inline void __delay_us(uint16_t __us) {
   __us -= 4;
   uint16_t i_start = __systick();
   while (__interval(i_start) < __us) {};
@@ -366,7 +366,7 @@ inline void PWM_Init(bool useServos) {
 
 #include "drv_i2c.h"
 
-uint16_t twi_err_cnt;
+extern uint16_t twi_err_cnt __attribute__((alias("i2cErrorCount")));
 
 inline void i2c_write_byte(uint8_t add, uint8_t reg, uint8_t val) {
   error = !i2cWrite(add, reg, val);
