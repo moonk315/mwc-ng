@@ -13,10 +13,7 @@
 #define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];}))
 
 // EEPROM
-#include <avr/eeprom.h>
-inline void __eeprom_write_byte(uint8_t *__p, uint8_t __value) {eeprom_write_byte(__p, __value);}
-inline uint8_t __eeprom_read_byte(const uint8_t *__p) {return eeprom_read_byte(__p);}
-inline void __eeprom_read_block (void *__dst, const void *__src, size_t __n) {eeprom_read_block(__dst, __src, __n);}
+#include <nvram.h>
 
 // GUI Serial
 #define AVR_USART_PORT  0

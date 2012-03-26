@@ -446,11 +446,8 @@ int main(void) {
   return 0;
 }
 
-inline void __eeprom_write_byte(uint8_t *__p, uint8_t __value) {}
-inline uint8_t __eeprom_read_byte(const uint8_t *__p) {
-  return 0;
-}
-inline void __eeprom_read_block (void *__dst, const void *__src, size_t __n) {}
+// FLASH
+#include <nvram.h>
 
 inline void StartBatteryVoltageMeasurement() {
 }
