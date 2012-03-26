@@ -5,16 +5,17 @@ static volatile uint32_t rxDMAPos = 0;
 
 static volatile uint8_t txBuffer[UART_BUFFER_SIZE];
 static volatile uint32_t txBufferTail = 0;
+static volatile uint32_t txBufferTailDMA = 0;
 static volatile uint32_t txBufferHead = 0;
 
 static void uartTxDMA(void) {
   DMA1_Channel4->CMAR = (uint32_t)&txBuffer[txBufferTail];
   if (txBufferHead > txBufferTail) {
     DMA1_Channel4->CNDTR = txBufferHead - txBufferTail;
-    txBufferTail = txBufferHead;
+    txBufferTailDMA = txBufferHead;
   } else {
     DMA1_Channel4->CNDTR = UART_BUFFER_SIZE - txBufferTail;
-    txBufferTail = 0;
+    txBufferTailDMA = 0;
   }
 
   DMA_Cmd(DMA1_Channel4, ENABLE);
@@ -23,6 +24,7 @@ static void uartTxDMA(void) {
 ISR(DMA1_Channel4_IRQHandler) {
   DMA_ClearITPendingBit(DMA1_IT_TC4);
   DMA_Cmd(DMA1_Channel4, DISABLE);
+  txBufferTail = txBufferTailDMA;
   if (txBufferHead != txBufferTail)
     uartTxDMA();
 }
@@ -115,10 +117,17 @@ uint8_t uartReadPoll(void) {
   return uartRead();
 }
 
+void uartTXCheck() {
+  if (txBufferHead != txBufferTail) {
+    // if DMA wasn't enabled, fire it up
+    if (!(DMA1_Channel4->CCR & 1)) uartTxDMA();
+  }
+}
+
 void uartWrite(uint8_t ch) {
   uint32_t i = (txBufferHead + 1) % UART_BUFFER_SIZE;
   // Prevent buffer overrun
-  while (i == txBufferTail);
+  while (i == txBufferTail) uartTXCheck();
   txBuffer[txBufferHead] = ch;
   txBufferHead = i;
 }
@@ -126,13 +135,6 @@ void uartWrite(uint8_t ch) {
 bool uartTXFull() {
   uint32_t i = (txBufferHead + 1) % UART_BUFFER_SIZE;
   return (i == txBufferTail);
-}
-
-void uartTXCheck() {
-  if (txBufferHead != txBufferTail) {
-    // if DMA wasn't enabled, fire it up
-    if (!(DMA1_Channel4->CCR & 1)) uartTxDMA();
-  }
 }
 
 inline void GUI_serial_open(uint32_t baud) {
