@@ -313,6 +313,7 @@ inline void BeepToggle() {
 }
 
 void Board_Idle() {
+  uartTXCheck();
 };
 
 #define PULSE_1MS       (1000) // 1ms pulse width

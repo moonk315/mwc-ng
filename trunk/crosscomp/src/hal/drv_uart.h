@@ -1,11 +1,11 @@
-#define UART_BUFFER_SIZE    256
+#define UART_BUFFER_SIZE    64
 // Receive buffer, circular DMA
-volatile uint8_t rxBuffer[UART_BUFFER_SIZE];
-uint32_t rxDMAPos = 0;
+static volatile uint8_t rxBuffer[UART_BUFFER_SIZE];
+static volatile uint32_t rxDMAPos = 0;
 
-volatile uint8_t txBuffer[UART_BUFFER_SIZE];
-uint32_t txBufferTail = 0;
-uint32_t txBufferHead = 0;
+static volatile uint8_t txBuffer[UART_BUFFER_SIZE];
+static volatile uint32_t txBufferTail = 0;
+static volatile uint32_t txBufferHead = 0;
 
 static void uartTxDMA(void) {
   DMA1_Channel4->CMAR = (uint32_t)&txBuffer[txBufferTail];
@@ -97,7 +97,7 @@ void uartInit(uint32_t baud) {
   USART_Cmd(USART1, ENABLE);
 }
 
-uint16_t uartAvailable(void) {
+bool uartAvailable(void) {
   return (DMA_GetCurrDataCounter(DMA1_Channel5) != rxDMAPos) ? true : false;
 }
 
@@ -116,17 +116,31 @@ uint8_t uartReadPoll(void) {
 }
 
 void uartWrite(uint8_t ch) {
+  uint32_t i = (txBufferHead + 1) % UART_BUFFER_SIZE;
+  // Prevent buffer overrun
+  while (i == txBufferTail);
   txBuffer[txBufferHead] = ch;
-  txBufferHead = (txBufferHead + 1) % UART_BUFFER_SIZE;
-  // if DMA wasn't enabled, fire it up
-  if (!(DMA1_Channel4->CCR & 1))
-    uartTxDMA();
+  txBufferHead = i;
+}
+
+bool uartTXFull() {
+  uint32_t i = (txBufferHead + 1) % UART_BUFFER_SIZE;
+  return (i == txBufferTail);
+}
+
+void uartTXCheck() {
+  if (txBufferHead != txBufferTail) {
+    // if DMA wasn't enabled, fire it up
+    if (!(DMA1_Channel4->CCR & 1)) uartTxDMA();
+  }
 }
 
 inline void GUI_serial_open(uint32_t baud) {
   uartInit(baud);
 }
+
 inline void GUI_serial_close() {}
+
 inline uint8_t GUI_serial_available() {
   return uartAvailable();
 }
@@ -140,7 +154,9 @@ inline void GUI_serial_write(uint8_t c) {
 inline void CLI_serial_open(uint32_t baud) {
   uartInit(baud);
 }
+
 inline void CLI_serial_close() {}
+
 inline uint8_t CLI_serial_available() {
   return uartAvailable();
 }
@@ -151,5 +167,5 @@ inline void CLI_serial_write(uint8_t c) {
   uartWrite(c);
 }
 inline uint8_t GUI_serial_tx_full() {
-  return 0;
+  return uartTXFull();
 }
