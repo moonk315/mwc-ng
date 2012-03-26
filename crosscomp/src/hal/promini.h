@@ -9,6 +9,9 @@
   #define PROGMEM __attribute__((section(".progmem.data")))
 #endif
 
+#undef PSTR
+#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];}))
+
 // EEPROM
 #include <avr/eeprom.h>
 inline void __eeprom_write_byte(uint8_t *__p, uint8_t __value) {eeprom_write_byte(__p, __value);}
