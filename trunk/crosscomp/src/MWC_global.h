@@ -455,13 +455,13 @@ typedef struct param_search_rec param_search_rec_t;
 
 struct rtti_struct_member {
   char  name[5];
-  rtti_type_info_t *type;
+  const rtti_type_info_t *type;
   uint8_t  encoding;
 };
 
 struct rtti_member_list {
   uint8_t  cnt;
-  rtti_struct_member_t *memb;
+  const rtti_struct_member_t *memb;
 };
 
 struct rtti_type_info {
@@ -472,12 +472,12 @@ struct rtti_type_info {
 
 struct param_data {
   char  name[7];
-  rtti_type_info_t *type;
+  const rtti_type_info_t *type;
   void *var;
 };
 
 struct struct_node_search_rec {
-  rtti_type_info_t *type;
+  rtti_type_info_t const *type;
   uint8_t idx;
   uint8_t encoding;
 };

@@ -23,47 +23,47 @@ rtti_type_info_t rtti_u16 = {PARAM_TYPE_KIND_U16, 2,  {0, 0},};
 rtti_type_info_t rtti_i32 = {PARAM_TYPE_KIND_I32, 4,  {0, 0},};
 
 // PID Profiles
-rtti_struct_member_t rtti_pid_terms_members[] PROGMEM = {
+const rtti_struct_member_t rtti_pid_terms_members[] PROGMEM = {
   {"P",    &rtti_u8,  PARAM_TYPE_ENC_FP_4x4},
   {"I",    &rtti_u8,  PARAM_TYPE_ENC_FP_0x10},
   {"D",    &rtti_u8,  PARAM_TYPE_ENC_GENERIC},
   {"FF",   &rtti_u8,  PARAM_TYPE_ENC_FP_1x7},
   {"WND",  &rtti_i32, PARAM_TYPE_ENC_GENERIC},
 };
-rtti_type_info_t rtti_pid_terms = {PARAM_TYPE_KIND_STRUCT, sizeof(pid_terms_t), {sizeof(rtti_pid_terms_members)/sizeof(rtti_struct_member_t), rtti_pid_terms_members},};
+const rtti_type_info_t rtti_pid_terms = {PARAM_TYPE_KIND_STRUCT, sizeof(pid_terms_t), {sizeof(rtti_pid_terms_members)/sizeof(rtti_struct_member_t), rtti_pid_terms_members},};
 
-rtti_struct_member_t rtti_pid_channels_members[] PROGMEM = {
+const rtti_struct_member_t rtti_pid_channels_members[] PROGMEM = {
   {"R",    &rtti_pid_terms,  PARAM_TYPE_ENC_GENERIC},
   {"P",    &rtti_pid_terms,  PARAM_TYPE_ENC_GENERIC},
   {"Y",    &rtti_pid_terms,  PARAM_TYPE_ENC_GENERIC},
   {"T",    &rtti_pid_terms,  PARAM_TYPE_ENC_GENERIC},
 };
-rtti_type_info_t rtti_pid_channels = {PARAM_TYPE_KIND_STRUCT, sizeof(pid_channels_t), {sizeof(rtti_pid_channels_members)/sizeof(rtti_struct_member_t), rtti_pid_channels_members},};
+const rtti_type_info_t rtti_pid_channels = {PARAM_TYPE_KIND_STRUCT, sizeof(pid_channels_t), {sizeof(rtti_pid_channels_members)/sizeof(rtti_struct_member_t), rtti_pid_channels_members},};
 
-rtti_struct_member_t rtti_pid_profile_members[] PROGMEM = {
+const rtti_struct_member_t rtti_pid_profile_members[] PROGMEM = {
   {"I",   &rtti_pid_channels, PARAM_TYPE_ENC_GENERIC},
   {"O",   &rtti_pid_channels, PARAM_TYPE_ENC_GENERIC},
 };
-rtti_type_info_t rtti_pid_profile = {PARAM_TYPE_KIND_STRUCT, sizeof(pid_profile_t), {sizeof(rtti_pid_profile_members)/sizeof(rtti_struct_member_t), rtti_pid_profile_members},};
+const rtti_type_info_t rtti_pid_profile = {PARAM_TYPE_KIND_STRUCT, sizeof(pid_profile_t), {sizeof(rtti_pid_profile_members)/sizeof(rtti_struct_member_t), rtti_pid_profile_members},};
 
-rtti_struct_member_t rtti_pid_profile_list_members[] PROGMEM = {
+const rtti_struct_member_t rtti_pid_profile_list_members[] PROGMEM = {
   {"0",   &rtti_pid_profile, PARAM_TYPE_ENC_GENERIC},
   {"1",   &rtti_pid_profile, PARAM_TYPE_ENC_GENERIC},
   {"2",   &rtti_pid_profile, PARAM_TYPE_ENC_GENERIC},
   {"3",   &rtti_pid_profile, PARAM_TYPE_ENC_GENERIC},
 };
-rtti_type_info_t rtti_pid_profile_list = {PARAM_TYPE_KIND_ARRAY, /*sizeof(pid.setup.profile)*/0, {4 , rtti_pid_profile_list_members},};
+const rtti_type_info_t rtti_pid_profile_list = {PARAM_TYPE_KIND_ARRAY, /*sizeof(pid.setup.profile)*/0, {4 , rtti_pid_profile_list_members},};
 
 // RC Params
-rtti_struct_member_t rtti_rc_map_list_members[] PROGMEM = {
+const rtti_struct_member_t rtti_rc_map_list_members[] PROGMEM = {
   {"0",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
   {"1",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
   {"2",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
   {"3",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
 };
-rtti_type_info_t rtti_map_list = {PARAM_TYPE_KIND_ARRAY, 0, {4 , rtti_rc_map_list_members},};
+const rtti_type_info_t rtti_map_list = {PARAM_TYPE_KIND_ARRAY, 0, {4 , rtti_rc_map_list_members},};
 
-rtti_struct_member_t rtti_input_setup_members[] PROGMEM = {
+const rtti_struct_member_t rtti_input_setup_members[] PROGMEM = {
   {"RATE",   &rtti_u8, PARAM_TYPE_ENC_RCR},
   {"EXPO",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
   {"PSW",    &rtti_u8, PARAM_TYPE_ENC_GENERIC},
@@ -71,18 +71,18 @@ rtti_struct_member_t rtti_input_setup_members[] PROGMEM = {
   {"PMAP",   &rtti_map_list, PARAM_TYPE_ENC_GENERIC},
   {"MMAP",   &rtti_map_list, PARAM_TYPE_ENC_GENERIC},
 };
-rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup), {sizeof(rtti_input_setup_members)/sizeof(rtti_struct_member_t ), rtti_input_setup_members},};
+const rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup), {sizeof(rtti_input_setup_members)/sizeof(rtti_struct_member_t ), rtti_input_setup_members},};
 
 // Voltage monitor
-rtti_struct_member_t rtti_vbat_setup_members[] PROGMEM = {
+const rtti_struct_member_t rtti_vbat_setup_members[] PROGMEM = {
   {"SCAL",   &rtti_u8,  PARAM_TYPE_ENC_GENERIC},
   {"W1",  &rtti_i16, PARAM_TYPE_ENC_FPD_1000},
   {"W2",  &rtti_i16, PARAM_TYPE_ENC_FPD_1000},
 };
-rtti_type_info_t rtti_vbat_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(flight.setup.vbat), {sizeof(rtti_vbat_setup_members)/sizeof(rtti_struct_member_t ), rtti_vbat_setup_members},};
+const rtti_type_info_t rtti_vbat_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(flight.setup.vbat), {sizeof(rtti_vbat_setup_members)/sizeof(rtti_struct_member_t ), rtti_vbat_setup_members},};
 
 // Global RTTI info (named type instances)
-param_data_t sys_rtti_info[] PROGMEM = {
+const param_data_t sys_rtti_info[] PROGMEM = {
   {"PID" ,  &rtti_pid_profile_list, pid.setup.profile},
   {"RC" ,   &rtti_input_setup,      &input.setup},
   {"VBAT",  &rtti_vbat_setup,       &flight.setup.vbat},
@@ -94,7 +94,7 @@ inline uint8_t param_get_encoding(param_search_rec_t *sr) {
   return sr->stack[sr->level].encoding;
 }
 
-inline rtti_type_info_t *param_get_type(param_search_rec_t *sr) {
+inline rtti_type_info_t const  *param_get_type(param_search_rec_t *sr) {
   return sr->stack[sr->level].type;
 }
 
@@ -110,11 +110,11 @@ inline uint8_t param_is_float(param_search_rec_t *sr) {
   return (param_get_encoding(sr) != PARAM_TYPE_ENC_GENERIC);
 }
 
-uint8_t is_scalar(rtti_type_info_t *t) {
+uint8_t is_scalar(rtti_type_info_t const *t) {
   return ((t->kind != PARAM_TYPE_KIND_STRUCT) && (t->kind != PARAM_TYPE_KIND_ARRAY));
 }
 
-float scalar_to_float(rtti_type_info_t *t, uint8_t encoding, void *inst) {
+float scalar_to_float(rtti_type_info_t const *t, uint8_t encoding, void *inst) {
   float res;
   switch (t->kind) {
     case PARAM_TYPE_KIND_U8:  res = *(uint8_t *)inst; break;
@@ -132,7 +132,7 @@ float scalar_to_float(rtti_type_info_t *t, uint8_t encoding, void *inst) {
  return res;
 }
 
-void float_to_scalar(rtti_type_info_t *t, float val, uint8_t encoding, void *inst) {
+void float_to_scalar(rtti_type_info_t const *t, float val, uint8_t encoding, void *inst) {
   float tmp = 1.0f;
   switch (encoding) {
     case PARAM_TYPE_ENC_FP_4x4:  tmp = 16.0f; break;
@@ -173,6 +173,8 @@ uint8_t param_search_first(param_search_rec_t *sr) {
   return param_search_next(sr);
 }
 
+const char sym_underscore[] PROGMEM = "_";
+
 uint8_t param_search_next(param_search_rec_t *sr) {
   rtti_struct_member_t memb;
   struct struct_node_search_rec *st;
@@ -187,7 +189,7 @@ uint8_t param_search_next(param_search_rec_t *sr) {
     st = &sr->stack[sr->level];
     if (st->idx < st->type->members.cnt) {
       memcpy_P(&memb, &st->type->members.memb[st->idx], sizeof(rtti_struct_member_t));
-      if (st->type->kind != PARAM_TYPE_KIND_ARRAY) strcat_P(sr->name, PSTR("_"));
+      if (st->type->kind != PARAM_TYPE_KIND_ARRAY) strcat_P(sr->name, sym_underscore);
       strcat(sr->name, memb.name);
       sr->stack[sr->level].idx++;
       sr->level++;
@@ -218,7 +220,7 @@ uint8_t param_search_next(param_search_rec_t *sr) {
         for (uint8_t i = 0; i < sr->level; i ++) {
           st = &sr->stack[i];
           memcpy_P(&memb, &st->type->members.memb[st->idx - 1], sizeof(rtti_struct_member_t));
-          if (st->type->kind != PARAM_TYPE_KIND_ARRAY) strcat_P(sr->name, PSTR("_"));
+          if (st->type->kind != PARAM_TYPE_KIND_ARRAY) strcat_P(sr->name, sym_underscore);
           strcat(sr->name, memb.name);
         }
       }
