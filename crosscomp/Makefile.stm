@@ -12,6 +12,9 @@ CCP = $(TCHAIN)arm-none-eabi-g++
 OPT = -Os
 OBJCOPY = $(TCHAIN)arm-none-eabi-objcopy
 AR = $(TCHAIN)arm-none-eabi-ar
+SIZE = $(TCHAIN)arm-none-eabi-size
+OBJDUMP = $(TCHAIN)arm-none-eabi-objdump
+
 RM = rm -rf
 
 # Add .d to Make's recognized suffixes.
@@ -60,6 +63,8 @@ DEPS := $(patsubst %.o,%.d,$(OBJS))
 
 all: $(BIN_DIR)/$(OUT_FILE).elf
 	$(OBJCOPY) -O ihex "$(BIN_DIR)/$(OUT_FILE).elf" "$(BIN_DIR)/$(OUT_FILE).hex"
+	$(OBJDUMP) -h -d "$(BIN_DIR)/$(OUT_FILE).elf" > "$(BIN_DIR)/$(OUT_FILE).lst"
+	$(SIZE) -A -t "$(BIN_DIR)/$(OUT_FILE).elf"
 
 upload: all
 	cmd /c start STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn $(BIN_DIR)/$(OUT_FILE).hex
