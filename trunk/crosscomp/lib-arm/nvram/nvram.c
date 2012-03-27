@@ -10,9 +10,9 @@
 #elif defined (STM32F10X_MD)
   #define FLASH_PAGE_SIZE  ((uint16_t)0x400)
 #endif
-const uint8_t flash_reserved_area[FLASH_PAGE_SIZE*2] __attribute__ ((aligned(FLASH_PAGE_SIZE))) = {0,};
+
+const uint8_t flash_reserved_area[FLASH_PAGE_SIZE] __attribute__ ((aligned(FLASH_PAGE_SIZE))) = {0,};
 #define FLASH_WRITE_ADDR ((uint32_t)&flash_reserved_area[0])
-//#define FLASH_WRITE_ADDR                (0x08000000 + (uint32_t)FLASH_PAGE_SIZE * 63)    // use the last KB for storage
 
 static char *_address;
 static uint8_t _mode = NVRAM_MODE_CLOSED;
@@ -26,6 +26,7 @@ void nvram_open(uint8_t mode) {
   _mode = mode;
   if (_mode == NVRAM_MODE_WRITE) {
     FLASH_Unlock();
+    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);
     FLASH_ErasePage(FLASH_WRITE_ADDR);
     _flash_word = 0;
     _flash_word_idx = 0;
@@ -35,18 +36,18 @@ void nvram_open(uint8_t mode) {
 void nvram_close() {
  if (_mode == NVRAM_MODE_WRITE) {
     if (_flash_word_idx != 0)
-      FLASH_ProgramWord(FLASH_WRITE_ADDR + (uint32_t)_address, _flash_word);
+      FLASH_ProgramWord((uint32_t)_address, _flash_word);
     FLASH_Lock();
  }
  _mode = NVRAM_MODE_CLOSED;
 }
 
 void flash_send_byte(uint8_t b) {
-  _flash_word = (_flash_word << 8) | b;
+  _flash_word = (_flash_word >> 8) | (b << 24);
   _flash_word_idx++;
   if (_flash_word_idx == 4) {
+    FLASH_ProgramWord((uint32_t)_address, _flash_word);
     _flash_word_idx = 0;
-    FLASH_ProgramWord(FLASH_WRITE_ADDR + (uint32_t)_address, _flash_word);
     _address += 4;
   }
 }
