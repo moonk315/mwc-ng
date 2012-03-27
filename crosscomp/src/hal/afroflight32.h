@@ -391,6 +391,43 @@ static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uin
   PT_END(pt);
 }
 
+void adcInit() {
+  ADC_InitTypeDef ADC_InitStructure;
+  //
+  ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+  ADC_InitStructure.ADC_ScanConvMode = DISABLE;
+  ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
+  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
+  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+  ADC_InitStructure.ADC_NbrOfChannel = 1;
+  ADC_Init(ADC1, &ADC_InitStructure);
+  //
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_4, 1, ADC_SampleTime_28Cycles5);
+  ADC_Cmd(ADC1, ENABLE);
+  // Calibrate ADC
+  ADC_ResetCalibration(ADC1);
+  while(ADC_GetResetCalibrationStatus(ADC1));
+  ADC_StartCalibration(ADC1);
+  while(ADC_GetCalibrationStatus(ADC1));
+  // Fire off ADC
+  ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+}
+
+inline void StartBatteryVoltageMeasurement() {
+  ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+}
+
+inline uint8_t IsBatteryVoltageMeasurementFinished() {
+  return (ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) != RESET);
+}
+
+int16_t GetBatteryVoltage() {
+  static int16_t lpf;
+  int16_t val = (ADC_GetConversionValue(ADC1) << 2);
+  lpf += (val - lpf) >> 2;
+  return lpf;
+}
+
 inline void Board_Init() {
   // Turn on clocks for stuff we use
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
@@ -435,6 +472,8 @@ inline void Board_Init() {
   PWM_Init(false);
   // i2c
   i2cInit(I2C2);
+  // ADC
+  adcInit();
 }
 
 void setup();
@@ -448,17 +487,6 @@ int main(void) {
 
 // FLASH
 #include <nvram.h>
-
-inline void StartBatteryVoltageMeasurement() {
-}
-
-inline uint8_t IsBatteryVoltageMeasurementFinished() {
-  return 1;
-}
-
-int16_t GetBatteryVoltage() {
-  return 0;
-}
 
 #include <errno.h>
 #include <sys/stat.h>
