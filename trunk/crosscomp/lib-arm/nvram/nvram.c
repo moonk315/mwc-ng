@@ -11,7 +11,7 @@
   #define FLASH_PAGE_SIZE  ((uint16_t)0x400)
 #endif
 
-const uint8_t flash_reserved_area[FLASH_PAGE_SIZE] __attribute__ ((aligned(FLASH_PAGE_SIZE))) = {0,};
+const uint8_t flash_reserved_area[FLASH_PAGE_SIZE*2] __attribute__ ((section(".nvram")));
 #define FLASH_WRITE_ADDR ((uint32_t)&flash_reserved_area[0])
 
 static char *_address;
