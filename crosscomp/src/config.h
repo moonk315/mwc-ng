@@ -3,8 +3,10 @@
 
 #define FRAME _QUADX_
 #define RX    _PPM_SERIAL_
+//#define RX    _PPM_
 #define ESC   _PWM_
 
+//#define SERIAL_COM_SPEED 256000
 //#define SERIAL_COM_SPEED 115200
 #define SERIAL_COM_SPEED 57600
 
@@ -17,8 +19,8 @@
 #define YAW_DIRECTION 1
 
 #define I2C_SPEED 400000L
-#define BOARD _PROMINI_
-//#define BOARD _AFROFLIGHT32_
+//#define BOARD _PROMINI_
+#define BOARD _AFROFLIGHT32_
 //#define MWC_DEBUG
 
 #define RC_MINTHROTTLE 1000
@@ -34,13 +36,26 @@
 #define ITG3200_LPF_98HZ
 #define ADXL345_ADDRESS 0xA6
 
+
 #define MIDRC 1500
 
+#if (BOARD == _PROMINI_)
 //#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  X; imu.acc.fr.y  = -Y; imu.acc.fr.z  = Z;}
-#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  -X; imu.acc.fr.y  = Y; imu.acc.fr.z  = Z;}
-#define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = X; imu.gyro_raw.eul.pitch =  Y; imu.gyro_raw.eul.yaw = -Z;}
-#define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  = -Y; magADC[PITCH]  = X; magADC[YAW]  = -Z;}
+  #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  -X; imu.acc.fr.y  = Y; imu.acc.fr.z  = Z;}
+  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = X; imu.gyro_raw.eul.pitch =  Y; imu.gyro_raw.eul.yaw = -Z;}
+  #define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  = -Y; magADC[PITCH]  = X; magADC[YAW]  = -Z;}
+#endif
 
+#if (BOARD == _AFROFLIGHT32_)
+//  Normal
+  #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  Y; imu.acc.fr.y  = X; imu.acc.fr.z  = Z;}
+  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = X; imu.gyro_raw.eul.pitch =  Y; imu.gyro_raw.eul.yaw = -Z;}
+  #define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  = -Y; magADC[PITCH]  = X; magADC[YAW]  = -Z;}
+//  Inverted
+//#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  Y; imu.acc.fr.y  = -X; imu.acc.fr.z  = -Z;}
+//#define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = X; imu.gyro_raw.eul.pitch =  -Y; imu.gyro_raw.eul.yaw = Z;}
+//#define MAG_ORIENTATION(X, Y, Z)  {magADC[ROLL]  = -Y; magADC[PITCH]  = X; magADC[YAW]  = -Z;}
+#endif
 
 #endif
 
