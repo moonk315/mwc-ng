@@ -259,7 +259,7 @@ uint16_t __interval(uint16_t i_start, uint16_t i_end) {
 }
 
 inline void __delay_us(uint16_t __us) {
-  __us -= 4;
+  __us = (__us << 1) - 4;
   uint16_t i_start = __systick();
   while (__interval(i_start) < __us) {};
 };
