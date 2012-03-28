@@ -22,7 +22,8 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 /* Specify the memory areas */
 MEMORY
 {
-  FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 64K
+  FLASH (rx)      : ORIGIN = 0x08000000, LENGTH = 64K - 2K
+  NVRAM (rx)      : ORIGIN = 0x08000000 + 62K, LENGTH = 2K
   RAM (xrw)       : ORIGIN = 0x20000000, LENGTH = 20K
   MEMORY_B1 (rx)  : ORIGIN = 0x60000000, LENGTH = 0K
 }
@@ -57,7 +58,6 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
-
    .ARM.extab   : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
     .ARM : {
     __exidx_start = .;
@@ -90,7 +90,7 @@ SECTIONS
   _sidata = .;
 
   /* Initialized data sections goes into RAM, load LMA copy after code */
-  .data : 
+  .data :
   {
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
@@ -100,6 +100,7 @@ SECTIONS
     . = ALIGN(4);
     _edata = .;        /* define a global symbol at data end */
   } >RAM AT> FLASH
+
 
   /* Uninitialized data section */
   . = ALIGN(4);
@@ -137,6 +138,13 @@ SECTIONS
     *(.mb1rodata)      /* read-only data (constants) */
     *(.mb1rodata*)
   } >MEMORY_B1
+
+  .nvram (NOLOAD) : {
+    . = ALIGN(4);
+    _nvram = .;
+    *(.nvram)
+    _nvram = .;
+   } >NVRAM
 
   /* Remove information from the standard libraries */
   /DISCARD/ :
