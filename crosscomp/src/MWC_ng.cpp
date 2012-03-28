@@ -118,7 +118,7 @@ static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
 static PT_THREAD(thread_outer_ctrl(struct pt *pt, uint16_t dt)) {
   PT_BEGIN(pt);
   PT_WAIT_UNTIL(pt, timer_expired(&timer_outer_ctrl, dt));
-  //StatusLEDToggle();
+  //DebugLEDToggle();
   AHRS_loop_outer();
   PID_loop_outer();
   PT_END(pt);
