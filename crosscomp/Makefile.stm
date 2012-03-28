@@ -67,7 +67,7 @@ all: $(BIN_DIR)/$(OUT_FILE).elf
 	$(SIZE) -A -t "$(BIN_DIR)/$(OUT_FILE).elf"
 
 upload: all
-	cmd /c start STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn $(BIN_DIR)/$(OUT_FILE).hex
+	cmd /c start STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn $(BIN_DIR)/$(OUT_FILE).hex -r --a 0x08000000
 
 $(BIN_DIR)/$(OUT_FILE).elf: $(LOBJS) $(OBJS)
 	@echo Linking...
