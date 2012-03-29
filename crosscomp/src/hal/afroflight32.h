@@ -361,6 +361,8 @@ inline void PWM_Init(bool useServos) {
   //
   TIM_Cmd(TIM1, ENABLE);
   TIM_Cmd(TIM4, ENABLE);
+  // Sync Timers
+  TIM1->CNT = 0;
   TIM_CtrlPWMOutputs(TIM1, ENABLE);
   TIM_CtrlPWMOutputs(TIM4, ENABLE);
 }
