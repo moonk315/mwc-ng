@@ -36,6 +36,7 @@ inline void beep(uint8_t pattern) {
     beep(BEEP_PATTERN_SHORT_BLINK);
   } else
   if (input.stick_state == STICK_STATE_ENTER_TRIM) {
+    flight.delay_cnt = 5;
     flight.sys_state = SYS_STATE_LEVEL_TRIM;
     beep(BEEP_PATTERN_SHORT_BLINK);
   }
@@ -53,11 +54,14 @@ inline void beep(uint8_t pattern) {
 
 int16_t get_trim_val(int8_t val, int16_t trim) {
   uint8_t changed = 0;
-  if (val > 100 / 4)  {trim += 1;  changed = 1;}
-  if (val > 200 / 4)  {trim += 10; changed = 1;}
-  if (val < 100 / 4)  {trim -= 1;  changed = 1;}
-  if (val < 200 / 4)  {trim -= 10; changed = 1;}
-  if (changed) beep(BEEP_PATTERN_SHORT_BLINK);
+  if (val >  100 / 4)  {trim += 1; changed = 2;}
+  if (val >  300 / 4)  {trim += 4; changed = 1;}
+  if (val < -100 / 4)  {trim -= 1; changed = 2;}
+  if (val < -300 / 4)  {trim -= 4; changed = 1;}
+  if (changed) {
+    beep(BEEP_PATTERN_SHORT_BLINK);
+    flight.delay_cnt = changed;
+  }
   return trim;
 }
 
@@ -68,8 +72,10 @@ inline void process_level_trim_state() {
     write_storage();
     beep(BEEP_PATTERN_SHORT_BLINK);
   } else {
-    ahrs.setup.level_trim.roll  = get_trim_val(input.ctrl.roll >> 2, ahrs.setup.level_trim.roll);
-    ahrs.setup.level_trim.pitch = get_trim_val(input.ctrl.pitch >> 2, ahrs.setup.level_trim.pitch);
+    if (!flight.delay_cnt) {
+      ahrs.setup.level_trim.roll  = get_trim_val(input.ctrl.roll >> 2, ahrs.setup.level_trim.roll);
+      ahrs.setup.level_trim.pitch = get_trim_val(input.ctrl.pitch >> 2, ahrs.setup.level_trim.pitch);
+    } else flight.delay_cnt--;
   }
  }
 
