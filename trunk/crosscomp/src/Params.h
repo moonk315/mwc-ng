@@ -81,11 +81,26 @@ const rtti_struct_member_t rtti_vbat_setup_members[] PROGMEM = {
 };
 const rtti_type_info_t rtti_vbat_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(flight.setup.vbat), {sizeof(rtti_vbat_setup_members)/sizeof(rtti_struct_member_t ), rtti_vbat_setup_members},};
 
+// crd_eul_t structure
+const rtti_struct_member_t rtti_crd_eul_members[] PROGMEM = {
+  {"R", &rtti_i16, PARAM_TYPE_ENC_GENERIC},
+  {"P", &rtti_i16, PARAM_TYPE_ENC_GENERIC},
+  {"Y", &rtti_i16, PARAM_TYPE_ENC_GENERIC},
+};
+const rtti_type_info_t rtti_crd_eul = {PARAM_TYPE_KIND_STRUCT, sizeof(crd_eul_t), {sizeof(rtti_crd_eul_members)/sizeof(rtti_struct_member_t ), rtti_crd_eul_members},};
+
+// Trims
+const rtti_struct_member_t rtti_ahrs_setup_members[] PROGMEM = {
+  {"LTR", &rtti_crd_eul, PARAM_TYPE_ENC_GENERIC},
+};
+const rtti_type_info_t rtti_ahrs_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(ahrs.setup), {sizeof(rtti_ahrs_setup_members)/sizeof(rtti_struct_member_t ), rtti_ahrs_setup_members},};
+
 // Global RTTI info (named type instances)
 const param_data_t sys_rtti_info[] PROGMEM = {
   {"PID" ,  &rtti_pid_profile_list, pid.setup.profile},
   {"RC" ,   &rtti_input_setup,      &input.setup},
   {"VBAT",  &rtti_vbat_setup,       &flight.setup.vbat},
+  {"AHRS",  &rtti_ahrs_setup,       &ahrs.setup},
   {"SYSID", &rtti_u8 ,              &mavlink_system.sysid},
 };
 const uint8_t sys_rtti_info_cnt = sizeof(sys_rtti_info) / sizeof(param_data_t);

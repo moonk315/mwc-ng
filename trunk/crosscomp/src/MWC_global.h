@@ -67,7 +67,8 @@
 #define STICK_STATE_DISARM     (_BV(STICK_STATE_TH_LOW) | _BV(STICK_STATE_ROLL_LOW))
 #define STICK_STATE_ENTER_CONF (_BV(STICK_STATE_TH_LOW) | _BV(STICK_STATE_YAW_HIGH) | _BV(STICK_STATE_PITCH_HIGH))
 #define STICK_STATE_EXIT_CONF  (_BV(STICK_STATE_TH_LOW) | _BV(STICK_STATE_YAW_LOW)  | _BV(STICK_STATE_PITCH_HIGH))
-
+#define STICK_STATE_ENTER_TRIM (_BV(STICK_STATE_TH_HIGH))
+#define STICK_STATE_EXIT_TRIM  (_BV(STICK_STATE_TH_LOW))
 
 #define INNER_CTRL_LOOP_TIME    (4000L)
 #define OUTER_CTRL_LOOP_TIME    (INNER_CTRL_LOOP_TIME * 3)
@@ -82,6 +83,7 @@ enum enym_system_states {
     SYS_STATE_FLIGHT,
     SYS_STATE_DISARM_REQ,
     SYS_STATE_CONFIG,
+    SYS_STATE_LEVEL_TRIM,
     SYS_STATE_FAILSAFE,
     SYS_STATE_LAST
 };
@@ -122,7 +124,7 @@ enum enum_led_patterns {
 };
 #define LED_NUMBER_OF_PATTERNS (LED_PATTERN_LAST)
 
-uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
+const uint8_t led_pattern_cfg[LED_NUMBER_OF_PATTERNS] = {
   0b00000000,
   0b00000010,
   0b11001100,
@@ -146,7 +148,7 @@ enum enum_beep_patterns {
 };
 #define BEEP_NUMBER_OF_PATTERNS (BEEP_PATTERN_LAST)
 
-uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
+const uint8_t beep_pattern_cfg[BEEP_NUMBER_OF_PATTERNS] = {
   0b00000000,
   0b00000010,
   0b11001100,
@@ -220,6 +222,9 @@ typedef struct {float x, y, z;} fp_vector_t;
 
 typedef struct ahrs_data ahrs_data_t;
 struct ahrs_data {
+  struct {
+    crd_eul_t level_trim;
+  } setup;
   fp_vector_t acc_grav;
   fp_vector_t est_grav;
   fp_vector_t est_mag;
