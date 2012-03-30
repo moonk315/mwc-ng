@@ -32,6 +32,7 @@ const nvr_entry_t nvr_entry[] = {
   {&imu.acc_offset, sizeof(imu.acc_offset)},
   {&imu.mag_offset, sizeof(imu.mag_offset)},
   {&flight.setup, sizeof(flight.setup)},
+  {&ahrs.setup, sizeof(ahrs.setup)},
 };
 const uint8_t nvr_entry_cnt = sizeof(nvr_entry) / sizeof(nvr_entry_t);
 
