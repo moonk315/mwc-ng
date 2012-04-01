@@ -21,69 +21,78 @@
 // ************************************************************************************************************
 //default board orientation
 #if !defined(ACC_ORIENTATION)
-  #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.world.x  = X; imu.acc.world.y  = Y; imu.acc.world.z  = Z;}
+#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.world.x  = X; imu.acc.world.y  = Y; imu.acc.world.z  = Z;}
 #endif
 #if !defined(GYRO_ORIENTATION)
-  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.world.x  = X; imu.gyro_raw.world.y  = Y; imu.gyro_raw.world.z  = Z;}
+#define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.world.x  = X; imu.gyro_raw.world.y  = Y; imu.gyro_raw.world.z  = Z;}
 #endif
 #if !defined(MAG_ORIENTATION)
-  #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.world.x  = X; imu.mag.world.y  = Y; imu.mag.world.z  = Z;}
+#define MAG_ORIENTATION(X, Y, Z)  {imu.mag.world.x  = X; imu.mag.world.y  = Y; imu.mag.world.z  = Z;}
 #endif
 
 /*** I2C address ***/
 #if !defined(ADXL345_ADDRESS)
-  #define ADXL345_ADDRESS 0x3A
+#define ADXL345_ADDRESS 0x3A
 #endif
 
 #if !defined(BMA180_ADDRESS)
-  #define BMA180_ADDRESS 0x80
+#define BMA180_ADDRESS 0x80
 #endif
 
 #if !defined(ITG3200_ADDRESS)
-  #define ITG3200_ADDRESS 0XD0
+#define ITG3200_ADDRESS 0XD0
 #endif
 
 #if !defined(MS561101BA_ADDRESS)
-  #define MS561101BA_ADDRESS 0xEE
+#define MS561101BA_ADDRESS 0xEE
 #endif
 
 //ITG3200 and ITG3205 Gyro LPF setting
 #if defined(ITG3200_LPF_256HZ) || defined(ITG3200_LPF_188HZ) || defined(ITG3200_LPF_98HZ) || defined(ITG3200_LPF_42HZ) || defined(ITG3200_LPF_20HZ) || defined(ITG3200_LPF_10HZ)
-  #if defined(ITG3200_LPF_256HZ)
-    #define ITG3200_SMPLRT_DIV 0  //8000Hz
-    #define ITG3200_DLPF_CFG   0
-  #endif
-  #if defined(ITG3200_LPF_188HZ)
-    #define ITG3200_SMPLRT_DIV 0  //1000Hz
-    #define ITG3200_DLPF_CFG   1
-  #endif
-  #if defined(ITG3200_LPF_98HZ)
-    #define ITG3200_SMPLRT_DIV 0
-    #define ITG3200_DLPF_CFG   2
-  #endif
-  #if defined(ITG3200_LPF_42HZ)
-    #define ITG3200_SMPLRT_DIV 0
-    #define ITG3200_DLPF_CFG   3
-  #endif
-  #if defined(ITG3200_LPF_20HZ)
-    #define ITG3200_SMPLRT_DIV 0
-    #define ITG3200_DLPF_CFG   4
-  #endif
-  #if defined(ITG3200_LPF_10HZ)
-    #define ITG3200_SMPLRT_DIV 0
-    #define ITG3200_DLPF_CFG   5
-  #endif
+#if defined(ITG3200_LPF_256HZ)
+#define ITG3200_SMPLRT_DIV 0  //8000Hz
+#define ITG3200_DLPF_CFG   0
+#endif
+#if defined(ITG3200_LPF_188HZ)
+#define ITG3200_SMPLRT_DIV 0  //1000Hz
+#define ITG3200_DLPF_CFG   1
+#endif
+#if defined(ITG3200_LPF_98HZ)
+#define ITG3200_SMPLRT_DIV 0
+#define ITG3200_DLPF_CFG   2
+#endif
+#if defined(ITG3200_LPF_42HZ)
+#define ITG3200_SMPLRT_DIV 0
+#define ITG3200_DLPF_CFG   3
+#endif
+#if defined(ITG3200_LPF_20HZ)
+#define ITG3200_SMPLRT_DIV 0
+#define ITG3200_DLPF_CFG   4
+#endif
+#if defined(ITG3200_LPF_10HZ)
+#define ITG3200_SMPLRT_DIV 0
+#define ITG3200_DLPF_CFG   5
+#endif
 #else
-    //Default settings LPF 256Hz/8000Hz sample
-    #define ITG3200_SMPLRT_DIV 0  //8000Hz
-    #define ITG3200_DLPF_CFG   0
+//Default settings LPF 256Hz/8000Hz sample
+#define ITG3200_SMPLRT_DIV 0  //8000Hz
+#define ITG3200_DLPF_CFG   0
 #endif
 
 static union {
   uint8_t raw[6];
-  struct {int16_t x, y, z;} bma_180;
-  struct {int16_t x, y, z;} adxl345;
-  struct {int16_t x, y, z;} itg_3200;
+  struct {
+    int16_t x, y, z;
+  } bma_180;
+  struct {
+    int16_t x, y, z;
+  } adxl345;
+  struct {
+    int16_t x, y, z;
+  } itg_3200;
+  struct {
+    int16_t x, y, z;
+  } hmc5843;
 } sensor_buff;
 
 static inline int16_t bswap_16(int16_t x) {
@@ -186,7 +195,9 @@ void ACC_init () {
   imu.acc_1g = 256;
 }
 
-inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, ADXL345_ADDRESS, 0x32, sensor_buff.raw, 6);}
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, ADXL345_ADDRESS, 0x32, sensor_buff.raw, 6);
+}
 
 void ACC_getADC () {
   if (!i2c_trn_error()) {
@@ -235,9 +246,11 @@ void ACC_init () {
   imu.acc_1g = 1024;
 }
 
-inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, BMA180_ADDRESS, 0x02, sensor_buff.raw, 6);}
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, BMA180_ADDRESS, 0x02, sensor_buff.raw, 6);
+}
 
-void ACC_getADC(){
+void ACC_getADC() {
   if (!i2c_trn_error()) {
     //usefull info is on the 14 bits  [2-15] bits  /4 => [0-13] bits  /8 => 11 bit resolution
     ACC_ORIENTATION(sensor_buff.bma_180.x >> 2, sensor_buff.bma_180.y >> 2, sensor_buff.bma_180.z >> 2);
@@ -266,7 +279,7 @@ void ACC_getADC(){
 //
 // ************************************************************************************************************
 #if (ACC == _BMA020_)
-void ACC_init(){
+void ACC_init() {
   i2c_write_byte(0x70,0x15,0x80);
   uint8_t control = i2c_read_byte(0x70, 0x14);
   control = control & 0xE0;
@@ -277,9 +290,11 @@ void ACC_init(){
   acc_1G = 255;
 }
 
-inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt, 0x70, 0x02, sensor_buff.raw, 6);}
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, 0x70, 0x02, sensor_buff.raw, 6);
+}
 
-void ACC_getADC(){
+void ACC_getADC() {
   i2c_getSixRawADC(0x70,0x02);
   ACC_ORIENTATION(    ((rawADC[1]<<8) | rawADC[0])/64 ,
                       ((rawADC[3]<<8) | rawADC[2])/64 ,
@@ -313,7 +328,9 @@ void Gyro_init() {
   __delay_ms(30);
 }
 
-static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return i2c_read_buffer_pt(pt,ITG3200_ADDRESS, 0x1D, sensor_buff.raw, 6);}
+static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt,ITG3200_ADDRESS, 0x1D, sensor_buff.raw, 6);
+}
 
 void Gyro_getADC() {
   if (!i2c_trn_error()) {
@@ -323,8 +340,45 @@ void Gyro_getADC() {
 }
 #endif
 
+
+#if  (MAG == _NONE_)
+void Mag_init() {}
+
+static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {return 0;}
+
+void Mag_getADC() {}
+
+#endif
+
+
+// ************************************************************************************************************
+// I2C Compass HMC5843 & HMC5883
+// ************************************************************************************************************
+// I2C adress: 0x3C (8bit)   0x1E (7bit)
+// ************************************************************************************************************
+#if  (MAG == _HMC5843_)
+void Mag_init() {
+  __delay_ms(100);
+  uint8_t control = i2c_read_byte(0X3C, 0x00);
+  control = control | (0x03 << 3); //Rate 50hz
+  i2c_write_byte(0X3C, 0x00, control);
+  i2c_write_byte(0X3C, 0x02, 0x00); //register: Mode register  --  value: Continuous-Conversion Mode
+}
+
+static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, 0X3C, 0X03, sensor_buff.raw, 6);
+}
+
+void Mag_getADC() {
+  if (!i2c_trn_error()) {
+    MAG_ORIENTATION(bswap_16(sensor_buff.hmc5843.x), bswap_16(sensor_buff.hmc5843.y), bswap_16(sensor_buff.hmc5843.z));
+  } else StatusLEDToggle();
+}
+#endif
+
 void Sensors_Init() {
   if (GYRO != _NONE_) Gyro_init();
   if (ACC  != _NONE_) ACC_init();
+  if (MAG  != _NONE_) Mag_init();
 }
 
