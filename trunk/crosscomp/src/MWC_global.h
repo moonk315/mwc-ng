@@ -51,6 +51,7 @@
 #define _ITG3200_     1100
 #define _BMA180_      1200
 #define _ADXL345_     1300
+#define _HMC5843_     1400
 
 
 #define STICK_STATE_TH_LOW     0
@@ -227,6 +228,7 @@ struct ahrs_data {
   } setup;
   fp_vector_t acc_grav;
   fp_vector_t est_grav;
+  fp_vector_t mag_mag;
   fp_vector_t est_mag;
   crd_eul_t eul_ref;
   crd_eul_t ctrl_ref;
