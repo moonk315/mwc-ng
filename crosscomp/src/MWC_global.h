@@ -299,6 +299,7 @@ struct pid_control_data {
     struct {int16_t roll, pitch, yaw, throttle;} outer_pid;
   } rt;
   control_data_t ctrl;
+  control_data_t ictrl_last;
   pid_profile_t *active_profile;
   unsigned locked:1;
 };
