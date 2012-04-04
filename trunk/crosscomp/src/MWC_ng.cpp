@@ -105,13 +105,15 @@ static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   current_time_us += INNER_CTRL_LOOP_TIME;
   current_time_ms += (INNER_CTRL_LOOP_TIME / 1000);
   DebugLEDToggle();
-  PT_SEM_WAIT(pt, &i2c_bus_mutex);
-  PT_SPAWN(pt, &thread_gyro_read_pt, ThreadGyro_GetADC_pt(&thread_gyro_read_pt));
-  Gyro_getADC();
-  PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
-  for (uint8_t i = 0; i < 3; i++)
-    imu.gyro.raw[i] = ((imu.gyro_raw.raw[i] >> 1) + (imu.gyro_prev.raw[i] >> 1)) >> 1;
-  imu.gyro_prev = imu.gyro_raw;
+  if (GYRO  != _NONE_) {
+    PT_SEM_WAIT(pt, &i2c_bus_mutex);
+    PT_SPAWN(pt, &thread_gyro_read_pt, ThreadGyro_GetADC_pt(&thread_gyro_read_pt));
+    Gyro_getADC();
+    PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
+    for (uint8_t i = 0; i < 3; i++)
+      imu.gyro.raw[i] = ((imu.gyro_raw.raw[i] >> 1) + (imu.gyro_prev.raw[i] >> 1)) >> 1;
+    imu.gyro_prev = imu.gyro_raw;
+  }
   PID_loop_inner();
   Output_loop_400hz();
   for (uint8_t i = 0; i < 3; i++)
@@ -123,7 +125,9 @@ static PT_THREAD(thread_outer_ctrl(struct pt *pt, uint16_t dt)) {
   PT_BEGIN(pt);
   PT_WAIT_UNTIL(pt, timer_expired(&timer_outer_ctrl, dt));
   //DebugLEDToggle();
-  AHRS_loop_outer();
+  if (GYRO  != _NONE_) {
+    AHRS_loop_outer();
+  }
   PID_loop_outer();
   PT_END(pt);
 }
@@ -143,7 +147,9 @@ static PT_THREAD(thread_acc_ctrl(struct pt *pt, uint16_t dt)) {
     Mag_getADC();
     PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
   }
-  AHRS_loop_acc();
+  if (ACC  != _NONE_) {
+    AHRS_loop_acc();
+  }
   RX_loop_50hz();
   Input_loop_50hz();
   PT_END(pt);

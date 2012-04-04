@@ -303,6 +303,16 @@ void ACC_getADC() {
 }
 #endif
 
+// ************************************************************************************************************
+// Dummy ACC
+// ************************************************************************************************************
+#if (ACC == _NONE_)
+void ACC_init() {}
+
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {return 0;}
+
+void ACC_getADC() {}
+#endif
 
 // ************************************************************************************************************
 // I2C Gyroscope ITG3200
@@ -340,15 +350,17 @@ void Gyro_getADC() {
 }
 #endif
 
+// ************************************************************************************************************
+// Dummy Gyro
+// ************************************************************************************************************
+#if (GYRO == _NONE_)
+void Gyro_init() {}
 
-#if  (MAG == _NONE_)
-void Mag_init() {}
+inline PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return 0;}
 
-static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {return 0;}
-
-void Mag_getADC() {}
-
+void Gyro_getADC() {}
 #endif
+
 
 
 // ************************************************************************************************************
@@ -375,6 +387,18 @@ void Mag_getADC() {
   } else StatusLEDToggle();
 }
 #endif
+
+// ************************************************************************************************************
+// Dummy Compass
+// ************************************************************************************************************
+#if  (MAG == _NONE_)
+void Mag_init() {}
+
+static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {return 0;}
+
+void Mag_getADC() {}
+#endif
+
 
 void Sensors_Init() {
   if (GYRO != _NONE_) Gyro_init();
