@@ -211,7 +211,7 @@ inline void mav_link_process_command() {
     case MAV_CMD_PREFLIGHT_CALIBRATION:
       if (mavlink_command_long->param1 == 1.0f) imu_calibrate_gyro();
       if (mavlink_command_long->param2 == 1.0f) imu_calibrate_acc();
-      //if (mavlink_command_long->param3 == 1.0f) imu_calibrate_mag();
+      if (mavlink_command_long->param3 == 1.0f) imu_calibrate_mag_gain();
       break;
     case MAV_CMD_PREFLIGHT_STORAGE:
       if (mavlink_command_long->param1 == 0.0f) read_storage();
