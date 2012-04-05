@@ -21,62 +21,13 @@
 // ************************************************************************************************************
 //default board orientation
 #if !defined(ACC_ORIENTATION)
-#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.world.x  = X; imu.acc.world.y  = Y; imu.acc.world.z  = Z;}
+  #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.world.x  = X; imu.acc.world.y  = Y; imu.acc.world.z  = Z;}
 #endif
 #if !defined(GYRO_ORIENTATION)
-#define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.world.x  = X; imu.gyro_raw.world.y  = Y; imu.gyro_raw.world.z  = Z;}
+  #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.world.x  = X; imu.gyro_raw.world.y  = Y; imu.gyro_raw.world.z  = Z;}
 #endif
 #if !defined(MAG_ORIENTATION)
-#define MAG_ORIENTATION(X, Y, Z)  {imu.mag.world.x  = X; imu.mag.world.y  = Y; imu.mag.world.z  = Z;}
-#endif
-
-/*** I2C address ***/
-#if !defined(ADXL345_ADDRESS)
-#define ADXL345_ADDRESS 0x3A
-#endif
-
-#if !defined(BMA180_ADDRESS)
-#define BMA180_ADDRESS 0x80
-#endif
-
-#if !defined(ITG3200_ADDRESS)
-#define ITG3200_ADDRESS 0XD0
-#endif
-
-#if !defined(MS561101BA_ADDRESS)
-#define MS561101BA_ADDRESS 0xEE
-#endif
-
-//ITG3200 and ITG3205 Gyro LPF setting
-#if defined(ITG3200_LPF_256HZ) || defined(ITG3200_LPF_188HZ) || defined(ITG3200_LPF_98HZ) || defined(ITG3200_LPF_42HZ) || defined(ITG3200_LPF_20HZ) || defined(ITG3200_LPF_10HZ)
-#if defined(ITG3200_LPF_256HZ)
-#define ITG3200_SMPLRT_DIV 0  //8000Hz
-#define ITG3200_DLPF_CFG   0
-#endif
-#if defined(ITG3200_LPF_188HZ)
-#define ITG3200_SMPLRT_DIV 0  //1000Hz
-#define ITG3200_DLPF_CFG   1
-#endif
-#if defined(ITG3200_LPF_98HZ)
-#define ITG3200_SMPLRT_DIV 0
-#define ITG3200_DLPF_CFG   2
-#endif
-#if defined(ITG3200_LPF_42HZ)
-#define ITG3200_SMPLRT_DIV 0
-#define ITG3200_DLPF_CFG   3
-#endif
-#if defined(ITG3200_LPF_20HZ)
-#define ITG3200_SMPLRT_DIV 0
-#define ITG3200_DLPF_CFG   4
-#endif
-#if defined(ITG3200_LPF_10HZ)
-#define ITG3200_SMPLRT_DIV 0
-#define ITG3200_DLPF_CFG   5
-#endif
-#else
-//Default settings LPF 256Hz/8000Hz sample
-#define ITG3200_SMPLRT_DIV 0  //8000Hz
-#define ITG3200_DLPF_CFG   0
+  #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.world.x  = X; imu.mag.world.y  = Y; imu.mag.world.z  = Z;}
 #endif
 
 static union {
@@ -182,7 +133,6 @@ inline void acc_common() {
   acc_correct_offset();
 }
 
-
 // ************************************************************************************************************
 // I2C Accelerometer ADXL345
 // ************************************************************************************************************
@@ -195,11 +145,16 @@ inline void acc_common() {
 //  4) bits b00001011 must be set on register 0x31 to select the data format (only once at the initialization)
 // ************************************************************************************************************
 #if (ACC == _ADXL345_)
+
+#if !defined(ADXL345_ADDRESS)
+  #define ADXL345_ADDRESS 0x3a
+#endif
+
 void ACC_init () {
   __delay_ms(10);
-  i2c_write_byte(ADXL345_ADDRESS,0x2D,1<<3); //  register: Power CTRL  -- value: Set measure bit 3 on
-  i2c_write_byte(ADXL345_ADDRESS,0x31,0x0B); //  register: DATA_FORMAT -- value: Set bits 3(full range) and 1 0 on (+/- 16g-range)
-  i2c_write_byte(ADXL345_ADDRESS,0x2C,8+2+1); // register: BW_RATE     -- value: 200Hz sampling (see table 5 of the spec)
+  i2c_write_byte(ADXL345_ADDRESS, 0x2d, 1<<3); //  register: Power CTRL  -- value: Set measure bit 3 on
+  i2c_write_byte(ADXL345_ADDRESS, 0x31, 0x0b); //  register: DATA_FORMAT -- value: Set bits 3(full range) and 1 0 on (+/- 16g-range)
+  i2c_write_byte(ADXL345_ADDRESS, 0x2c, 8+2+1); // register: BW_RATE     -- value: 200Hz sampling (see table 5 of the spec)
   //i2c_write_byte(ADXL345_ADDRESS,0x2C,8+4+2+1); // register: BW_RATE     -- value: 1600Hz sampling (see table 5 of the spec)
   //i2c_write_byte(ADXL345_ADDRESS,0x2C,8+4+2); // register: BW_RATE     -- value: 800Hz sampling (see table 5 of the spec)
   imu.acc_1g = 256;
@@ -234,8 +189,13 @@ void ACC_getADC () {
 //                   |                                             150Hz |                 !!Calibration!! |
 // ************************************************************************************************************
 #if (ACC == _BMA180_)
+
+#if !defined(BMA180_ADDRESS)
+  #define BMA180_ADDRESS 0x80
+#endif
+
 void ACC_init () {
-  i2c_write_byte(BMA180_ADDRESS,0x0D,1<<4); // register: ctrl_reg0  -- value: set bit ee_w to 1 to enable writing
+  i2c_write_byte(BMA180_ADDRESS, 0x0D, 1<<4); // register: ctrl_reg0  -- value: set bit ee_w to 1 to enable writing
   __delay_ms(5);
   uint8_t control = i2c_read_byte(BMA180_ADDRESS, 0x20);
   control = control & 0x0F; // register: bw_tcs reg: bits 4-7 to set bw -- value: set low pass filter to 10Hz (bits value = 0000xxxx)
@@ -336,6 +296,35 @@ void ACC_getADC() {}
 // 3) sample rate = 1000Hz ( 1kHz/(div+1) )
 // ************************************************************************************************************
 #if (GYRO == _ITG3200_)
+
+#if !defined(ITG3200_ADDRESS)
+  #define ITG3200_ADDRESS 0xd0
+#endif
+
+#if defined(ITG3200_LPF_256HZ)
+  #define ITG3200_SMPLRT_DIV 0  //8000Hz
+  #define ITG3200_DLPF_CFG   0
+#elif defined(ITG3200_LPF_188HZ)
+  #define ITG3200_SMPLRT_DIV 0  //1000Hz
+  #define ITG3200_DLPF_CFG   1
+#elif defined(ITG3200_LPF_98HZ)
+  #define ITG3200_SMPLRT_DIV 0
+  #define ITG3200_DLPF_CFG   2
+#elif defined(ITG3200_LPF_42HZ)
+  #define ITG3200_SMPLRT_DIV 0
+  #define ITG3200_DLPF_CFG   3
+#elif defined(ITG3200_LPF_20HZ)
+  #define ITG3200_SMPLRT_DIV 0
+  #define ITG3200_DLPF_CFG   4
+#elif defined(ITG3200_LPF_10HZ)
+  #define ITG3200_SMPLRT_DIV 0
+  #define ITG3200_DLPF_CFG   5
+#else
+  //Default settings LPF 256Hz/8000Hz sample
+  #define ITG3200_SMPLRT_DIV 0  //8000Hz
+  #define ITG3200_DLPF_CFG   0
+#endif
+
 void Gyro_init() {
   __delay_ms(30);
   i2c_write_byte(ITG3200_ADDRESS, 0x3E, 0x80); //register: Power Management  --  value: reset device
@@ -370,8 +359,6 @@ inline PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return 0;}
 
 void Gyro_getADC() {}
 #endif
-
-
 
 // ************************************************************************************************************
 // I2C Compass HMC5843
@@ -476,9 +463,7 @@ void Mag_getADC() {}
 void Mag_calibrate_gain_start() {}
 
 void Mag_calibrate_gain_end() {}
-
 #endif
-
 
 void Sensors_Init() {
   if (GYRO != _NONE_) Gyro_init();
