@@ -109,11 +109,18 @@ static inline int16_t bswap_16(int16_t x) {
 }
 
 inline void imu_calibrate_gyro() {
-  imu.gyro_off_cal = 512;
+  if (GYRO != _NONE_)
+    imu.gyro_off_cal = 512;
 }
 
 inline void imu_calibrate_acc() {
-  imu.acc_off_cal = 512;
+  if (ACC != _NONE_)
+    imu.acc_off_cal = 512;
+}
+
+inline void imu_calibrate_mag_gain() {
+  if (MAG != _NONE_)
+    imu.mag_bias_cal = 10;
 }
 
 // ****************
@@ -364,27 +371,47 @@ void Gyro_getADC() {}
 
 
 // ************************************************************************************************************
-// I2C Compass HMC5843 & HMC5883
+// I2C Compass HMC5843
 // ************************************************************************************************************
 // I2C adress: 0x3C (8bit)   0x1E (7bit)
 // ************************************************************************************************************
 #if  (MAG == _HMC5843_)
+#define HMC5843_ADDRESS     0x3c
+#define HMC5843_GAIN        970.0f
+#define HMC5843_POS_BIAS_X  0.55f
+#define HMC5843_POS_BIAS_Y  0.55f
+#define HMC5843_POS_BIAS_Z  0.55f
+
 void Mag_init() {
   __delay_ms(100);
-  uint8_t control = i2c_read_byte(0X3C, 0x00);
-  control = control | (0x03 << 3); //Rate 50hz
-  i2c_write_byte(0X3C, 0x00, control);
-  i2c_write_byte(0X3C, 0x02, 0x00); //register: Mode register  --  value: Continuous-Conversion Mode
-}
-
-static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
-  return i2c_read_buffer_pt(pt, 0X3C, 0X03, sensor_buff.raw, 6);
+  i2c_write_byte(HMC5843_ADDRESS, 0x00, 0x18);  // 50Hz, Normal
+  i2c_write_byte(HMC5843_ADDRESS, 0x01, 0x40);  // 1.5 GA range, 970 cnt/Ga gain
+  i2c_write_byte(HMC5843_ADDRESS, 0x02, 0x00);  // Continous conversion mode
 }
 
 void Mag_getADC() {
   if (!i2c_trn_error()) {
     MAG_ORIENTATION(bswap_16(sensor_buff.hmc5843.x), bswap_16(sensor_buff.hmc5843.y), bswap_16(sensor_buff.hmc5843.z));
   } else StatusLEDToggle();
+}
+
+static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, HMC5843_ADDRESS, 0x03, sensor_buff.raw, 6);
+}
+
+void Mag_calibrate_bias_start() {
+  i2c_write_byte(HMC5843_ADDRESS, 0x00, 0x19);  // 50Hz, Positive Bias
+  i2c_write_byte(HMC5843_ADDRESS, 0x01, 0x40);  // 1.5 GA range, 970 cnt/Ga gain
+  i2c_write_byte(HMC5843_ADDRESS, 0x02, 0x01);  // Single conversion mode
+}
+
+void Mag_calibrate_bias_end() {
+  i2c_write_byte(HMC5843_ADDRESS, 0x00, 0x18);  // 50Hz, Normal
+  i2c_write_byte(HMC5843_ADDRESS, 0x01, 0x40);  // 1.5 GA range, 970 cnt/Ga gain
+  i2c_write_byte(HMC5843_ADDRESS, 0x02, 0x00);  // Continous conversion mode
+  ahrs.setup.mag_gain.x = (HMC5843_POS_BIAS_X * HMC5843_GAIN) / abs(imu.mag.fr.x);
+  ahrs.setup.mag_gain.y = (HMC5843_POS_BIAS_Y * HMC5843_GAIN) / abs(imu.mag.fr.y);
+  ahrs.setup.mag_gain.z = (HMC5843_POS_BIAS_Z * HMC5843_GAIN) / abs(imu.mag.fr.z);
 }
 #endif
 
@@ -397,6 +424,11 @@ void Mag_init() {}
 static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {return 0;}
 
 void Mag_getADC() {}
+
+void Mag_calibrate_bias_start() {}
+
+void Mag_calibrate_bias_end() {}
+
 #endif
 
 

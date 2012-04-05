@@ -217,6 +217,7 @@ struct imu_data {
   uint16_t acc_off_cal;
   uint16_t gyro_off_cal;
   uint16_t mag_off_cal;
+  uint8_t mag_bias_cal;
 };
 imu_data_t imu;
 
@@ -226,6 +227,7 @@ typedef struct ahrs_data ahrs_data_t;
 struct ahrs_data {
   struct {
     crd_eul_t level_trim;
+    fp_vector_t mag_gain;
   } setup;
   fp_vector_t acc_grav;
   fp_vector_t est_grav;

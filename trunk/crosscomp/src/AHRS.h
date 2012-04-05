@@ -110,9 +110,9 @@ inline void pre_filter_acc(){
 }
 
 inline void pre_filter_mag(){
-  ahrs.mag_mag.x = ahrs.mag_mag.x * (1.0f - INV_LPF_CONST) + imu.mag.fr.x * INV_LPF_CONST;
-  ahrs.mag_mag.y = ahrs.mag_mag.y * (1.0f - INV_LPF_CONST) + imu.mag.fr.y * INV_LPF_CONST;
-  ahrs.mag_mag.z = ahrs.mag_mag.z * (1.0f - INV_LPF_CONST) + imu.mag.fr.z * INV_LPF_CONST;
+  ahrs.mag_mag.x = ahrs.mag_mag.x * (1.0f - INV_LPF_CONST) + (imu.mag.fr.x * ahrs.setup.mag_gain.x) * INV_LPF_CONST;
+  ahrs.mag_mag.y = ahrs.mag_mag.y * (1.0f - INV_LPF_CONST) + (imu.mag.fr.y * ahrs.setup.mag_gain.y) * INV_LPF_CONST;
+  ahrs.mag_mag.z = ahrs.mag_mag.z * (1.0f - INV_LPF_CONST) + (imu.mag.fr.z * ahrs.setup.mag_gain.x) * INV_LPF_CONST;
 }
 
 void ahrs_reset() __attribute__ ((noinline));
