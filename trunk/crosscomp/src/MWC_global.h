@@ -53,6 +53,7 @@
 #define _ADXL345_     1300
 #define _HMC5843_     1400
 #define _BMA020_      1500
+#define _HMC5883_     1600
 
 
 #define STICK_STATE_TH_LOW     0
