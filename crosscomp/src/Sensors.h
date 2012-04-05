@@ -93,6 +93,9 @@ static union {
   struct {
     int16_t x, y, z;
   } hmc5843;
+  struct {
+    int16_t x, z, y;
+  } hmc5883;
 } sensor_buff;
 
 static inline int16_t bswap_16(int16_t x) {
@@ -412,6 +415,51 @@ void Mag_calibrate_gain_end() {
   ahrs.setup.mag_gain.x = (HMC5843_POS_BIAS_X * HMC5843_GAIN) / abs(imu.mag.fr.x);
   ahrs.setup.mag_gain.y = (HMC5843_POS_BIAS_Y * HMC5843_GAIN) / abs(imu.mag.fr.y);
   ahrs.setup.mag_gain.z = (HMC5843_POS_BIAS_Z * HMC5843_GAIN) / abs(imu.mag.fr.z);
+}
+#endif
+
+// ************************************************************************************************************
+// I2C Compass HMC5883
+// ************************************************************************************************************
+// I2C adress: 0x3C (8bit)   0x1E (7bit)
+// ************************************************************************************************************
+#if  (MAG == _HMC5883_)
+#define HMC5883_ADDRESS     0x3c
+#define HMC5883_GAIN        660.0f
+#define HMC5883_POS_BIAS_X  1.16f
+#define HMC5883_POS_BIAS_Y  1.16f
+#define HMC5883_POS_BIAS_Z  1.08f
+
+void Mag_init() {
+  __delay_ms(100);
+  i2c_write_byte(HMC5883_ADDRESS, 0x00, 0x74);  // 8 samples avg, 30Hz, Normal
+  i2c_write_byte(HMC5883_ADDRESS, 0x01, 0x40);  // 1.9 GA range, 820 cnt/Ga gain
+  i2c_write_byte(HMC5883_ADDRESS, 0x02, 0x00);  // Continous conversion mode
+}
+
+void Mag_getADC() {
+  if (!i2c_trn_error()) {
+    MAG_ORIENTATION(bswap_16(sensor_buff.hmc5883.x), bswap_16(sensor_buff.hmc5883.y), bswap_16(sensor_buff.hmc5883.z));
+  } else StatusLEDToggle();
+}
+
+static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, HMC5883_ADDRESS, 0x03, sensor_buff.raw, 6);
+}
+
+void Mag_calibrate_gain_start() {
+  i2c_write_byte(HMC5883_ADDRESS, 0x00, 0x75);  // 8 samples avg, 30Hz, Positive Bias
+  i2c_write_byte(HMC5883_ADDRESS, 0x01, 0x60);  // 2.5 GA range, 660 cnt/Ga gain
+  i2c_write_byte(HMC5883_ADDRESS, 0x02, 0x01);  // Single conversion mode
+}
+
+void Mag_calibrate_gain_end() {
+  i2c_write_byte(HMC5883_ADDRESS, 0x00, 0x74);  // 8 samples avg, 30Hz, Normal
+  i2c_write_byte(HMC5883_ADDRESS, 0x01, 0x40);  // 1.9 GA range, 820 cnt/Ga gain
+  i2c_write_byte(HMC5883_ADDRESS, 0x02, 0x00);  // Continous conversion mode
+  ahrs.setup.mag_gain.x = (HMC5883_POS_BIAS_X * HMC5883_GAIN) / abs(imu.mag.fr.x);
+  ahrs.setup.mag_gain.y = (HMC5883_POS_BIAS_Y * HMC5883_GAIN) / abs(imu.mag.fr.y);
+  ahrs.setup.mag_gain.z = (HMC5883_POS_BIAS_Z * HMC5883_GAIN) / abs(imu.mag.fr.z);
 }
 #endif
 
