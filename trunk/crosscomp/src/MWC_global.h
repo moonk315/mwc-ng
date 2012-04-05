@@ -228,11 +228,14 @@ struct ahrs_data {
   struct {
     crd_eul_t level_trim;
     fp_vector_t mag_gain;
+    fp_vector_t mag_offset;
   } setup;
   fp_vector_t acc_grav;
   fp_vector_t est_grav;
   fp_vector_t mag_mag;
   fp_vector_t est_mag;
+  fp_vector_t mag_prev;
+  float inv_mag_prev;
   crd_eul_t eul_ref;
   crd_eul_t ctrl_ref;
 };

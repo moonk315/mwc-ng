@@ -109,10 +109,37 @@ inline void pre_filter_acc(){
   ahrs.acc_grav.z = ahrs.acc_grav.z * (1.0f - INV_LPF_CONST) + imu.acc.fr.z * INV_LPF_CONST;
 }
 
+inline void mag_estimate_offset(){
+  // new MAG vector
+  fp_vector_t mag_new;
+  mag_new.x = imu.mag.fr.x * ahrs.setup.mag_gain.x - ahrs.setup.mag_offset.x;
+  mag_new.y = imu.mag.fr.y * ahrs.setup.mag_gain.y - ahrs.setup.mag_offset.y;
+  mag_new.x = imu.mag.fr.z * ahrs.setup.mag_gain.z - ahrs.setup.mag_offset.z;
+  // Difference vector
+  fp_vector_t mag_diff;
+  mag_diff.x = mag_new.x - ahrs.mag_prev.x;
+  mag_diff.y = mag_new.y - ahrs.mag_prev.y;
+  mag_diff.z = mag_new.z - ahrs.mag_prev.z;
+  // Magnitudes
+  float inv_mag = InvSqrt(mag_new.x * mag_new.x + mag_new.y * mag_new.y + mag_new.z * mag_new.z);
+  float inv_mag_diff = InvSqrt(mag_diff.x * mag_diff.x + mag_diff.y * mag_diff.y + mag_diff.z * mag_diff.z);
+  // Correction
+  float corr = (inv_mag_diff / ahrs.inv_mag_prev - inv_mag_diff / inv_mag) * 0.05;
+  // Apply correction
+  if (corr != NAN) {
+    ahrs.setup.mag_offset.x += mag_diff.x * corr;
+    ahrs.setup.mag_offset.y += mag_diff.y * corr;
+    ahrs.setup.mag_offset.z += mag_diff.z * corr;
+  }
+  // Remember values for next iteration
+  ahrs.inv_mag_prev = inv_mag;
+  ahrs.mag_prev = mag_new;
+}
+
 inline void pre_filter_mag(){
-  ahrs.mag_mag.x = ahrs.mag_mag.x * (1.0f - INV_LPF_CONST) + (imu.mag.fr.x * ahrs.setup.mag_gain.x) * INV_LPF_CONST;
-  ahrs.mag_mag.y = ahrs.mag_mag.y * (1.0f - INV_LPF_CONST) + (imu.mag.fr.y * ahrs.setup.mag_gain.y) * INV_LPF_CONST;
-  ahrs.mag_mag.z = ahrs.mag_mag.z * (1.0f - INV_LPF_CONST) + (imu.mag.fr.z * ahrs.setup.mag_gain.x) * INV_LPF_CONST;
+  ahrs.mag_mag.x = ahrs.mag_mag.x * (1.0f - INV_LPF_CONST) + (ahrs.mag_prev.x) * INV_LPF_CONST;
+  ahrs.mag_mag.y = ahrs.mag_mag.y * (1.0f - INV_LPF_CONST) + (ahrs.mag_prev.y) * INV_LPF_CONST;
+  ahrs.mag_mag.z = ahrs.mag_mag.z * (1.0f - INV_LPF_CONST) + (ahrs.mag_prev.z) * INV_LPF_CONST;
 }
 
 void ahrs_reset() __attribute__ ((noinline));
@@ -123,6 +150,9 @@ void ahrs_reset() {
   ahrs.acc_grav.x = 0;
   ahrs.acc_grav.y = 0;
   ahrs.acc_grav.z = imu.acc_1g;
+  ahrs.setup.mag_offset.x = 0;
+  ahrs.setup.mag_offset.y = 0;
+  ahrs.setup.mag_offset.z = 0;
 }
 
 inline void AHRS_Init() {
@@ -136,6 +166,7 @@ inline void AHRS_loop_acc() {
   pre_filter_acc();
   apply_acc_cf();
   if (MAG != _NONE_) {
+    mag_estimate_offset();
     pre_filter_mag();
     apply_mag_cf();
   }
