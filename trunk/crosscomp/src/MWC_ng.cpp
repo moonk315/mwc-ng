@@ -52,10 +52,12 @@ void debug_print_system_state() {
   //dprintf("Fl. Ctrl: (st): %x \n",  flight.sys_state);
   //dprintf("PID:   (th, r, p, y): %8d, %8d, %8d, %8d  \n",  pid.ctrl.throttle, pid.ctrl.roll, pid.ctrl.pitch, pid.ctrl.yaw);
   //dprintf("Out.m[]:(0, 1, 2, 3): %8d, %8d, %8d, %8d  \n",  out.motor[0], out.motor[1], out.motor[2], out.motor[3]);
-  dprintf("Mag  (X, Y, Z): %8d, %8d, %8d  \n",  imu.mag.fr.x, imu.mag.fr.y, imu.mag.fr.z);
-  dprintf("MAG f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.mag_mag.x), int16_t(ahrs.mag_mag.y), int16_t(ahrs.mag_mag.z));
-  dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_mag.x), int16_t(ahrs.est_mag.y), int16_t(ahrs.est_mag.z));
-  dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
+  dprintf("Mag     (X, Y, Z): %8d, %8d, %8d  \n",  imu.mag.fr.x, imu.mag.fr.y, imu.mag.fr.z);
+  dprintf("MAG_gain(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.setup.mag_gain.x   * 100.0f), int16_t(ahrs.setup.mag_gain.y   * 100.0f), int16_t(ahrs.setup.mag_gain.z   * 100.0f));
+  dprintf("MAG_off (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.setup.mag_offset.x * 100.0f), int16_t(ahrs.setup.mag_offset.y * 100.0f), int16_t(ahrs.setup.mag_offset.z * 100.0f));
+  dprintf("MAG f   (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.mag_mag.x), int16_t(ahrs.mag_mag.y), int16_t(ahrs.mag_mag.z));
+  dprintf("AHRSV   (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_mag.x), int16_t(ahrs.est_mag.y), int16_t(ahrs.est_mag.z));
+  dprintf("AHRS    (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
 }
 
 
