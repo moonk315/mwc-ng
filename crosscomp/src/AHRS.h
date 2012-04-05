@@ -127,6 +127,9 @@ void ahrs_reset() {
 
 inline void AHRS_Init() {
   ahrs_reset();
+  ahrs.setup.mag_gain.x = 1.0f;
+  ahrs.setup.mag_gain.y = 1.0f;
+  ahrs.setup.mag_gain.x = 1.0f;
 }
 
 inline void AHRS_loop_acc() {
