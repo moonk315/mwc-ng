@@ -217,7 +217,7 @@ struct imu_data {
   uint16_t acc_off_cal;
   uint16_t gyro_off_cal;
   uint16_t mag_off_cal;
-  uint8_t mag_bias_cal;
+  uint8_t mag_gain_cal;
 };
 imu_data_t imu;
 

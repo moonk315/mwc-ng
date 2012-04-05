@@ -144,16 +144,16 @@ static PT_THREAD(thread_acc_ctrl(struct pt *pt, uint16_t dt)) {
   }
   if (MAG  != _NONE_) {
     PT_SEM_WAIT(pt, &i2c_bus_mutex);
-    if (imu.mag_bias_cal == 10)
-      Mag_calibrate_bias_start();
-    if (imu.mag_bias_cal <= 1) {
+    if (imu.mag_gain_cal == 10)
+      Mag_calibrate_gain_start();
+    if (imu.mag_gain_cal <= 1) {
       PT_SPAWN(pt, &thread_acc_read_pt, ThreadMag_GetADC_pt(&thread_acc_read_pt));
       Mag_getADC();
-      if (imu.mag_bias_cal == 1) {
-        Mag_calibrate_bias_end();
-        imu.mag_bias_cal = 0;
+      if (imu.mag_gain_cal == 1) {
+        Mag_calibrate_gain_end();
+        imu.mag_gain_cal = 0;
       }
-    } else imu.mag_bias_cal--;
+    } else imu.mag_gain_cal--;
     PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
   }
   if (ACC  != _NONE_) {

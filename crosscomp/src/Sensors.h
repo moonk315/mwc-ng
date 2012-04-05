@@ -120,7 +120,7 @@ inline void imu_calibrate_acc() {
 
 inline void imu_calibrate_mag_gain() {
   if (MAG != _NONE_)
-    imu.mag_bias_cal = 10;
+    imu.mag_gain_cal = 10;
 }
 
 // ****************
@@ -399,13 +399,13 @@ static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
   return i2c_read_buffer_pt(pt, HMC5843_ADDRESS, 0x03, sensor_buff.raw, 6);
 }
 
-void Mag_calibrate_bias_start() {
+void Mag_calibrate_gain_start() {
   i2c_write_byte(HMC5843_ADDRESS, 0x00, 0x19);  // 50Hz, Positive Bias
   i2c_write_byte(HMC5843_ADDRESS, 0x01, 0x40);  // 1.5 GA range, 970 cnt/Ga gain
   i2c_write_byte(HMC5843_ADDRESS, 0x02, 0x01);  // Single conversion mode
 }
 
-void Mag_calibrate_bias_end() {
+void Mag_calibrate_gain_end() {
   i2c_write_byte(HMC5843_ADDRESS, 0x00, 0x18);  // 50Hz, Normal
   i2c_write_byte(HMC5843_ADDRESS, 0x01, 0x40);  // 1.5 GA range, 970 cnt/Ga gain
   i2c_write_byte(HMC5843_ADDRESS, 0x02, 0x00);  // Continous conversion mode
@@ -425,9 +425,9 @@ static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {return 0;}
 
 void Mag_getADC() {}
 
-void Mag_calibrate_bias_start() {}
+void Mag_calibrate_gain_start() {}
 
-void Mag_calibrate_bias_end() {}
+void Mag_calibrate_gain_end() {}
 
 #endif
 
