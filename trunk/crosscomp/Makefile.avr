@@ -66,7 +66,7 @@ DEPS := $(patsubst %.o,%.d,$(OBJS))
 all: $(BIN_DIR)/$(OUT_FILE).elf
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) -O ihex -R .eeprom "$(BIN_DIR)/$(OUT_FILE).elf" "$(BIN_DIR)/$(OUT_FILE).hex"
-	$(SIZE) -C "$(BIN_DIR)/$(OUT_FILE).elf"
+	$(SIZE) --mcu=$(MCU) -C "$(BIN_DIR)/$(OUT_FILE).elf"
 	avr-objdump -d "$(BIN_DIR)/$(OUT_FILE).elf" > "$(BIN_DIR)/$(OUT_FILE).asm"
 
 upload: all
