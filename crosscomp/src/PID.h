@@ -16,42 +16,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-int32_t calc_pid(int16_t pr_err, int32_t sp_err, pid_terms_t *t, pid_rt_t *rt) {
-  // P term
-  int32_t res = sp_err * t->P / 10;
-  // I term
-  rt->i_term += sp_err;
-  if (rt->i_term < -t->i_windup) rt->i_term = -t->i_windup;
-  else
-  if (rt->i_term > t->i_windup) rt->i_term = t->i_windup;
-  res += rt->i_term * t->I  / 1000;
-  // D term
-  int16_t tmp = rt->last_pr_error - pr_err;
-  rt->last_pr_error = pr_err;
-  res -= tmp * t->D;
-  return res;
-};
-
-
 int32_t update_pid16(int16_t sp, int16_t pv, pid_terms_t *t, pid_rt_t *rt) {
-  int32_t sp_err = sp - pv;
-  // P term
-  int32_t res = (sp_err * t->P) >> 4;
+  int32_t sp32 = (int32_t)sp;
+  int32_t sp_err32 = sp32 - pv;
   // I term
-  rt->i_term += sp_err;
-  if (rt->i_term < -t->i_windup) rt->i_term = -t->i_windup;
+  int32_t i_term = rt->i_term;
+  i_term += sp_err32;
+  if (i_term < -(t->i_windup)) i_term = -(t->i_windup);
   else
-  if (rt->i_term > t->i_windup) rt->i_term = t->i_windup;
-  res += (rt->i_term * t->I)  >> 10;
+  if (i_term > t->i_windup) i_term = t->i_windup;
+  int32_t res = (i_term * t->I)  >> 10;
+  rt->i_term = i_term;
+  // P term
+  res += (sp_err32 * t->P) >> 4;
   // D term
-  int16_t tmp = pv - rt->last_pr_error;
+  int32_t tmp32 = pv - rt->last_pr_error;
   rt->last_pr_error = pv;
-  res -= tmp * t->D;
+  res -= tmp32 * t->D;
   // Feed forward
-  res += ((int32_t)sp * t->FF) >> 7;
+  res += (sp32 * t->FF) >> 7;
   return res;
 }
-
 
 void reset_pid_state() {
   memset(&pid.rt, 0, sizeof(pid.rt));
