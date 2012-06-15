@@ -20,7 +20,7 @@ NODEPS:=clean tags svn
 OBJECT_DIR = obj/avr
 BIN_DIR = bin/avr
 OUT_FILE = mwc_ng
-MCU=atmega328p
+#MCU=atmega328p
 
 # Assembler, Compiler and Linker flags and linker script settings
 LINKER_FLAGS=-mmcu=$(MCU) $(OPT) -Wl,--relax,--gc-sections "-Wl,-Map=$(BIN_DIR)/$(OUT_FILE).map"
@@ -30,7 +30,7 @@ COMPILER_FLAGS=-c -g -mmcu=$(MCU) $(OPT) -ffunction-sections -fdata-sections -fn
   -fno-inline-small-functions -fno-split-wide-types \
   -mcall-prologues \
   -fno-jump-tables \
-  -DF_CPU=16000000L -DARDUINO=22 -Isrc -Ilib-avr/arduino -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-avr -Ilib-avr/nvram
+  -DF_CPU=16000000L -DARDUINO=22 -DBOARD=$(BOARD) -Isrc -Ilib-avr/arduino -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-avr -Ilib-avr/nvram
 
 # Define sources and objects
 LSRC := $(wildcard  lib-avr/*/*/*/*/*/*/*.c) \
