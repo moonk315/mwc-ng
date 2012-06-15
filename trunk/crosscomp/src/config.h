@@ -20,7 +20,7 @@
 
 #define I2C_SPEED 400000L
 //#define BOARD _PROMINI_
-#define BOARD _AFROFLIGHT32_
+//#define BOARD _AFROFLIGHT32_
 //#define MWC_DEBUG
 
 #define RC_MINTHROTTLE 1000
