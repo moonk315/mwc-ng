@@ -96,5 +96,68 @@ inline void RX_loop_200hz() {
 }
 #endif
 
+#if (RX == _DSM_) | (RX == _DSM2_)
+
+#define SPEK_STATE_START     0x00
+#define SPEK_STATE_PAYLOAD00 0x10
+#define SPEK_STATE_PAYLOAD01 0x30
+
+#if (RX == _DSM_)
+  #define SPEK_CHAN_SHIFT  2       // Assumes 10 bit frames, that is 1024 mode.
+  #define SPEK_CHAN_MASK   0x03    // Assumes 10 bit frames, that is 1024 mode.
+#endif
+#if (RX == _DSM2_)
+  #define SPEK_CHAN_SHIFT  3       // Assumes 11 bit frames, that is 2048 mode.
+  #define SPEK_CHAN_MASK   0x07    // Assumes 11 bit frames, that is 2048 mode.
+#endif
+
+inline void RX_Init() {
+  SPK_serial_open(115200);
+}
+
+inline void RX_loop_50hz() {
+}
+
+inline void RX_loop_200hz() {
+  static uint8_t state = SPEK_STATE_START;
+  static uint8_t val0;
+  uint8_t avail = SPK_serial_available();
+  if (avail) {
+    do {
+      uint8_t val1 = SPK_serial_read();
+      switch (state & 0xF0) {
+        case SPEK_STATE_START:
+          if (val1 == 0x01) {
+            state = SPEK_STATE_PAYLOAD00;
+            // ToDo: Read status/RSI
+            #if defined(FAILSAFE)
+            #endif
+          } else
+            val0  = val1;
+          break;
+        case SPEK_STATE_PAYLOAD00:
+          val0   = val1;
+          state |= SPEK_STATE_PAYLOAD01;
+          break;
+        case SPEK_STATE_PAYLOAD01:
+          uint8_t C = 0x0F & (val0 >> SPEK_CHAN_SHIFT);
+          if (C < 10) {
+          #if (RX == _DSM_)
+            rx_data.raw[C] = 988  +  (((uint16_t(val0 & SPEK_CHAN_MASK)  << 8)) | val1);
+          #endif
+          #if (RX == _DSM2_)
+            rx_data.raw[C] = 988  + (((uint16_t(val0 & SPEK_CHAN_MASK)  << 8)) | val1) >> 1);
+          #endif
+          }
+          if (((state++) & 0x0F) == 0x06)
+            state = SPEK_STATE_START;
+          else
+            state = (state & 0x0F) | SPEK_STATE_PAYLOAD00;
+          break;
+      }
+    } while ((avail = SPK_serial_available()));
+  } else state = SPEK_STATE_START;
+}
+#endif
 
 
