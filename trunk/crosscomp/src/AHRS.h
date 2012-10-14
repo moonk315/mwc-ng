@@ -37,7 +37,7 @@
 /* Set the Gyro Weight for Gyro/Magnetometer complementary filter */
 /* Increasing this value would reduce and delay Magnetometer influence on the output of the filter*/
 /* Default WMC value: n/a*/
-#define GYR_CMPFM_FACTOR 300.0f
+#define GYR_CMPFM_FACTOR 500.0f
 
 #define INV_GYR_CMPF_FACTOR   (1.0f / (GYR_CMPF_FACTOR  + 1.0f))
 #define INV_GYR_CMPFM_FACTOR  (1.0f / (GYR_CMPFM_FACTOR + 1.0f))
@@ -48,6 +48,7 @@
 
 #define GYRO_LSB   14.375f
 //#define GYRO_LSB   13.7f
+
 #define GYRO_SCALE ((PI)/(GYRO_LSB * 180.0f * 1000000.0f) * OUTER_CTRL_LOOP_TIME / 256.0)
 
 inline void rotate_vectors(){
@@ -55,7 +56,7 @@ inline void rotate_vectors(){
   #define eg  ahrs.est_grav
   #define em  ahrs.est_mag
   // Rotate Estimated vector(s), ROLL
-  deltaGyroAngle  = imu.gyro_ahrs.eul.roll * GYRO_SCALE;
+  deltaGyroAngle  = (imu.gyro_ahrs.eul.roll - ahrs.acc_err.x) * GYRO_SCALE;
   eg.y =  scos(deltaGyroAngle) * eg.y + ssin(deltaGyroAngle) * eg.z;
   eg.z = -ssin(deltaGyroAngle) * eg.y + scos(deltaGyroAngle) * eg.z;
   if (MAG != _NONE_) {
@@ -63,7 +64,7 @@ inline void rotate_vectors(){
     em.z = -ssin(deltaGyroAngle) * em.y + scos(deltaGyroAngle) * em.z;
   }
   // Rotate Estimated vector(s), PITCH
-  deltaGyroAngle  = imu.gyro_ahrs.eul.pitch * GYRO_SCALE;
+  deltaGyroAngle  = (imu.gyro_ahrs.eul.pitch - ahrs.acc_err.y) * GYRO_SCALE;
   eg.z =  scos(deltaGyroAngle) * eg.z - ssin(deltaGyroAngle) * eg.x;
   eg.x =  ssin(deltaGyroAngle) * eg.z + scos(deltaGyroAngle) * eg.x;
   if (MAG != _NONE_) {
@@ -71,7 +72,7 @@ inline void rotate_vectors(){
     em.x =  ssin(deltaGyroAngle) * em.z + scos(deltaGyroAngle) * em.x;
   }
   // Rotate Estimated vector(s), YAW
-  deltaGyroAngle  = -imu.gyro_ahrs.eul.yaw * GYRO_SCALE;
+  deltaGyroAngle  = -(imu.gyro_ahrs.eul.yaw - ahrs.acc_err.z) * GYRO_SCALE;
   eg.x =  scos(deltaGyroAngle) * eg.x - ssin(deltaGyroAngle) * eg.y;
   eg.y =  ssin(deltaGyroAngle) * eg.x + scos(deltaGyroAngle) * eg.y;
   if (MAG != _NONE_) {
@@ -86,21 +87,29 @@ inline void rotate_vectors(){
     ahrs.eul_ref.yaw = _atan2(eg.z * em.x - eg.x * em.z, eg.y * em.z - eg.z * em.y);
   }
   // Calculate level reference and apply trims
-  float inv_mag = InvSqrt(eg.x * eg.x + eg.y * eg.y + eg.z * eg.z) * 2000.0f;
-  ahrs.ctrl_ref.roll  = (int16_t)(eg.y * inv_mag) - ahrs.setup.level_trim.roll;
-  ahrs.ctrl_ref.pitch = (int16_t)(eg.x * inv_mag) - ahrs.setup.level_trim.pitch;
+  //float inv_mag = InvSqrt(eg.x * eg.x + eg.y * eg.y + eg.z * eg.z) * 2000.0f;
+  //ahrs.ctrl_ref.roll  = (int16_t)(eg.y * inv_mag) - ahrs.setup.level_trim.roll;
+  //ahrs.ctrl_ref.pitch = (int16_t)(eg.x * inv_mag) - ahrs.setup.level_trim.pitch;
+  ahrs.ctrl_ref.roll  = (int16_t)(eg.y * 2000.0f) - ahrs.setup.level_trim.roll;
+  ahrs.ctrl_ref.pitch = (int16_t)(eg.x * 2000.0f) - ahrs.setup.level_trim.pitch;
 }
 
 inline void apply_acc_cf(){
-  ahrs.est_grav.x = (ahrs.est_grav.x * GYR_CMPF_FACTOR + ahrs.acc_grav.x) * INV_GYR_CMPF_FACTOR;
-  ahrs.est_grav.y = (ahrs.est_grav.y * GYR_CMPF_FACTOR + ahrs.acc_grav.y) * INV_GYR_CMPF_FACTOR;
-  ahrs.est_grav.z = (ahrs.est_grav.z * GYR_CMPF_FACTOR + ahrs.acc_grav.z) * INV_GYR_CMPF_FACTOR;
+  float inv_mag = InvSqrt(ahrs.acc_grav.x * ahrs.acc_grav.x + ahrs.acc_grav.y * ahrs.acc_grav.y + ahrs.acc_grav.z * ahrs.acc_grav.z);
+  //
+  ahrs.est_grav.x = (ahrs.est_grav.x * GYR_CMPF_FACTOR + ahrs.acc_grav.x * inv_mag) * INV_GYR_CMPF_FACTOR;
+  ahrs.est_grav.y = (ahrs.est_grav.y * GYR_CMPF_FACTOR + ahrs.acc_grav.y * inv_mag) * INV_GYR_CMPF_FACTOR;
+  ahrs.est_grav.z = (ahrs.est_grav.z * GYR_CMPF_FACTOR + ahrs.acc_grav.z * inv_mag) * INV_GYR_CMPF_FACTOR;
+  // Error
+  ahrs.acc_err.x += ((ahrs.acc_grav.z * inv_mag) * ahrs.est_grav.y - (ahrs.acc_grav.y * inv_mag) * ahrs.est_grav.z) * 2.5;
+  ahrs.acc_err.y += ((ahrs.acc_grav.z * inv_mag) * ahrs.est_grav.x - (ahrs.acc_grav.x * inv_mag) * ahrs.est_grav.z) * 2.5;
+  ahrs.acc_err.z += ((ahrs.acc_grav.x * inv_mag) * ahrs.est_grav.y - (ahrs.acc_grav.y * inv_mag) * ahrs.est_grav.x) * 2.5;
 }
 
 inline void apply_mag_cf(){
-  ahrs.est_mag.x = (ahrs.est_mag.x * GYR_CMPF_FACTOR + ahrs.mag_mag.x) * INV_GYR_CMPF_FACTOR;
-  ahrs.est_mag.y = (ahrs.est_mag.y * GYR_CMPF_FACTOR + ahrs.mag_mag.y) * INV_GYR_CMPF_FACTOR;
-  ahrs.est_mag.z = (ahrs.est_mag.z * GYR_CMPF_FACTOR + ahrs.mag_mag.z) * INV_GYR_CMPF_FACTOR;
+  ahrs.est_mag.x = (ahrs.est_mag.x * GYR_CMPFM_FACTOR + ahrs.mag_mag.x) * INV_GYR_CMPFM_FACTOR;
+  ahrs.est_mag.y = (ahrs.est_mag.y * GYR_CMPFM_FACTOR + ahrs.mag_mag.y) * INV_GYR_CMPFM_FACTOR;
+  ahrs.est_mag.z = (ahrs.est_mag.z * GYR_CMPFM_FACTOR + ahrs.mag_mag.z) * INV_GYR_CMPFM_FACTOR;
 }
 
 inline void pre_filter_acc(){
@@ -109,64 +118,36 @@ inline void pre_filter_acc(){
   ahrs.acc_grav.z = ahrs.acc_grav.z * (1.0f - INV_LPF_CONST) + imu.acc.fr.z * INV_LPF_CONST;
 }
 
-inline void mag_estimate_offset(){
-  // new MAG vector
-  fp_vector_t mag_new;
-  mag_new.x = imu.mag.fr.x * ahrs.setup.mag_gain.x - ahrs.setup.mag_offset.x;
-  mag_new.y = imu.mag.fr.y * ahrs.setup.mag_gain.y - ahrs.setup.mag_offset.y;
-  mag_new.x = imu.mag.fr.z * ahrs.setup.mag_gain.z - ahrs.setup.mag_offset.z;
-  // Difference vector
-  fp_vector_t mag_diff;
-  mag_diff.x = mag_new.x - ahrs.mag_prev.x;
-  mag_diff.y = mag_new.y - ahrs.mag_prev.y;
-  mag_diff.z = mag_new.z - ahrs.mag_prev.z;
-  // Magnitudes
-  float inv_mag = InvSqrt(mag_new.x * mag_new.x + mag_new.y * mag_new.y + mag_new.z * mag_new.z);
-  float inv_mag_diff = InvSqrt(mag_diff.x * mag_diff.x + mag_diff.y * mag_diff.y + mag_diff.z * mag_diff.z);
-  // Correction
-  float corr = (inv_mag_diff / ahrs.inv_mag_prev - inv_mag_diff / inv_mag) * 0.05;
-  // Apply correction
-  if (corr != NAN) {
-    ahrs.setup.mag_offset.x += mag_diff.x * corr;
-    ahrs.setup.mag_offset.y += mag_diff.y * corr;
-    ahrs.setup.mag_offset.z += mag_diff.z * corr;
-  }
-  // Remember values for next iteration
-  ahrs.inv_mag_prev = inv_mag;
-  ahrs.mag_prev = mag_new;
-}
-
 inline void pre_filter_mag(){
-  ahrs.mag_mag.x = ahrs.mag_mag.x * (1.0f - INV_LPF_CONST) + (ahrs.mag_prev.x) * INV_LPF_CONST;
-  ahrs.mag_mag.y = ahrs.mag_mag.y * (1.0f - INV_LPF_CONST) + (ahrs.mag_prev.y) * INV_LPF_CONST;
-  ahrs.mag_mag.z = ahrs.mag_mag.z * (1.0f - INV_LPF_CONST) + (ahrs.mag_prev.z) * INV_LPF_CONST;
+  ahrs.mag_mag.x = ahrs.mag_mag.x * (1.0f - INV_LPF_CONST) + (imu.mag.fr.x * ahrs.setup.mag_gain.x) * INV_LPF_CONST;
+  ahrs.mag_mag.y = ahrs.mag_mag.y * (1.0f - INV_LPF_CONST) + (imu.mag.fr.y * ahrs.setup.mag_gain.y) * INV_LPF_CONST;
+  ahrs.mag_mag.z = ahrs.mag_mag.z * (1.0f - INV_LPF_CONST) + (imu.mag.fr.z * ahrs.setup.mag_gain.z) * INV_LPF_CONST;
 }
 
 void ahrs_reset() __attribute__ ((noinline));
 void ahrs_reset() {
   ahrs.est_grav.x = 0;
   ahrs.est_grav.y = 0;
-  ahrs.est_grav.z = imu.acc_1g;
+  ahrs.est_grav.z = 1.0f;
   ahrs.acc_grav.x = 0;
   ahrs.acc_grav.y = 0;
   ahrs.acc_grav.z = imu.acc_1g;
-  ahrs.setup.mag_offset.x = 0;
-  ahrs.setup.mag_offset.y = 0;
-  ahrs.setup.mag_offset.z = 0;
+  ahrs.acc_err.x = 0;
+  ahrs.acc_err.y = 0;
+  ahrs.acc_err.z = 0;
 }
 
 inline void AHRS_Init() {
   ahrs_reset();
   ahrs.setup.mag_gain.x = 1.0f;
   ahrs.setup.mag_gain.y = 1.0f;
-  ahrs.setup.mag_gain.x = 1.0f;
+  ahrs.setup.mag_gain.z = 1.0f;
 }
 
 inline void AHRS_loop_acc() {
   pre_filter_acc();
   apply_acc_cf();
   if (MAG != _NONE_) {
-    mag_estimate_offset();
     pre_filter_mag();
     apply_mag_cf();
   }
@@ -174,5 +155,8 @@ inline void AHRS_loop_acc() {
 
 inline void  AHRS_loop_outer() {
   rotate_vectors();
+}
+
+inline void  AHRS_loop_5hz() {
 }
 
