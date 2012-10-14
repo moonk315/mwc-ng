@@ -54,7 +54,8 @@
 #define _HMC5843_     1400
 #define _BMA020_      1500
 #define _HMC5883_     1600
-
+#define _DSM_         1700
+#define _DSM2_        1800
 
 #define STICK_STATE_TH_LOW     0
 #define STICK_STATE_TH_HIGH    1
@@ -77,6 +78,8 @@
 #define OUTER_CTRL_LOOP_TIME    (INNER_CTRL_LOOP_TIME * 3)
 #define ACC_CTRL_LOOP_TIME      (20000L)
 #define SERVICE_LOOP_TIME       (200000L)
+
+#define __PACKED__ __attribute__((__packed__))
 
 enum enym_system_states {
     SYS_STATE_IDLE,
@@ -227,16 +230,14 @@ typedef struct {float x, y, z;} fp_vector_t;
 typedef struct ahrs_data ahrs_data_t;
 struct ahrs_data {
   struct {
-    crd_eul_t level_trim;
+    crd_eul_t level_trim __PACKED__;
     fp_vector_t mag_gain;
-    fp_vector_t mag_offset;
   } setup;
   fp_vector_t acc_grav;
   fp_vector_t est_grav;
   fp_vector_t mag_mag;
   fp_vector_t est_mag;
-  fp_vector_t mag_prev;
-  float inv_mag_prev;
+  fp_vector_t acc_err;
   crd_eul_t eul_ref;
   crd_eul_t ctrl_ref;
 };
@@ -312,12 +313,11 @@ struct pid_control_data {
 };
 pid_control_data_t pid;
 
-
 typedef struct out_control_data out_control_data_t;
 struct out_control_data {
   struct {} setup;
-  uint16_t motor[8];
-  uint16_t servo[8];
+  int16_t motor[8];
+  int16_t servo[8];
   uint8_t motor_cnt;
   uint8_t servo_cnt;
   unsigned motors_armed:1;
@@ -329,7 +329,7 @@ struct vbat_data {
   uint8_t  voltage_scaler;
   int16_t  voltage_warn1;
   int16_t  voltage_warn2;
-};
+} __PACKED__;
 
 
 typedef struct flight_control_data flight_control_data_t;
