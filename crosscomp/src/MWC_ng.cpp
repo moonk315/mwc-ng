@@ -22,6 +22,7 @@
 #include <pt.h>
 #include <pt-sem.h>
 #include <MWC_MAVLink.h>
+#include <mvc_dsp.h>
 #include "MWC_global.h"
 #include "config.h"
 #include "Core.h"
@@ -39,25 +40,28 @@
 #include "Storage.h"
 
 void debug_print_system_state() {
+  //return;
   dprintf("\033[1;1H");
   //dprintf("PPM  (th, r, p, y): %8d, %8d, %8d, %8d \n",  get_raw_ppm_data_no_block(RX_CHANNEL_THROTTLE), get_raw_ppm_data_no_block(RX_CHANNEL_ROLL), get_raw_ppm_data_no_block(RX_CHANNEL_PITCH), get_raw_ppm_data_no_block(RX_CHANNEL_YAW));
   //dprintf("RX:  (th, r, p, y, aux1, aux2, aux3, aux4): %8d, %8d, %8d, %8d, %8d, %8d, %8d, %8d  \n",  rx_data.throttle, rx_data.roll, rx_data.pitch, rx_data.yaw, rx_data.aux1, rx_data.aux2, rx_data.aux3, rx_data.aux4);
-  //dprintf("Gyro (r, p, y): %8d, %8d, %8d  \n",  imu.gyro.eul.roll, imu.gyro.eul.pitch, imu.gyro.eul.yaw);
-  //dprintf("Acc  (X, Y, Z): %8d, %8d, %8d  \n",  imu.acc.fr.x, imu.acc.fr.y, imu.acc.fr.z);
-  //dprintf("ACC f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_grav.x), int16_t(ahrs.acc_grav.y), int16_t(ahrs.acc_grav.z));
-  //dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_grav.x), int16_t(ahrs.est_grav.y), int16_t(ahrs.est_grav.z));
-  //dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
+  dprintf("Gyro (r, p, y): %8d, %8d, %8d  \n",  imu.gyro.eul.roll, imu.gyro.eul.pitch, imu.gyro.eul.yaw);
+  dprintf("Acc  (X, Y, Z): %8d, %8d, %8d  \n",  imu.acc.fr.x, imu.acc.fr.y, imu.acc.fr.z);
+  dprintf("ACC f(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_grav.x), int16_t(ahrs.acc_grav.y), int16_t(ahrs.acc_grav.z));
+  dprintf("AHRSV(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_grav.x*100), int16_t(ahrs.est_grav.y*100), int16_t(ahrs.est_grav.z*100));
+  dprintf("AHRSE(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.acc_err.x*1), int16_t(ahrs.acc_err.y*1), int16_t(ahrs.acc_err.z*1));
+  dprintf("AHRS (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
+  dprintf("VBAT (v,w1,w2): %8d, %8d, %8d  \n",  batt_voltage, flight.setup.vbat.voltage_warn1, flight.setup.vbat.voltage_warn2);
   //dprintf("CPU: %8d%%  \n",  cpu_util_pct * 100 / 255);
   //dprintf("Input: (th, r, p, y, st): %8d, %8d, %8d, %8d  %x \n",  input.ctrl.throttle, input.ctrl.roll, input.ctrl.pitch, input.ctrl.yaw, input.stick_state);
   //dprintf("Fl. Ctrl: (st): %x \n",  flight.sys_state);
   //dprintf("PID:   (th, r, p, y): %8d, %8d, %8d, %8d  \n",  pid.ctrl.throttle, pid.ctrl.roll, pid.ctrl.pitch, pid.ctrl.yaw);
   //dprintf("Out.m[]:(0, 1, 2, 3): %8d, %8d, %8d, %8d  \n",  out.motor[0], out.motor[1], out.motor[2], out.motor[3]);
-  dprintf("Mag     (X, Y, Z): %8d, %8d, %8d  \n",  imu.mag.fr.x, imu.mag.fr.y, imu.mag.fr.z);
-  dprintf("MAG_gain(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.setup.mag_gain.x   * 100.0f), int16_t(ahrs.setup.mag_gain.y   * 100.0f), int16_t(ahrs.setup.mag_gain.z   * 100.0f));
-  dprintf("MAG_off (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.setup.mag_offset.x * 100.0f), int16_t(ahrs.setup.mag_offset.y * 100.0f), int16_t(ahrs.setup.mag_offset.z * 100.0f));
-  dprintf("MAG f   (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.mag_mag.x), int16_t(ahrs.mag_mag.y), int16_t(ahrs.mag_mag.z));
-  dprintf("AHRSV   (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_mag.x), int16_t(ahrs.est_mag.y), int16_t(ahrs.est_mag.z));
-  dprintf("AHRS    (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
+  //dprintf("Mag     (X, Y, Z): %8d, %8d, %8d  \n",  imu.mag.fr.x, imu.mag.fr.y, imu.mag.fr.z);
+  //dprintf("MAG_gain(x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.setup.mag_gain.x   * 10.0f), int16_t(ahrs.setup.mag_gain.y   * 10.0f), int16_t(ahrs.setup.mag_gain.z   * 10.0f));
+//  dprintf("MAG_off (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.setup.mag_offset.x * 10.0f), int16_t(ahrs.setup.mag_offset.y * 10.0f), int16_t(ahrs.setup.mag_offset.z * 10.0f));
+  //dprintf("MAG f   (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.mag_mag.x), int16_t(ahrs.mag_mag.y), int16_t(ahrs.mag_mag.z));
+  //dprintf("AHRSV   (x, y, z): %8d, %8d, %8d  \n",  int16_t(ahrs.est_mag.x), int16_t(ahrs.est_mag.y), int16_t(ahrs.est_mag.z));
+  //dprintf("AHRS    (r, p, y): %8d, %8d, %8d  \n",  ahrs.eul_ref.roll, ahrs.eul_ref.pitch, ahrs.eul_ref.yaw);
 }
 
 
@@ -102,6 +106,86 @@ static struct pt thread_acc_read_pt;
 #define IDLE_LOOP_CNT (SERVICE_LOOP_TIME / IDLE_LOOP_PERIOD)
 static uint16_t main_loop_cnt;
 
+/*
+const int16_t gyro_fir_h[] PROGMEM = {
+  124,
+  410,
+  506,
+  170,
+ -168,
+ -101,
+   83,
+   59,
+  -21,
+  -12,
+    7,
+    0,
+    0,
+};
+*/
+
+/*
+const int16_t gyro_fir_h[] PROGMEM = {
+   95,
+  320,
+  472,
+  300,
+  -48,
+ -178,
+  -19,
+  115,
+   66,
+  -20,
+  -21,
+    6,
+    5,
+};
+*/
+
+
+/*
+const int16_t gyro_fir_h[] PROGMEM = {
+  487,
+  648,
+  -53,
+ -121,
+   75,
+  -16,
+    2,
+};
+*/
+
+/*
+const int16_t gyro_fir_h[] PROGMEM = {
+  488,
+  649,
+  -53,
+ -121,
+   75,
+  -16,
+    2,
+};
+*/
+
+const int16_t gyro_fir_h[] PROGMEM = {
+  149,
+  459,
+  478,
+   78,
+ -184,
+  -90,
+   15,
+   12,
+};
+
+const uint8_t gyro_fir_ntaps = sizeof(gyro_fir_h)/sizeof(int16_t);
+int16_t gyro_fir_buff[3][gyro_fir_ntaps];
+fir_filter16_t gyro_fir[3] = {
+  {gyro_fir_ntaps, 0, gyro_fir_h, gyro_fir_buff[0]},
+  {gyro_fir_ntaps, 0, gyro_fir_h, gyro_fir_buff[1]},
+  {gyro_fir_ntaps, 0, gyro_fir_h, gyro_fir_buff[2]},
+};
+
 static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   PT_BEGIN(pt);
   PT_WAIT_UNTIL(pt, timer_expired(&timer_inner_ctrl, dt));
@@ -114,6 +198,8 @@ static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
     Gyro_getADC();
     PT_SEM_SIGNAL(pt, &i2c_bus_mutex);
     for (uint8_t i = 0; i < 3; i++)
+      //imu.gyro.raw[i] = fir_16_P(&gyro_fir[i], (imu.gyro_raw.raw[i] >> 1) + (imu.gyro_prev.raw[i] >> 1)) >> 1;
+      //imu.gyro.raw[i] = fir_16_P(&gyro_fir[i], imu.gyro_raw.raw[i]) >> 1;
       imu.gyro.raw[i] = ((imu.gyro_raw.raw[i] >> 1) + (imu.gyro_prev.raw[i] >> 1)) >> 1;
     imu.gyro_prev = imu.gyro_raw;
   }
@@ -132,6 +218,7 @@ static PT_THREAD(thread_outer_ctrl(struct pt *pt, uint16_t dt)) {
     AHRS_loop_outer();
   }
   PID_loop_outer();
+  RX_loop_200hz();
   PT_END(pt);
 }
 
@@ -171,6 +258,7 @@ static PT_THREAD(thread_service(struct pt *pt, uint16_t dt)) {
   PT_WAIT_UNTIL(pt, timer_expired(&timer_service, dt));
   Input_loop_5hz();
   FlightControl_loop_5hz();
+  AHRS_loop_5hz();
   // Calc CPU utilization
   uint16_t delta = main_loop_cnt;
   uint8_t idle_pct = ((uint32_t)delta << 8) / IDLE_LOOP_CNT;
