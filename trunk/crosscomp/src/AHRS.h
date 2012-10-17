@@ -101,9 +101,9 @@ inline void apply_acc_cf(){
   ahrs.est_grav.y = (ahrs.est_grav.y * GYR_CMPF_FACTOR + ahrs.acc_grav.y * inv_mag) * INV_GYR_CMPF_FACTOR;
   ahrs.est_grav.z = (ahrs.est_grav.z * GYR_CMPF_FACTOR + ahrs.acc_grav.z * inv_mag) * INV_GYR_CMPF_FACTOR;
   // Error
-  ahrs.acc_err.x += ((ahrs.acc_grav.z * inv_mag) * ahrs.est_grav.y - (ahrs.acc_grav.y * inv_mag) * ahrs.est_grav.z) * 2.5;
-  ahrs.acc_err.y += ((ahrs.acc_grav.z * inv_mag) * ahrs.est_grav.x - (ahrs.acc_grav.x * inv_mag) * ahrs.est_grav.z) * 2.5;
-  ahrs.acc_err.z += ((ahrs.acc_grav.x * inv_mag) * ahrs.est_grav.y - (ahrs.acc_grav.y * inv_mag) * ahrs.est_grav.x) * 2.5;
+  ahrs.acc_err.x += ((ahrs.acc_grav.z * inv_mag) * ahrs.est_grav.y - (ahrs.acc_grav.y * inv_mag) * ahrs.est_grav.z) * 25.6f;
+  ahrs.acc_err.y += ((ahrs.acc_grav.z * inv_mag) * ahrs.est_grav.x - (ahrs.acc_grav.x * inv_mag) * ahrs.est_grav.z) * 25.6f;
+  ahrs.acc_err.z -= ((ahrs.acc_grav.x * inv_mag) * ahrs.est_grav.y - (ahrs.acc_grav.y * inv_mag) * ahrs.est_grav.x) * 25.6f;
 }
 
 inline void apply_mag_cf(){
