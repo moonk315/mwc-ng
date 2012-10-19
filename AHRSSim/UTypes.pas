@@ -17,6 +17,11 @@ type
     Z: float;
   end;
 
+  TFpQ = record
+    v: TFpVector;
+    w: float;
+  end;
+
   TGyroData = record
     roll: integer;
     pitch: integer;
@@ -49,6 +54,15 @@ type
     eul_ref_yaw: float;
     ctrl_ref: TGyroData;
     acc_err: TFpVector;
+
+    eul_ref2_roll: float;
+    eul_ref2_pitch: float;
+    eul_ref2_yaw: float;
+
+    eul_ref3_roll: float;
+    eul_ref3_pitch: float;
+    eul_ref3_yaw: float;
+
   end;
 
 
