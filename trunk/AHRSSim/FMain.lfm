@@ -1,15 +1,15 @@
 object Form1: TForm1
   Left = 780
-  Height = 276
+  Height = 295
   Top = 327
-  Width = 366
+  Width = 505
   Caption = 'Form1'
-  ClientHeight = 276
-  ClientWidth = 366
+  ClientHeight = 295
+  ClientWidth = 505
   OnCreate = FormCreate
   LCLVersion = '1.0.1.3'
   object EdtRoll: TLabeledEdit
-    Left = 8
+    Left = 48
     Height = 21
     Top = 24
     Width = 80
@@ -19,17 +19,17 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Control = EdtRoll
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtRoll
-    EditLabel.Left = 8
+    EditLabel.Left = 48
     EditLabel.Height = 14
     EditLabel.Top = 7
     EditLabel.Width = 80
-    EditLabel.Caption = 'Roll'
+    EditLabel.Caption = 'V.Roll'
     EditLabel.ParentColor = False
     ReadOnly = True
     TabOrder = 0
   end
   object EdtPitch: TLabeledEdit
-    Left = 8
+    Left = 48
     Height = 21
     Top = 64
     Width = 80
@@ -39,17 +39,17 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Control = EdtPitch
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtPitch
-    EditLabel.Left = 8
+    EditLabel.Left = 48
     EditLabel.Height = 14
     EditLabel.Top = 47
     EditLabel.Width = 80
-    EditLabel.Caption = 'Pitch'
+    EditLabel.Caption = 'V.Pitch'
     EditLabel.ParentColor = False
     ReadOnly = True
     TabOrder = 1
   end
   object AccErrX: TLabeledEdit
-    Left = 216
+    Left = 400
     Height = 21
     Top = 24
     Width = 80
@@ -59,7 +59,7 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Control = AccErrX
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = AccErrX
-    EditLabel.Left = 216
+    EditLabel.Left = 400
     EditLabel.Height = 14
     EditLabel.Top = 7
     EditLabel.Width = 80
@@ -69,7 +69,7 @@ object Form1: TForm1
     TabOrder = 2
   end
   object AccErrY: TLabeledEdit
-    Left = 216
+    Left = 400
     Height = 21
     Top = 64
     Width = 80
@@ -79,7 +79,7 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Control = AccErrY
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = AccErrY
-    EditLabel.Left = 216
+    EditLabel.Left = 400
     EditLabel.Height = 14
     EditLabel.Top = 47
     EditLabel.Width = 80
@@ -89,9 +89,9 @@ object Form1: TForm1
     TabOrder = 3
   end
   object AccErrZ: TLabeledEdit
-    Left = 216
+    Left = 400
     Height = 21
-    Top = 112
+    Top = 104
     Width = 80
     Color = clBtnFace
     EditLabel.AnchorSideLeft.Control = AccErrZ
@@ -99,31 +99,276 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Control = AccErrZ
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = AccErrZ
-    EditLabel.Left = 216
+    EditLabel.Left = 400
     EditLabel.Height = 14
-    EditLabel.Top = 95
+    EditLabel.Top = 87
     EditLabel.Width = 80
     EditLabel.Caption = 'Z'
     EditLabel.ParentColor = False
     ReadOnly = True
     TabOrder = 4
   end
+  object EdtYaw: TLabeledEdit
+    Left = 48
+    Height = 21
+    Top = 104
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtYaw
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtYaw
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtYaw
+    EditLabel.Left = 48
+    EditLabel.Height = 14
+    EditLabel.Top = 87
+    EditLabel.Width = 80
+    EditLabel.Caption = 'V.Yaw'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 5
+  end
+  object EdtRoll1: TLabeledEdit
+    Left = 128
+    Height = 21
+    Top = 24
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtRoll1
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtRoll1
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtRoll1
+    EditLabel.Left = 128
+    EditLabel.Height = 14
+    EditLabel.Top = 7
+    EditLabel.Width = 80
+    EditLabel.Caption = 'Q.Roll'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 6
+  end
+  object EdtPitch1: TLabeledEdit
+    Left = 128
+    Height = 21
+    Top = 64
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtPitch1
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtPitch1
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtPitch1
+    EditLabel.Left = 128
+    EditLabel.Height = 14
+    EditLabel.Top = 47
+    EditLabel.Width = 80
+    EditLabel.Caption = 'Q.Pitch'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 7
+  end
+  object EdtYaw1: TLabeledEdit
+    Left = 128
+    Height = 21
+    Top = 104
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtYaw1
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtYaw1
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtYaw1
+    EditLabel.Left = 128
+    EditLabel.Height = 14
+    EditLabel.Top = 87
+    EditLabel.Width = 80
+    EditLabel.Caption = 'Q.Yaw'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 8
+  end
+  object EdtYaw2: TLabeledEdit
+    Left = 208
+    Height = 21
+    Top = 104
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtYaw2
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtYaw2
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtYaw2
+    EditLabel.Left = 208
+    EditLabel.Height = 14
+    EditLabel.Top = 87
+    EditLabel.Width = 80
+    EditLabel.Caption = 'E.Yaw'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 9
+  end
+  object EdtPitch2: TLabeledEdit
+    Left = 208
+    Height = 21
+    Top = 64
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtPitch2
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtPitch2
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtPitch2
+    EditLabel.Left = 208
+    EditLabel.Height = 14
+    EditLabel.Top = 47
+    EditLabel.Width = 80
+    EditLabel.Caption = 'E.Pitch'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 10
+  end
+  object EdtRoll2: TLabeledEdit
+    Left = 208
+    Height = 21
+    Top = 24
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtRoll2
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtRoll2
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtRoll2
+    EditLabel.Left = 208
+    EditLabel.Height = 14
+    EditLabel.Top = 7
+    EditLabel.Width = 80
+    EditLabel.Caption = 'E.Roll'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 11
+  end
+  object EdtRoll3: TLabeledEdit
+    Left = 288
+    Height = 21
+    Top = 24
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtRoll3
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtRoll3
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtRoll3
+    EditLabel.Left = 288
+    EditLabel.Height = 14
+    EditLabel.Top = 7
+    EditLabel.Width = 80
+    EditLabel.Caption = 'EU.Roll'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 12
+  end
+  object EdtPitch3: TLabeledEdit
+    Left = 288
+    Height = 21
+    Top = 64
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtPitch3
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtPitch3
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtPitch3
+    EditLabel.Left = 288
+    EditLabel.Height = 14
+    EditLabel.Top = 47
+    EditLabel.Width = 80
+    EditLabel.Caption = 'EU.Pitch'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 13
+  end
+  object EdtYaw3: TLabeledEdit
+    Left = 288
+    Height = 21
+    Top = 104
+    Width = 80
+    Color = clBtnFace
+    EditLabel.AnchorSideLeft.Control = EdtYaw3
+    EditLabel.AnchorSideTop.Side = asrCenter
+    EditLabel.AnchorSideRight.Control = EdtYaw3
+    EditLabel.AnchorSideRight.Side = asrBottom
+    EditLabel.AnchorSideBottom.Control = EdtYaw3
+    EditLabel.Left = 288
+    EditLabel.Height = 14
+    EditLabel.Top = 87
+    EditLabel.Width = 80
+    EditLabel.Caption = 'EU.Yaw'
+    EditLabel.ParentColor = False
+    ReadOnly = True
+    TabOrder = 14
+  end
+  object OpenGLControl1: TOpenGLControl
+    Left = 48
+    Height = 117
+    Top = 160
+    Width = 136
+    OnPaint = OpenGLControl1Paint
+  end
+  object OpenGLControl2: TOpenGLControl
+    Left = 192
+    Height = 117
+    Top = 160
+    Width = 136
+    OnPaint = OpenGLControl2Paint
+  end
+  object OpenGLControl3: TOpenGLControl
+    Left = 336
+    Height = 117
+    Top = 160
+    Width = 136
+    OnPaint = OpenGLControl3Paint
+  end
+  object Label1: TLabel
+    Left = 48
+    Height = 14
+    Top = 141
+    Width = 32
+    Caption = 'Vector'
+    ParentColor = False
+  end
+  object Label2: TLabel
+    Left = 192
+    Height = 14
+    Top = 141
+    Width = 9
+    Caption = 'Q'
+    ParentColor = False
+  end
+  object Label3: TLabel
+    Left = 336
+    Height = 14
+    Top = 140
+    Width = 15
+    Caption = 'Eul'
+    ParentColor = False
+  end
   object TmOuter: TTimer
-    Interval = 12
+    Interval = 1
     OnTimer = TmOuterTimer
-    left = 16
-    top = 200
+    left = 48
+    top = 248
   end
   object TmUpdate: TTimer
     Interval = 100
     OnTimer = TmUpdateTimer
-    left = 80
-    top = 200
+    left = 112
+    top = 248
   end
   object tmAcc: TTimer
     Interval = 20
     OnTimer = tmAccTimer
-    left = 40
-    top = 200
+    left = 72
+    top = 248
   end
 end
