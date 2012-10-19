@@ -63,9 +63,9 @@ end;
 
 procedure integrate_euler();
 begin
-  ahrs.eul_ref3_yaw += imu.gyro_ahrs.eul.yaw * GYRO_SCALE;
-  ahrs.eul_ref3_roll += imu.gyro_ahrs.eul.roll * GYRO_SCALE;
-  ahrs.eul_ref3_pitch += imu.gyro_ahrs.eul.pitch * GYRO_SCALE;
+  //ahrs.eul_ref3_yaw += imu.gyro_ahrs.eul.yaw * GYRO_SCALE;
+  //ahrs.eul_ref3_roll += imu.gyro_ahrs.eul.roll * GYRO_SCALE;
+  //ahrs.eul_ref3_pitch += imu.gyro_ahrs.eul.pitch * GYRO_SCALE;
 end;
 
 procedure extract_euler();
@@ -79,6 +79,7 @@ procedure rotate_vectors();
 var
   deltaGyroAngle: float;
   inv_mag: float;
+  ax, ay, cs, si: float;
 begin
   // Rotate Estimated vector(s), YAW
   deltaGyroAngle  := -(imu.gyro_ahrs.eul.yaw - ahrs.acc_err.z) * GYRO_SCALE;
@@ -90,13 +91,13 @@ begin
     ahrs.est_mag.y :=  ssin(deltaGyroAngle) * ahrs.est_mag.x + scos(deltaGyroAngle) * ahrs.est_mag.y;
   end;
   // Rotate Estimated vector(s), ROLL
-   deltaGyroAngle  := (imu.gyro_ahrs.eul.roll - ahrs.acc_err.x) * GYRO_SCALE;
-   ahrs.est_grav.y :=  scos(deltaGyroAngle) * ahrs.est_grav.y + ssin(deltaGyroAngle) * ahrs.est_grav.z;
-   ahrs.est_grav.z := -ssin(deltaGyroAngle) * ahrs.est_grav.y + scos(deltaGyroAngle) * ahrs.est_grav.z;
+   deltaGyroAngle  := -(imu.gyro_ahrs.eul.roll - ahrs.acc_err.x) * GYRO_SCALE;
+   ahrs.est_grav.y :=  scos(deltaGyroAngle) * ahrs.est_grav.y - ssin(deltaGyroAngle) * ahrs.est_grav.z;
+   ahrs.est_grav.z :=  ssin(deltaGyroAngle) * ahrs.est_grav.y + scos(deltaGyroAngle) * ahrs.est_grav.z;
    if (MAG <> _NONE_) then
    begin
-     ahrs.est_mag.y :=  scos(deltaGyroAngle) * ahrs.est_mag.y + ssin(deltaGyroAngle) * ahrs.est_mag.z;
-     ahrs.est_mag.z := -ssin(deltaGyroAngle) * ahrs.est_mag.y + scos(deltaGyroAngle) * ahrs.est_mag.z;
+     ahrs.est_mag.y :=  scos(deltaGyroAngle) * ahrs.est_mag.y - ssin(deltaGyroAngle) * ahrs.est_mag.z;
+     ahrs.est_mag.z :=  ssin(deltaGyroAngle) * ahrs.est_mag.y + scos(deltaGyroAngle) * ahrs.est_mag.z;
    end;
    // Rotate Estimated vector(s), PITCH
    deltaGyroAngle  := (imu.gyro_ahrs.eul.pitch - ahrs.acc_err.y) * GYRO_SCALE;
@@ -115,6 +116,8 @@ begin
    begin
      ahrs.eul_ref_yaw := arctan2(ahrs.est_grav.y * ahrs.est_mag.z - ahrs.est_grav.z * ahrs.est_mag.y, ahrs.est_grav.z * ahrs.est_mag.x - ahrs.est_grav.x * ahrs.est_mag.z);
    end;
+
+
    // Calculate level reference and apply trims
    inv_mag := 1.0 / Sqrt(ahrs.est_grav.x * ahrs.est_grav.x + ahrs.est_grav.y * ahrs.est_grav.y + ahrs.est_grav.z * ahrs.est_grav.z) * 2000.0;
    ahrs.ctrl_ref.roll  := round(ahrs.est_grav.y * inv_mag);
@@ -130,6 +133,19 @@ begin
    ahrs.est_mag.x *= inv_mag;
    ahrs.est_mag.y *= inv_mag;
    ahrs.est_mag.z *= inv_mag;
+
+
+   //G x [0, 0, 1]
+
+   ax := ahrs.est_grav.y;
+   ay := ahrs.est_grav.x;
+   cs := ahrs.est_grav.z;
+   si := Sqrt(ahrs.est_grav.x * ahrs.est_grav.x + ahrs.est_grav.y * ahrs.est_grav.y);
+
+   ahrs.eul_ref3_yaw := arctan2(- ax * ay * (1 - cs), 1 - (ay * ay) * (1 - cs));
+   ahrs.eul_ref3_pitch := arcsin( ay * si);
+   ahrs.eul_ref3_roll := arctan2(ax * si, 1 - (ax *ax) * (1 - cs));
+
 end;
 
 procedure rotate_acc_vector();
