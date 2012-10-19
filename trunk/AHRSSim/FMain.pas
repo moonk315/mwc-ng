@@ -46,7 +46,8 @@ type
     procedure TmUpdateTimer(Sender: TObject);
   private
     procedure OpenGLControlInit;
-    procedure OpenGLControlPainCube;
+    procedure OpenGLControlPaintCube;
+    procedure OpenGLControlPaintVectors;
     { private declarations }
   public
     { public declarations }
@@ -70,7 +71,7 @@ begin
   imu.acc.fr.y := 0;
   imu.acc.fr.z := 0;
   imu.gyro_ahrs.eul.roll := 60*255;
-  imu.gyro_ahrs.eul.pitch := 60*255;
+  imu.gyro_ahrs.eul.pitch := 0;
   imu.gyro_ahrs.eul.yaw := 0;
   q.v.Z := 0;
   q.W := 1;
@@ -91,7 +92,7 @@ begin
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 end;
 
-procedure TForm1.OpenGLControlPainCube;
+procedure TForm1.OpenGLControlPaintCube;
 begin
   glBegin(GL_QUADS);
           glColor3f(0.0,1.0,0.0);                              // Set The Color To Green
@@ -100,6 +101,15 @@ begin
           glVertex3f(-1.0, 1.0, 1.0);                  // Bottom Left Of The Quad (Top)
           glVertex3f( 1.0, 1.0, 1.0);                  // Bottom Right Of The Quad (Top)
   glEnd();
+  glLineWidth(1.0);
+  glBegin(GL_LINES);
+         glVertex3f( 1.0, 1.0, -1.0);
+         glVertex3f( -1.0, 1.0, 1.0);
+         glVertex3f(-1.0, 1.0,-1.0);
+         glVertex3f( 1.0, 1.0, 1.0);
+  glEnd();
+  glLineWidth(2.0);
+
   glBegin(GL_QUADS);
           glColor3f(1.0,0.5,0.0);                              // Set The Color To Orange
           glVertex3f( 1.0,-1.0, 1.0);                  // Top Right Of The Quad (Bottom)
@@ -107,6 +117,7 @@ begin
           glVertex3f(-1.0,-1.0,-1.0);                  // Bottom Left Of The Quad (Bottom)
           glVertex3f( 1.0,-1.0,-1.0);                  // Bottom Right Of The Quad (Bottom)
   glEnd();
+
   glBegin(GL_QUADS);
           glColor3f(1.0,0.0,0.0);                              // Set The Color To Red
           glVertex3f( 1.0, 1.0, 1.0);                  // Top Right Of The Quad (Front)
@@ -114,6 +125,7 @@ begin
           glVertex3f(-1.0,-1.0, 1.0);                  // Bottom Left Of The Quad (Front)
           glVertex3f( 1.0,-1.0, 1.0);                  // Bottom Right Of The Quad (Front)
   glEnd();
+
   glBegin(GL_QUADS);
           glColor3f(1.0,1.0,0.0);                              // Set The Color To Yellow
           glVertex3f( 1.0,-1.0,-1.0);                  // Bottom Left Of The Quad (Back)
@@ -121,6 +133,7 @@ begin
           glVertex3f(-1.0, 1.0,-1.0);                  // Top Right Of The Quad (Back)
           glVertex3f( 1.0, 1.0,-1.0);                  // Top Left Of The Quad (Back)
   glEnd();
+
   glBegin(GL_QUADS);
           glColor3f(0.0,0.0,1.0);                              // Set The Color To Blue
           glVertex3f(-1.0, 1.0, 1.0);                  // Top Right Of The Quad (Left)
@@ -128,12 +141,37 @@ begin
           glVertex3f(-1.0,-1.0,-1.0);                  // Bottom Left Of The Quad (Left)
           glVertex3f(-1.0,-1.0, 1.0);                  // Bottom Right Of The Quad (Left)
   glEnd();
+
   glBegin(GL_QUADS);
           glColor3f(1.0,0.0,1.0);                              // Set The Color To Violet
           glVertex3f( 1.0, 1.0,-1.0);                  // Top Right Of The Quad (Right)
           glVertex3f( 1.0, 1.0, 1.0);                  // Top Left Of The Quad (Right)
           glVertex3f( 1.0,-1.0, 1.0);                  // Bottom Left Of The Quad (Right)
           glVertex3f( 1.0,-1.0,-1.0);                  // Bottom Right Of The Quad (Right)
+  glEnd();
+
+  glLineWidth(1.0);
+  glBegin(GL_LINES);
+         glVertex3f( 1.0, 1.0,-1.0);
+         glVertex3f( 1.0,-1.0, 1.0);
+         glVertex3f( 1.0, 1.0, 1.0);
+         glVertex3f( 1.0,-1.0,-1.0);
+  glEnd();
+  glLineWidth(2.0);
+
+end;
+
+procedure TForm1.OpenGLControlPaintVectors;
+begin
+  glBegin(GL_LINES);
+    glColor3f(0.0,0.0,0.0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(ahrs.est_grav.X, ahrs.est_grav.Z, ahrs.est_grav.Y);
+  glEnd();
+  glBegin(GL_LINES);
+    glColor3f(1.0,0.0,0.0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(ahrs.est_mag.X, ahrs.est_mag.Z, ahrs.est_mag.Y);
   glEnd();
 end;
 
@@ -156,21 +194,9 @@ begin
   z := c1 * s2 * c3 - s1 * c2 * s3;
   glRotatef(radtodeg(angle), x, y, -z);
 
-  OpenGLControlPainCube;
+  OpenGLControlPaintCube;
   glPopMatrix();
-
-  glBegin(GL_LINES);
-    glColor3f(0.0,0.0,0.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(ahrs.est_grav.X, ahrs.est_grav.Z, ahrs.est_grav.X);
-  glEnd();
-
-  glBegin(GL_LINES);
-    glColor3f(100.0,0.0,0.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(ahrs.est_mag.X, ahrs.est_mag.Z, ahrs.est_mag.X);
-  glEnd();
-
+  OpenGLControlPaintVectors;
   OpenGLControl1.SwapBuffers;
 end;
 
@@ -179,7 +205,6 @@ var
   Speed, c1, c2, c3, s1, s2, s3, x, y, z, angle: Double;
 begin
   OpenGLControlInit;
-
   glPushMatrix();
 
   c1 := cos(ahrs.eul_ref2_yaw / 2);
@@ -195,17 +220,9 @@ begin
   z := c1 * s2 * c3 - s1 * c2 * s3;
 
   glRotatef(radtodeg(angle), x, y, -z);
-
-  OpenGLControlPainCube;
-
+  OpenGLControlPaintCube;
   glPopMatrix();
-  glBegin(GL_LINES);
-    glColor3f(0.0,0.0,0.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(ahrs.est_grav.X, ahrs.est_grav.Z, ahrs.est_grav.X);
-  glEnd();
-
-
+  OpenGLControlPaintVectors;
   OpenGLControl2.SwapBuffers;
 end;
 
@@ -229,16 +246,9 @@ begin
   z := c1 * s2 * c3 - s1 * c2 * s3;
 
   glRotatef(radtodeg(angle), x, y, -z);
-
-  OpenGLControlPainCube;
-
+  OpenGLControlPaintCube;
   glPopMatrix();
-  glBegin(GL_LINES);
-    glColor3f(0.0,0.0,0.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(ahrs.est_grav.X, ahrs.est_grav.Z, ahrs.est_grav.X);
-  glEnd();
-
+  OpenGLControlPaintVectors;
   OpenGLControl3.SwapBuffers;
 end;
 
