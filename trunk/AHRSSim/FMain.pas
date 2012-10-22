@@ -70,9 +70,9 @@ begin
   imu.acc.fr.x := 255;
   imu.acc.fr.y := 0;
   imu.acc.fr.z := 0;
-  imu.gyro_ahrs.eul.roll := 60*255;
+  imu.gyro_ahrs.eul.roll := 200*256;
   imu.gyro_ahrs.eul.pitch := 0;
-  imu.gyro_ahrs.eul.yaw := 0;
+  imu.gyro_ahrs.eul.yaw := 200*256;
   q.v.Z := 0;
   q.W := 1;
 end;
@@ -166,12 +166,27 @@ begin
   glBegin(GL_LINES);
     glColor3f(0.0,0.0,0.0);
     glVertex3f(0, 0, 0);
-    glVertex3f(ahrs.est_grav.X, ahrs.est_grav.Z, ahrs.est_grav.Y);
+    glVertex3f(ahrs.grav_local.X, ahrs.grav_local.Z, ahrs.grav_local.Y);
+  glEnd();
+  glBegin(GL_LINES);
+    glColor3f(0.0,0.0,0.0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(ahrs.grav_earth.X, ahrs.grav_earth.Z, ahrs.grav_earth.Y);
   glEnd();
   glBegin(GL_LINES);
     glColor3f(1.0,0.0,0.0);
     glVertex3f(0, 0, 0);
     glVertex3f(ahrs.est_mag.X, ahrs.est_mag.Z, ahrs.est_mag.Y);
+  glEnd();
+  glBegin(GL_LINES);
+    glColor3f(0.0,1.0,0.0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(ahrs.yaw_ref.X, ahrs.yaw_ref.Z, ahrs.yaw_ref.Y);
+  glEnd();
+  glBegin(GL_LINES);
+    glColor3f(1.0,1.0,0.0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(ahrs.yaw_ref2.X, ahrs.yaw_ref2.Z, ahrs.yaw_ref2.Y);
   glEnd();
 end;
 
@@ -282,9 +297,9 @@ begin
   EdtPitch3.Text := FormatFloat('0.000', radtodeg(ahrs.eul_ref3_pitch));
   EdtYaw3.Text := FormatFloat('0.000', radtodeg(ahrs.eul_ref3_yaw));
 
-  AccErrX.Text := FormatFloat('0.000', ahrs.acc_err.X);
-  AccErrY.Text := FormatFloat('0.000', ahrs.acc_err.Y);
-  AccErrZ.Text := FormatFloat('0.000', ahrs.acc_err.Z);
+  AccErrX.Text := FormatFloat('0.000', ahrs.yaw_ref2.X);
+  AccErrY.Text := FormatFloat('0.000', ahrs.yaw_ref2.Y);
+  AccErrZ.Text := FormatFloat('0.000', ahrs.yaw_ref2.Z);
   OpenGLControl1.Invalidate;
   OpenGLControl2.Invalidate;
   OpenGLControl3.Invalidate;

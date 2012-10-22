@@ -17,6 +17,11 @@ type
     Z: float;
   end;
 
+  TRotEntry = record
+    sin: float;
+    cos: float;
+  end;
+
   TFpQ = record
     v: TFpVector;
     w: float;
@@ -55,6 +60,11 @@ type
     ctrl_ref: TGyroData;
     acc_err: TFpVector;
 
+    yaw_ref: TFpVector;
+    yaw_ref2: TFpVector;
+
+    yaw_ref3: TFpVector;
+
     eul_ref2_roll: float;
     eul_ref2_pitch: float;
     eul_ref2_yaw: float;
@@ -63,6 +73,9 @@ type
     eul_ref3_pitch: float;
     eul_ref3_yaw: float;
 
+    rot_mat: array [0..2] of TRotEntry;
+    grav_earth: TFpVector;
+    grav_local: TFpVector;
   end;
 
 
