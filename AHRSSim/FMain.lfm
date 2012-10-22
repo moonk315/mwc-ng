@@ -10,7 +10,7 @@ object Form1: TForm1
   LCLVersion = '1.0.1.3'
   object EdtRoll: TLabeledEdit
     Left = 48
-    Height = 21
+    Height = 23
     Top = 24
     Width = 80
     Color = clBtnFace
@@ -20,8 +20,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtRoll
     EditLabel.Left = 48
-    EditLabel.Height = 14
-    EditLabel.Top = 7
+    EditLabel.Height = 16
+    EditLabel.Top = 5
     EditLabel.Width = 80
     EditLabel.Caption = 'V.Roll'
     EditLabel.ParentColor = False
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object EdtPitch: TLabeledEdit
     Left = 48
-    Height = 21
+    Height = 23
     Top = 64
     Width = 80
     Color = clBtnFace
@@ -40,8 +40,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtPitch
     EditLabel.Left = 48
-    EditLabel.Height = 14
-    EditLabel.Top = 47
+    EditLabel.Height = 16
+    EditLabel.Top = 45
     EditLabel.Width = 80
     EditLabel.Caption = 'V.Pitch'
     EditLabel.ParentColor = False
@@ -50,7 +50,7 @@ object Form1: TForm1
   end
   object AccErrX: TLabeledEdit
     Left = 400
-    Height = 21
+    Height = 23
     Top = 24
     Width = 80
     Color = clBtnFace
@@ -60,8 +60,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = AccErrX
     EditLabel.Left = 400
-    EditLabel.Height = 14
-    EditLabel.Top = 7
+    EditLabel.Height = 16
+    EditLabel.Top = 5
     EditLabel.Width = 80
     EditLabel.Caption = 'X'
     EditLabel.ParentColor = False
@@ -70,7 +70,7 @@ object Form1: TForm1
   end
   object AccErrY: TLabeledEdit
     Left = 400
-    Height = 21
+    Height = 23
     Top = 64
     Width = 80
     Color = clBtnFace
@@ -80,8 +80,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = AccErrY
     EditLabel.Left = 400
-    EditLabel.Height = 14
-    EditLabel.Top = 47
+    EditLabel.Height = 16
+    EditLabel.Top = 45
     EditLabel.Width = 80
     EditLabel.Caption = 'Y'
     EditLabel.ParentColor = False
@@ -90,7 +90,7 @@ object Form1: TForm1
   end
   object AccErrZ: TLabeledEdit
     Left = 400
-    Height = 21
+    Height = 23
     Top = 104
     Width = 80
     Color = clBtnFace
@@ -100,8 +100,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = AccErrZ
     EditLabel.Left = 400
-    EditLabel.Height = 14
-    EditLabel.Top = 87
+    EditLabel.Height = 16
+    EditLabel.Top = 85
     EditLabel.Width = 80
     EditLabel.Caption = 'Z'
     EditLabel.ParentColor = False
@@ -110,7 +110,7 @@ object Form1: TForm1
   end
   object EdtYaw: TLabeledEdit
     Left = 48
-    Height = 21
+    Height = 23
     Top = 104
     Width = 80
     Color = clBtnFace
@@ -120,8 +120,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtYaw
     EditLabel.Left = 48
-    EditLabel.Height = 14
-    EditLabel.Top = 87
+    EditLabel.Height = 16
+    EditLabel.Top = 85
     EditLabel.Width = 80
     EditLabel.Caption = 'V.Yaw'
     EditLabel.ParentColor = False
@@ -130,7 +130,7 @@ object Form1: TForm1
   end
   object EdtRoll1: TLabeledEdit
     Left = 128
-    Height = 21
+    Height = 23
     Top = 24
     Width = 80
     Color = clBtnFace
@@ -140,8 +140,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtRoll1
     EditLabel.Left = 128
-    EditLabel.Height = 14
-    EditLabel.Top = 7
+    EditLabel.Height = 16
+    EditLabel.Top = 5
     EditLabel.Width = 80
     EditLabel.Caption = 'Q.Roll'
     EditLabel.ParentColor = False
@@ -150,7 +150,7 @@ object Form1: TForm1
   end
   object EdtPitch1: TLabeledEdit
     Left = 128
-    Height = 21
+    Height = 23
     Top = 64
     Width = 80
     Color = clBtnFace
@@ -160,8 +160,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtPitch1
     EditLabel.Left = 128
-    EditLabel.Height = 14
-    EditLabel.Top = 47
+    EditLabel.Height = 16
+    EditLabel.Top = 45
     EditLabel.Width = 80
     EditLabel.Caption = 'Q.Pitch'
     EditLabel.ParentColor = False
@@ -170,7 +170,7 @@ object Form1: TForm1
   end
   object EdtYaw1: TLabeledEdit
     Left = 128
-    Height = 21
+    Height = 23
     Top = 104
     Width = 80
     Color = clBtnFace
@@ -180,8 +180,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtYaw1
     EditLabel.Left = 128
-    EditLabel.Height = 14
-    EditLabel.Top = 87
+    EditLabel.Height = 16
+    EditLabel.Top = 85
     EditLabel.Width = 80
     EditLabel.Caption = 'Q.Yaw'
     EditLabel.ParentColor = False
@@ -190,7 +190,7 @@ object Form1: TForm1
   end
   object EdtYaw2: TLabeledEdit
     Left = 208
-    Height = 21
+    Height = 23
     Top = 104
     Width = 80
     Color = clBtnFace
@@ -200,8 +200,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtYaw2
     EditLabel.Left = 208
-    EditLabel.Height = 14
-    EditLabel.Top = 87
+    EditLabel.Height = 16
+    EditLabel.Top = 85
     EditLabel.Width = 80
     EditLabel.Caption = 'E.Yaw'
     EditLabel.ParentColor = False
@@ -210,7 +210,7 @@ object Form1: TForm1
   end
   object EdtPitch2: TLabeledEdit
     Left = 208
-    Height = 21
+    Height = 23
     Top = 64
     Width = 80
     Color = clBtnFace
@@ -220,8 +220,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtPitch2
     EditLabel.Left = 208
-    EditLabel.Height = 14
-    EditLabel.Top = 47
+    EditLabel.Height = 16
+    EditLabel.Top = 45
     EditLabel.Width = 80
     EditLabel.Caption = 'E.Pitch'
     EditLabel.ParentColor = False
@@ -230,7 +230,7 @@ object Form1: TForm1
   end
   object EdtRoll2: TLabeledEdit
     Left = 208
-    Height = 21
+    Height = 23
     Top = 24
     Width = 80
     Color = clBtnFace
@@ -240,8 +240,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtRoll2
     EditLabel.Left = 208
-    EditLabel.Height = 14
-    EditLabel.Top = 7
+    EditLabel.Height = 16
+    EditLabel.Top = 5
     EditLabel.Width = 80
     EditLabel.Caption = 'E.Roll'
     EditLabel.ParentColor = False
@@ -250,7 +250,7 @@ object Form1: TForm1
   end
   object EdtRoll3: TLabeledEdit
     Left = 288
-    Height = 21
+    Height = 23
     Top = 24
     Width = 80
     Color = clBtnFace
@@ -260,8 +260,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtRoll3
     EditLabel.Left = 288
-    EditLabel.Height = 14
-    EditLabel.Top = 7
+    EditLabel.Height = 16
+    EditLabel.Top = 5
     EditLabel.Width = 80
     EditLabel.Caption = 'EU.Roll'
     EditLabel.ParentColor = False
@@ -270,7 +270,7 @@ object Form1: TForm1
   end
   object EdtPitch3: TLabeledEdit
     Left = 288
-    Height = 21
+    Height = 23
     Top = 64
     Width = 80
     Color = clBtnFace
@@ -280,8 +280,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtPitch3
     EditLabel.Left = 288
-    EditLabel.Height = 14
-    EditLabel.Top = 47
+    EditLabel.Height = 16
+    EditLabel.Top = 45
     EditLabel.Width = 80
     EditLabel.Caption = 'EU.Pitch'
     EditLabel.ParentColor = False
@@ -290,7 +290,7 @@ object Form1: TForm1
   end
   object EdtYaw3: TLabeledEdit
     Left = 288
-    Height = 21
+    Height = 23
     Top = 104
     Width = 80
     Color = clBtnFace
@@ -300,8 +300,8 @@ object Form1: TForm1
     EditLabel.AnchorSideRight.Side = asrBottom
     EditLabel.AnchorSideBottom.Control = EdtYaw3
     EditLabel.Left = 288
-    EditLabel.Height = 14
-    EditLabel.Top = 87
+    EditLabel.Height = 16
+    EditLabel.Top = 85
     EditLabel.Width = 80
     EditLabel.Caption = 'EU.Yaw'
     EditLabel.ParentColor = False
@@ -331,25 +331,25 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 48
-    Height = 14
+    Height = 16
     Top = 141
-    Width = 32
+    Width = 35
     Caption = 'Vector'
     ParentColor = False
   end
   object Label2: TLabel
     Left = 264
-    Height = 14
+    Height = 16
     Top = 144
-    Width = 9
+    Width = 10
     Caption = 'Q'
     ParentColor = False
   end
   object Label3: TLabel
     Left = 472
-    Height = 14
+    Height = 16
     Top = 144
-    Width = 15
+    Width = 17
     Caption = 'Eul'
     ParentColor = False
   end
