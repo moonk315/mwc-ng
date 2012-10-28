@@ -75,7 +75,7 @@
 #define STICK_STATE_EXIT_TRIM  (_BV(STICK_STATE_TH_LOW))
 
 #define INNER_CTRL_LOOP_TIME    (4000L)
-#define OUTER_CTRL_LOOP_TIME    (INNER_CTRL_LOOP_TIME * 3)
+#define OUTER_CTRL_LOOP_TIME    (INNER_CTRL_LOOP_TIME * 4)
 #define ACC_CTRL_LOOP_TIME      (20000L)
 #define SERVICE_LOOP_TIME       (200000L)
 
@@ -202,6 +202,11 @@ struct crd_eul32 {
   int32_t roll, pitch, yaw;
 };
 
+typedef struct crd_eulfp   crd_eulfp_t;
+struct crd_eulfp {
+  float roll, pitch, yaw;
+};
+
 typedef union {crd_eul_t eul; crd_fr_t fr; int16_t raw[3];} gyro_data_t;
 typedef union {crd_eul32_t eul; crd_fr32_t fr; int32_t raw[3];} gyro_data32_t;
 
@@ -238,7 +243,7 @@ struct ahrs_data {
   fp_vector_t mag_mag;
   fp_vector_t est_mag;
   fp_vector_t acc_err;
-  crd_eul_t eul_ref;
+  crd_eulfp_t eul_ref;
   crd_eul_t ctrl_ref;
 };
 ahrs_data_t ahrs;
