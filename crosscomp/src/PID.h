@@ -54,11 +54,12 @@ inline void PID_loop_inner() {
 }
 
 inline void PID_loop_outer() {
-  if (pid.locked) return;
-  pid.rt.outer_pid.roll =  update_pid16((input.ctrl.roll + pid.ictrl_last.roll) << 1,   ahrs.ctrl_ref.roll,  &pid.active_profile->outer.roll,   &pid.rt.outer.roll) ;
-  pid.rt.outer_pid.pitch = update_pid16((input.ctrl.pitch + pid.ictrl_last.pitch) << 1, ahrs.ctrl_ref.pitch, &pid.active_profile->outer.pitch,  &pid.rt.outer.pitch);
-  pid.rt.outer_pid.yaw   = update_pid16((input.ctrl.yaw + pid.ictrl_last.yaw) << 1,     ahrs.eul_ref.yaw >> 2,   &pid.active_profile->outer.yaw,    &pid.rt.outer.yaw);
-  pid.rt.outer_pid.throttle   = update_pid16(input.ctrl.throttle, 0, &pid.active_profile->outer.throttle,  &pid.rt.outer.throttle);
+  if (!pid.locked) {
+    pid.rt.outer_pid.roll =  update_pid16((input.ctrl.roll + pid.ictrl_last.roll) << 1,   ahrs.ctrl_ref.roll,  &pid.active_profile->outer.roll,   &pid.rt.outer.roll) ;
+    pid.rt.outer_pid.pitch = update_pid16((input.ctrl.pitch + pid.ictrl_last.pitch) << 1, ahrs.ctrl_ref.pitch, &pid.active_profile->outer.pitch,  &pid.rt.outer.pitch);
+    pid.rt.outer_pid.yaw   = update_pid16((input.ctrl.yaw + pid.ictrl_last.yaw) << 1,     ahrs.ctrl_ref.yaw,   &pid.active_profile->outer.yaw,    &pid.rt.outer.yaw);
+    pid.rt.outer_pid.throttle   = update_pid16(input.ctrl.throttle, 0, &pid.active_profile->outer.throttle,  &pid.rt.outer.throttle);
+  }
   pid.ictrl_last = input.ctrl;
 }
 
