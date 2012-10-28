@@ -83,10 +83,21 @@ static PT_THREAD(i2c_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uin
 }
 
 // Delay support
-#include <util\delay.h>
-inline void __delay_ms(double __ms) {_delay_ms(__ms);};
-inline void __delay_us(double __us) {_delay_us(__us);};
+void __delay_us(uint16_t __us) __attribute__ ((noinline));
+void __delay_us(uint16_t __us) {
+#if (TICKS_PER_US == 2)
+  __us = (__us << 1) - 4;
+#else
+  __us = __us  - 4;
+#endif
+  uint16_t i_start = __systick();
+  while (__interval(i_start) < __us) {};
+};
 
+void __delay_ms(uint16_t __ms) __attribute__ ((noinline));
+void __delay_ms(uint16_t __ms) {
+  while (__ms--) __delay_us(1000);
+}
 
 // Timers
 volatile uint16_t timer1_overflow_count = 0;
