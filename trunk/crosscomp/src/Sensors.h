@@ -415,7 +415,7 @@ void Mag_calibrate_gain_end() {
 #define HMC5883_ADDRESS     0x3c
 #define HMC5883_GAIN        660.0f
 #define HMC5883_POS_BIAS_X  1.16f
-#define HMC5883_POS_BIAS_Y  1.16f
+#define HMC5883_POS_BIAS_Y  1.08f
 #define HMC5883_POS_BIAS_Z  1.08f
 
 void Mag_init() {
@@ -443,7 +443,7 @@ void Mag_calibrate_gain_start() {
 
 void Mag_calibrate_gain_end() {
   i2c_write_byte(HMC5883_ADDRESS, 0x00, 0x74);  // 8 samples avg, 30Hz, Normal
-  i2c_write_byte(HMC5883_ADDRESS, 0x01, 0x40);  // 1.9 GA range, 820 cnt/Ga gain
+  i2c_write_byte(HMC5883_ADDRESS, 0x01, 0x60);  // 1.9 GA range, 820 cnt/Ga gain
   i2c_write_byte(HMC5883_ADDRESS, 0x02, 0x00);  // Continous conversion mode
   ahrs.setup.mag_gain.x = (HMC5883_POS_BIAS_X * HMC5883_GAIN) / abs(imu.mag.fr.x);
   ahrs.setup.mag_gain.y = (HMC5883_POS_BIAS_Y * HMC5883_GAIN) / abs(imu.mag.fr.y);
