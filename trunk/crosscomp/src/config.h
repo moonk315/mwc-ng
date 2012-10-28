@@ -44,7 +44,7 @@
 //#define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  X; imu.acc.fr.y  = -Y; imu.acc.fr.z  = Z;}
   #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  -X; imu.acc.fr.y  = Y; imu.acc.fr.z  = Z;}
   #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = X; imu.gyro_raw.eul.pitch =  Y; imu.gyro_raw.eul.yaw = -Z;}
-  #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.fr.x  = Y; imu.mag.fr.y  = X; imu.mag.fr.z  = Z;}
+  #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.fr.x  = -Y; imu.mag.fr.y  = X; imu.mag.fr.z  = Z;}
 #endif
 
 #if (BOARD == _AFROFLIGHT32_)
@@ -56,7 +56,7 @@
 //  Inverted
   #define ACC_ORIENTATION(X, Y, Z)  {imu.acc.fr.x  =  -Y; imu.acc.fr.y  = X; imu.acc.fr.z  = -Z;}
   #define GYRO_ORIENTATION(X, Y, Z) {imu.gyro_raw.eul.roll = -X; imu.gyro_raw.eul.pitch =  Y; imu.gyro_raw.eul.yaw = Z;}
-  #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.fr.x  = -X; imu.mag.fr.y  = -Y; imu.mag.fr.z  = -Z;}
+  #define MAG_ORIENTATION(X, Y, Z)  {imu.mag.fr.x  = X; imu.mag.fr.y  = Y; imu.mag.fr.z  = Z;}
 #endif
 
 #endif
