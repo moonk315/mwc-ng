@@ -111,12 +111,12 @@ inline void pack_sys_status() {
 
 inline void pack_attitude() {
   mavlink_msg_attitude_pack_inline(mavlink_system.sysid,  mavlink_system.compid, &mav.snd_msg, current_time_ms,
-    ahrs.eul_ref.roll * radians(0.01f),
-    ahrs.eul_ref.pitch * radians(-0.01f),
-    ahrs.eul_ref.yaw * radians(0.01f),
-    0,
-    0,
-    0);
+    ahrs.eul_ref.roll,
+    -ahrs.eul_ref.pitch,
+    -ahrs.eul_ref.yaw,
+    ahrs_get_roll_speed(),
+    ahrs_get_pitch_speed(),
+    ahrs_get_yaw_speed());
 }
 
 inline void pack_raw_imu() {
