@@ -296,7 +296,7 @@ void ACC_getADC() {
 void ACC_init () {
   __delay_ms(10);
   i2c_write_byte(MPU6050_ADDRESS, 0x1C, 0x10);  //ACCEL_CONFIG  -- AFS_SEL=2 (Full Scale = +/-8G)  ; ACCELL_HPF=0   //note something is wrong in the spec.
-  imu.acc_1g = 256;
+  imu.acc_1g = 2048;
 }
 
 inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
