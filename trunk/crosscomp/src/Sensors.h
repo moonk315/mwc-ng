@@ -282,6 +282,36 @@ void ACC_getADC() {
 #endif
 
 // ************************************************************************************************************
+// I2C Accelerometer MPU6050
+// ************************************************************************************************************
+// I2C adress: 0xD2 (8bit)   0x69 (7bit)
+// I2C adress: 0xD0 (8bit)   0x68 (7bit)
+// ************************************************************************************************************
+#if (ACC == _MPU6050_)
+
+#if !defined(MPU6050_ADDRESS)
+  #define MPU6050_ADDRESS     0xd0
+#endif
+
+void ACC_init () {
+  __delay_ms(10);
+  i2c_write_byte(MPU6050_ADDRESS, 0x1C, 0x10);  //ACCEL_CONFIG  -- AFS_SEL=2 (Full Scale = +/-8G)  ; ACCELL_HPF=0   //note something is wrong in the spec.
+  imu.acc_1g = 256;
+}
+
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, MPU6050_ADDRESS, 0x3B, sensor_buff.raw, 6);
+}
+
+void ACC_getADC () {
+  if (!i2c_trn_error()) {
+    ACC_ORIENTATION(bswap_16(sensor_buff.mpu6050.x), bswap_16(sensor_buff.mpu6050.y), bswap_16(sensor_buff.mpu6050.z));
+    acc_common();
+  }
+}
+#endif
+
+// ************************************************************************************************************
 // Dummy ACC
 // ************************************************************************************************************
 #if (ACC == _NONE_)
