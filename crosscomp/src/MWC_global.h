@@ -57,6 +57,7 @@
 #define _DSM_         1700
 #define _DSM2_        1800
 #define _MPU3050_     1900
+#define _MPU6050_     2000
 
 #define STICK_STATE_TH_LOW     0
 #define STICK_STATE_TH_HIGH    1
