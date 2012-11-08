@@ -48,20 +48,12 @@
 #define ssin(val) (val)
 #define scos(val) (1.0f)
 
-//#define GYRO_LSB   14.375f
-//#define GYRO_LSB   13.7f
-#define GYRO_LSB 16.4
-
-#define GYRO_SCALE ((PI)/(GYRO_LSB * 180.0f * 1000000.0f) * OUTER_CTRL_LOOP_TIME / 256.0 * 1.04)
-
+#define GYRO_SCALE ((PI)/(Gyro_getLSB() * 180.0f * 1000000.0f) * OUTER_CTRL_LOOP_TIME / 256.0 * 1.04)
 
 static uint8_t ahrs_fast_spin() {
-  if (imu.gyro.eul.roll  >  (AHRS_FAST_SPIN * GYRO_LSB / 2)) return 1;
-  if (imu.gyro.eul.roll  < -(AHRS_FAST_SPIN * GYRO_LSB / 2)) return 1;
-  if (imu.gyro.eul.pitch >  (AHRS_FAST_SPIN * GYRO_LSB / 2)) return 1;
-  if (imu.gyro.eul.pitch < -(AHRS_FAST_SPIN * GYRO_LSB / 2)) return 1;
-  if (imu.gyro.eul.yaw   >  (AHRS_FAST_SPIN * GYRO_LSB / 2)) return 1;
-  if (imu.gyro.eul.yaw   < -(AHRS_FAST_SPIN * GYRO_LSB / 2)) return 1;
+  if (abs(imu.gyro.eul.roll)  >  (AHRS_FAST_SPIN * Gyro_getLSB() / 2)) return 1;
+  if (abs(imu.gyro.eul.pitch) >  (AHRS_FAST_SPIN * Gyro_getLSB() / 2)) return 1;
+  if (abs(imu.gyro.eul.yaw)   >  (AHRS_FAST_SPIN * Gyro_getLSB() / 2)) return 1;
   return 0;
 }
 

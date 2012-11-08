@@ -300,7 +300,7 @@ void ACC_getADC() {}
 // or 2) I2C adress is set to 0x68 (AD0 PIN connected to GND)
 // 3) sample rate = 1000Hz ( 1kHz/(div+1) )
 // ************************************************************************************************************
-#if (GYRO == _ITG3200_)
+#if ((GYRO == _ITG3200_) || (GYRO == _MPU3050_))
 
 #if !defined(ITG3200_ADDRESS)
   #define ITG3200_ADDRESS 0xd0
@@ -352,6 +352,16 @@ void Gyro_getADC() {
     gyro_common();
   } else StatusLEDToggle();
 }
+
+inline float Gyro_getLSB() {
+  #if (GYRO == _ITG3200_)
+    return 14.375f;
+  #endif
+  #if (GYRO == _MPU3050_)
+    return 16.4f;
+  #endif
+}
+
 #endif
 
 // ************************************************************************************************************
@@ -363,6 +373,8 @@ void Gyro_init() {}
 inline PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return 0;}
 
 void Gyro_getADC() {}
+
+inline float Gyro_getLSB() {return 0.0f;}
 #endif
 
 // ************************************************************************************************************
