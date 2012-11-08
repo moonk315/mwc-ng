@@ -64,7 +64,7 @@ static inline int16_t bswap_16(int16_t x) {
 
 inline void imu_calibrate_gyro() {
   if (GYRO != _NONE_)
-    imu.gyro_off_cal = 512;
+    imu.gyro_off_cal = 512 * 2;
 }
 
 inline void imu_calibrate_acc() {
@@ -84,10 +84,15 @@ void gyro_calc_offset() {
   static int32_t g[3];
   uint16_t gyro_off_cal_cache = imu.gyro_off_cal;
   for (uint8_t i = 0; i < 3; i++) {
-    if (gyro_off_cal_cache  == 512) g[i] = 0;
+    if (gyro_off_cal_cache  == 512 * 2) g[i] = 0;
+    if (gyro_off_cal_cache  == 512)     g[i] = 0;
     g[i] += imu.gyro_raw.raw[i];
+    if (gyro_off_cal_cache == 513)
+      imu.gyro_offset.raw[i] = g[i] >> 9;
     if (gyro_off_cal_cache == 1) {
-      imu.gyro_offset.raw[i] = g[i] / 512;
+      if (abs(imu.gyro_offset.raw[i] - (g[i] >> 9)) > 8) {
+        gyro_off_cal_cache = 512 * 2 + 1;
+      }
     }
   }
   gyro_off_cal_cache--;
