@@ -43,6 +43,9 @@ static union {
   } itg_3200;
   struct {
     int16_t x, y, z;
+  } mpu6050;
+  struct {
+    int16_t x, y, z;
   } hmc5843;
   struct {
     int16_t x, z, y;
@@ -362,6 +365,71 @@ inline float Gyro_getLSB() {
   #endif
 }
 
+#endif
+
+// ************************************************************************************************************
+// I2C Gyroscope MPU6050
+// ************************************************************************************************************
+// I2C adress: 0xD2 (8bit)   0x69 (7bit)
+// I2C adress: 0xD0 (8bit)   0x68 (7bit)
+// ************************************************************************************************************
+#if ((GYRO == _MPU6050_))
+
+#if !defined(MPU6050_ADDRESS)
+  #define MPU6050_ADDRESS     0xd0
+#endif
+
+//MPU6050 Gyro LPF setting
+#if defined(MPU6050_LPF_256HZ) || defined(MPU6050_LPF_188HZ) || defined(MPU6050_LPF_98HZ) || defined(MPU6050_LPF_42HZ) || defined(MPU6050_LPF_20HZ) || defined(MPU6050_LPF_10HZ) || defined(MPU6050_LPF_5HZ)
+  #if defined(MPU6050_LPF_256HZ)
+    #define MPU6050_DLPF_CFG   0
+  #endif
+  #if defined(MPU6050_LPF_188HZ)
+    #define MPU6050_DLPF_CFG   1
+  #endif
+  #if defined(MPU6050_LPF_98HZ)
+    #define MPU6050_DLPF_CFG   2
+  #endif
+  #if defined(MPU6050_LPF_42HZ)
+    #define MPU6050_DLPF_CFG   3
+  #endif
+  #if defined(MPU6050_LPF_20HZ)
+    #define MPU6050_DLPF_CFG   4
+  #endif
+  #if defined(MPU6050_LPF_10HZ)
+    #define MPU6050_DLPF_CFG   5
+  #endif
+  #if defined(MPU6050_LPF_5HZ)
+    #define MPU6050_DLPF_CFG   6
+  #endif
+#else
+    #define MPU6050_DLPF_CFG   0
+#endif
+
+void Gyro_init() {
+  __delay_ms(30);
+  i2c_write_byte(MPU6050_ADDRESS, 0x6B, 0x80); //register: Power Management  --  value: reset device
+  __delay_ms(30);
+  i2c_write_byte(MPU6050_ADDRESS, 0x6B, 0x03); //PWR_MGMT_1    -- SLEEP 0; CYCLE 0; TEMP_DIS 0; CLKSEL 3 (PLL with Z Gyro reference)
+  i2c_write_byte(MPU6050_ADDRESS, 0x1A, MPU6050_DLPF_CFG); //CONFIG  -- EXT_SYNC_SET 0 (disable input pin for data sync) ; default DLPF_CFG = 0 => ACC bandwidth = 260Hz  GYRO bandwidth = 256Hz)
+  i2c_write_byte(MPU6050_ADDRESS, 0x1B, 0x18);             //GYRO_CONFIG   -- FS_SEL = 3: Full scale set to 2000 deg/sec
+  __delay_ms(30);
+}
+
+static PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, MPU6050_ADDRESS, 0x43, sensor_buff.raw, 6);
+}
+
+void Gyro_getADC() {
+  if (!i2c_trn_error()) {
+    GYRO_ORIENTATION(bswap_16(sensor_buff.mpu6050.x), bswap_16(sensor_buff.mpu6050.y), bswap_16(sensor_buff.mpu6050.z));
+    gyro_common();
+  } else StatusLEDToggle();
+}
+
+inline float Gyro_getLSB() {
+  return 16.4f;
+}
 #endif
 
 // ************************************************************************************************************
