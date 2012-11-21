@@ -28,6 +28,7 @@
 // emitted.  This helps greatly when diagnosing subtle issues.
 //
 #pragma GCC diagnostic warning "-Wall"
+#pragma GCC diagnostic warning "-Winline"
 #pragma GCC diagnostic warning "-Wextra"
 #pragma GCC diagnostic warning "-Wlogical-op"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
@@ -408,15 +409,10 @@ void AttachPPMSerial();
 inline void rx_ppm_serial_callback(uint16_t time);
 inline void PPMCallback(uint8_t ch, uint16_t time, uint8_t state);
 
-//void __delay_ms(double __ms);
-//void __delay_us(double __us);
-
 // SysTick
-uint32_t __micros();
-uint16_t __systick();
-uint8_t __systick8();
-uint16_t __interval(uint16_t i_start, uint16_t i_end);
-uint16_t __interval(uint16_t i_start);
+inline uint16_t __systick();
+inline uint16_t __interval(uint16_t i_start, uint16_t i_end);
+inline uint16_t __interval(uint16_t i_start);
 
 // Init
 void Board_Init();

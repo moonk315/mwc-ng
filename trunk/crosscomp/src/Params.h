@@ -164,11 +164,13 @@ void float_to_scalar(rtti_type_info_t const *t, float val, uint8_t encoding, voi
   }
 }
 
-inline float param_get_val(param_search_rec_t *sr) {
+__attribute__ ((always_inline))
+float param_get_val(param_search_rec_t *sr) {
   return scalar_to_float(param_get_type(sr), param_get_encoding(sr), param_get_inst(sr));
 }
 
-inline void param_set_val(param_search_rec_t *sr, float val) {
+__attribute__ ((always_inline))
+void param_set_val(param_search_rec_t *sr, float val) {
   float_to_scalar(param_get_type(sr), val, param_get_encoding(sr), param_get_inst(sr));
 }
 

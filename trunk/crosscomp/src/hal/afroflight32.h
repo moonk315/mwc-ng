@@ -279,7 +279,7 @@ uint16_t __interval(uint16_t i_start, uint16_t i_end) {
   return (i_end - i_start);
 }
 
-inline void __delay_us(uint16_t __us) {
+static void __delay_us(uint16_t __us) {
   __us = (__us << 1) - 4;
   uint16_t i_start = __systick();
   while (__interval(i_start) < __us) {};
@@ -342,7 +342,7 @@ void Board_Idle() {
 #define PULSE_PERIOD_SERVO_DIGITAL  (5000) // pulse period for digital servo (200Hz)
 #define PULSE_PERIOD_SERVO_ANALOG  (20000) // pulse period for analog servo (50Hz)
 
-inline void PWM_Init(bool useServos) {
+static void PWM_Init(bool useServos) {
   // Output pins
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;

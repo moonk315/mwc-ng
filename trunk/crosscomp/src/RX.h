@@ -46,6 +46,7 @@ inline void init_ppm() {
 }
 
 #if (RX == _PPM_)
+__attribute__ ((always_inline))
 void PPMCallback(uint8_t ch, uint16_t time, uint8_t state) {
   if (state) {
     ppm_edge_time[ch] = time;
@@ -70,7 +71,8 @@ inline void RX_loop_200hz() {
 
 
 #if (RX == _PPM_SERIAL_)
-inline void rx_ppm_serial_callback(uint16_t time) {
+__attribute__ ((always_inline))
+void rx_ppm_serial_callback(uint16_t time) {
   static uint16_t last;
   static uint8_t ch;
   uint16_t d_time = time - last;
