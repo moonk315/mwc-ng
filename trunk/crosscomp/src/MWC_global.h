@@ -58,6 +58,9 @@
 #define _DSM2_        1800
 #define _MPU3050_     1900
 #define _MPU6050_     2000
+#define _TAROT450_    2100
+#define _MINIX_       2200
+#define _SHURICUS_    2300
 
 #define STICK_STATE_TH_LOW     0
 #define STICK_STATE_TH_HIGH    1
@@ -237,7 +240,7 @@ typedef struct {float x, y, z;} fp_vector_t;
 typedef struct ahrs_data ahrs_data_t;
 struct ahrs_data {
   struct {
-    crd_eul_t level_trim __PACKED__;
+    crd_eul_t level_trim;
     fp_vector_t mag_gain;
   } setup;
   fp_vector_t acc_grav;

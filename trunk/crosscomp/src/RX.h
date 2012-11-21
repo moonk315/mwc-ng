@@ -96,7 +96,7 @@ inline void RX_loop_200hz() {
 }
 #endif
 
-#if (RX == _DSM_) | (RX == _DSM2_)
+#if (RX == _DSM_) || (RX == _DSM2_)
 
 #define SPEK_STATE_START     0x00
 #define SPEK_STATE_PAYLOAD00 0x10
@@ -160,4 +160,12 @@ inline void RX_loop_200hz() {
 }
 #endif
 
+
+#if (RX == _NONE_)
+
+inline void RX_Init() {};
+inline void RX_loop_50hz() {};
+inline void RX_loop_200hz() {};
+
+#endif
 

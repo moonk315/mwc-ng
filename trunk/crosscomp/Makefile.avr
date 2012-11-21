@@ -30,7 +30,7 @@ COMPILER_FLAGS=-c -g -mmcu=$(MCU) $(OPT) -ffunction-sections -fdata-sections -fn
   -fno-inline-small-functions -fno-split-wide-types \
   -mcall-prologues \
   -fno-jump-tables \
-  -DF_CPU=16000000L -DARDUINO=22 -DBOARD=$(BOARD) -Isrc -Ilib-avr/arduino -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-avr -Ilib-avr/nvram
+  -DF_CPU=16000000L -DARDUINO=22 -DBOARD=$(BOARD) -DCONFIG=$(CONFIG) -Isrc -Ilib-avr/arduino -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-avr -Ilib-avr/nvram -Ilib-avr/mvc_dsp
 
 # Define sources and objects
 LSRC := $(wildcard  lib-avr/*/*/*/*/*/*/*.c) \
