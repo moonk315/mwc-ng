@@ -9,7 +9,7 @@
 TCHAIN=
 CC = $(TCHAIN)arm-none-eabi-gcc
 CCP = $(TCHAIN)arm-none-eabi-g++
-OPT = -Os
+OPT = -O2
 OBJCOPY = $(TCHAIN)arm-none-eabi-objcopy
 AR = $(TCHAIN)arm-none-eabi-ar
 SIZE = $(TCHAIN)arm-none-eabi-size
