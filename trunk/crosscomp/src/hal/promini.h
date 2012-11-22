@@ -168,13 +168,15 @@ void PWMOut(uint8_t ch, uint16_t val) {
 
 void PWMOut(uint8_t ch, uint16_t val) {
   //val = val >> 3;
+  uint8_t __sreg = SREG;
   cli();
   switch (ch) {
-    case 0: OCR0A = val; break;
-    case 1: OCR0B = val; break;
-    case 2: OCR2A = val; break;
-    case 3: OCR2B = val; break;
+    case 0: OCR0A = val >> 3; break;
+    case 1: OCR0B = val >> 3; break;
+    case 2: OCR2A = val >> 3; break;
+    case 3: OCR2B = val >> 3; break;
   }
+  SREG = __sreg;
 }
 
 #endif
