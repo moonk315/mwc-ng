@@ -234,18 +234,12 @@ struct input_control_data {
     uint8_t ctrl_rate;
     uint8_t ctrl_exp;
     uint8_t profile_switch;
-    uint8_t mode_switch;
     uint8_t profile_map[4];
-    uint8_t mode_map[4];
   } setup;
   control_data_t ctrl;
   uint8_t stick_state;
   int16_t control_expo_lookup[7];
   uint8_t profile_val;
-  uint8_t mode_val;
-  //unsigned level_mode:1;
-  //unsigned mag_hh_mode:1;
-  //unsigned alt_hold_mode:1;
 };
 input_control_data_t input;
 
@@ -256,8 +250,6 @@ typedef struct pid_rt pid_rt_t;
 struct pid_rt {
   int16_t last_pr_error;
   int32_t i_term;
-  //int16_t d_term_fir[8];
-  //uint8_t d_term_fir_ptr;
 };
 
 typedef struct pid_channels pid_channels_t;
