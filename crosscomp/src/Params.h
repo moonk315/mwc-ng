@@ -67,9 +67,7 @@ const rtti_struct_member_t rtti_input_setup_members[] PROGMEM = {
   {"RATE",   &rtti_u8, PARAM_TYPE_ENC_RCR},
   {"EXPO",   &rtti_u8, PARAM_TYPE_ENC_GENERIC},
   {"PSW",    &rtti_u8, PARAM_TYPE_ENC_GENERIC},
-  {"MSW",    &rtti_u8, PARAM_TYPE_ENC_GENERIC},
   {"PMAP",   &rtti_map_list, PARAM_TYPE_ENC_GENERIC},
-  {"MMAP",   &rtti_map_list, PARAM_TYPE_ENC_GENERIC},
 };
 const rtti_type_info_t rtti_input_setup = {PARAM_TYPE_KIND_STRUCT, sizeof(input.setup), {sizeof(rtti_input_setup_members)/sizeof(rtti_struct_member_t ), rtti_input_setup_members},};
 
