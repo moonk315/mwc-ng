@@ -66,8 +66,8 @@ void process_mode_switches() {
   uint8_t ch = input.setup.profile_switch;
   ch &= 0x07;
   uint8_t val = (rx_data.raw[ch] >> 8);
+  if (val > 7) val = 7;
   if (val >= 4) val -= 4; else val = 0;
-  val &= 0x03;
   val = input.setup.profile_map[val] & 0x03;
   if (input.profile_val != val) {
     pid.active_profile = &pid.setup.profile[val];
