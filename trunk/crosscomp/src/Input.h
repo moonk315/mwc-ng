@@ -16,14 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-void process_mode_switches();
+static void process_mode_switches();
 
-void build_expo_table() {
+static void build_expo_table() {
   for(uint8_t i = 0; i < 7; i++)
     input.control_expo_lookup[i] = (2500 + input.setup.ctrl_exp * (i*i - 25)) * i * (int32_t)input.setup.ctrl_rate / 1250;
 }
 
-void process_input_control() {
+static void process_input_control() {
   // Roll and Pitch, range -500..500
   for(uint8_t i = CTRL_CHANNEL_ROLL; i <= CTRL_CHANNEL_PITCH; i++) {
     uint16_t tmp = abs(int16_t(rx_data.raw[i] - RC_MIDPOINT));
@@ -62,7 +62,7 @@ void process_stick_states() {
   input.stick_state = tmp;
 }
 
-void process_mode_switches() {
+static void process_mode_switches() {
   uint8_t ch = input.setup.profile_switch;
   ch &= 0x07;
   uint8_t val = (rx_data.raw[ch] >> 8);
@@ -71,9 +71,9 @@ void process_mode_switches() {
   val = input.setup.profile_map[val] & 0x03;
   if (input.profile_val != val) {
     pid.active_profile = &pid.setup.profile[val];
-    reset_pid_state();
-    beep(BEEP_PATTERN_SHORT_BLINK);
     input.profile_val = val;
+    beep(BEEP_PATTERN_SHORT_BLINK);
+    reset_pid_state();
   }
 }
 
