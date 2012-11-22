@@ -29,8 +29,8 @@ static void process_input_control() {
     uint16_t tmp = abs(int16_t(rx_data.raw[i] - RC_MIDPOINT));
     uint16_t idx = tmp/100;
     tmp = input.control_expo_lookup[idx] + (tmp - idx*100) * (input.control_expo_lookup[idx+1] - input.control_expo_lookup[idx]) / 100;
-    #if (DEADBAND_RP > 0)
-      if (tmp < DEADBAND_RP) tmp = 0;
+    #if (RC_DEADBAND_RP > 0)
+      if (tmp < RC_DEADBAND_RP) tmp = 0;
     #endif
     if (rx_data.raw[i] > RC_MIDPOINT)
       input.ctrl.raw[i] = tmp;
@@ -39,8 +39,8 @@ static void process_input_control() {
   }
   // Yaw, range -500..500
   int16_t tmp = rx_data.yaw - RC_MIDPOINT;
-  #if (DEADBAND_YAW > 0)
-    if (abs(tmp) < DEADBAND_YAW) tmp = 0;
+  #if (RC_DEADBAND_YAW > 0)
+    if (abs(tmp) < RC_DEADBAND_YAW) tmp = 0;
   #endif
   input.ctrl.yaw      = tmp;
   // Throttle, range 0..1000
