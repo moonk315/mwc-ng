@@ -253,9 +253,15 @@ inline void AttachPPMSerial() {
   TIM_Cmd(TIM2, ENABLE);
 }
 
+#if defined(PWM_ESC_EXT_RANGE)
+void PWMOut(uint8_t ch, uint16_t val) {
+  if (ch < 6) *OutputChannels[ch] = (val << 2) - 4000 + 32;
+}
+#else
 void PWMOut(uint8_t ch, uint16_t val) {
   if (ch < 6) *OutputChannels[ch] = (val << 1);
 }
+#endif
 
 void PWCOut(uint8_t ch, uint16_t val) {
 }
