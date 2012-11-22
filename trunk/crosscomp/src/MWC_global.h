@@ -56,7 +56,7 @@
 #define _BMA020_      1500
 #define _HMC5883_     1600
 #define _DSM_         1700
-#define _DSM2_        1800
+#define _DSMX_        1800
 #define _MPU3050_     1900
 #define _MPU6050_     2000
 #define _TAROT450_    2100

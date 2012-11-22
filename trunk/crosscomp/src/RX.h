@@ -98,7 +98,7 @@ inline void RX_loop_200hz() {
 }
 #endif
 
-#if (RX == _DSM_) || (RX == _DSM2_)
+#if (RX == _DSM_) || (RX == _DSMX_)
 
 #define SPEK_STATE_START     0x00
 #define SPEK_STATE_PAYLOAD00 0x10
@@ -108,7 +108,7 @@ inline void RX_loop_200hz() {
   #define SPEK_CHAN_SHIFT  2       // Assumes 10 bit frames, that is 1024 mode.
   #define SPEK_CHAN_MASK   0x03    // Assumes 10 bit frames, that is 1024 mode.
 #endif
-#if (RX == _DSM2_)
+#if (RX == _DSMX_)
   #define SPEK_CHAN_SHIFT  3       // Assumes 11 bit frames, that is 2048 mode.
   #define SPEK_CHAN_MASK   0x07    // Assumes 11 bit frames, that is 2048 mode.
 #endif
@@ -147,7 +147,7 @@ inline void RX_loop_200hz() {
           #if (RX == _DSM_)
             rx_data.raw[C] = 988  +  (((uint16_t(val0 & SPEK_CHAN_MASK)  << 8)) | val1);
           #endif
-          #if (RX == _DSM2_)
+          #if (RX == _DSMX_)
             rx_data.raw[C] = 988  + (((uint16_t(val0 & SPEK_CHAN_MASK)  << 8)) | val1) >> 1);
           #endif
           }
