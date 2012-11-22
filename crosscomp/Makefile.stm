@@ -32,7 +32,7 @@ LINK_SCRIPT=stm32_flash.ld
 # Assembler, Compiler and Linker flags and linker script settings
 LINKER_FLAGS=-lm -mthumb -mcpu=cortex-m3 -Wl,--gc-sections -T$(LINK_SCRIPT) -static -Wl,-cref "-Wl,-Map=$(BIN_DIR)/$(OUT_FILE).map" -Wl,--defsym=malloc_getpagesize_P=0x1000
 ASSEMBLER_FLAGS=-c $(OPT) -mcpu=cortex-m3 -mthumb -x assembler-with-cpp -Isrc -Ilib-arm/STM32F10x_StdPeriph_Driver/inc -Ilib-arm/CMSIS/CM3/CoreSupport -Ilib-arm/CMSIS/CM3/DeviceSupport/ST/STM32F10x
-COMPILER_FLAGS=-c -g -mcpu=cortex-m3 $(OPT) -Wall -fpack-struct -fno-strict-aliasing -ffunction-sections -fdata-sections -mthumb -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER \
+COMPILER_FLAGS=-c -g -mcpu=cortex-m3 $(OPT) -Wall -fno-strict-aliasing -ffunction-sections -fdata-sections -mthumb -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER \
   -DBOARD=$(BOARD) -DCONFIG=$(CONFIG) -Isrc -Ilib-arm/STM32F10x_StdPeriph_Driver/inc -Ilib-arm/CMSIS/CM3/CoreSupport -Ilib-arm/CMSIS/CM3/DeviceSupport/ST/STM32F10x -Ilib/MWC_PT -Ilib/MWC_MAVLINK -Ilib-arm/nvram -Ilib-arm/mvc_dsp
 
 # Define sources and objects
