@@ -18,7 +18,7 @@
 volatile uint16_t raw_ppm_data[RX_NUMBER_OF_CHANNELS];
 uint16_t ppm_edge_time[RX_NUMBER_OF_CHANNELS];
 
-#define PPM_HYST 1
+#define RC_HYST 1
 
 inline uint16_t get_raw_ppm_data_no_block(uint8_t ch) {
   uint16_t res = raw_ppm_data[ch];
@@ -30,9 +30,9 @@ void filter_ppm_data() {
   for (uint8_t i = 0; i < RX_NUMBER_OF_CHANNELS; i++) {
     uint16_t tmp = get_raw_ppm_data_no_block(i);
     if ((tmp > 900) && (tmp < 2200)) {
-    #if (PPM_HYST > 0)
-      if (tmp > rx_data.raw[i] + (PPM_HYST)) rx_data.raw[i] = tmp - (PPM_HYST - 1);
-      if (tmp < rx_data.raw[i] - (PPM_HYST)) rx_data.raw[i] = tmp + (PPM_HYST - 1);
+    #if (RC_HYST > 0)
+      if (tmp > rx_data.raw[i] + (RC_HYST)) rx_data.raw[i] = tmp - (RC_HYST - 1);
+      if (tmp < rx_data.raw[i] - (RC_HYST)) rx_data.raw[i] = tmp + (RC_HYST - 1);
     #else
       rx_data.raw[i] = tmp;
     #endif
@@ -42,7 +42,7 @@ void filter_ppm_data() {
 
 inline void init_ppm() {
   for (uint8_t i = 0; i < RX_NUMBER_OF_CHANNELS; i++)
-    raw_ppm_data[i] = 1500*2;
+    raw_ppm_data[i] = RC_MIDPOINT * 2;
 }
 
 #if (RX == _PPM_)
