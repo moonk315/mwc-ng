@@ -144,7 +144,7 @@ inline void process_level_trim_state() {
 void process_led_state() {
   uint8_t led_pattern = flight.led_pattern;
   if (!led_pattern) {
-    led_pattern = led_pattern_cfg[flight.led_pattern_req];
+    led_pattern = flight.led_pattern_req;
     flight.led_pattern_req = 0;
   }
   if ((led_pattern & 0x01))
@@ -158,7 +158,7 @@ void process_led_state() {
 void process_beep_state() {
   uint8_t beep_pattern = flight.beep_pattern;
   if (!beep_pattern) {
-    beep_pattern = beep_pattern_cfg[flight.beep_pattern_req];
+    beep_pattern = flight.beep_pattern_req;
     flight.beep_pattern_req = 0;
   }
   if ((beep_pattern & 0x01))
