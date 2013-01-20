@@ -9,9 +9,9 @@
 		<Option virtualFolders="Misc\;Core\;Subsystems\;Config\;HAL\;HAL\afroflight32\;lib-avr\;Makefiles\;" />
 		<Build>
 			<Target title="ProMini">
-				<Option output="bin\avr\mwc_ng.elf" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\avr\" />
-				<Option object_output="C:\Ziss\mwc-ng\trunk\crosscomp\.objs" />
+				<Option output="bin/avr/mwc_ng.elf" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/avr/" />
+				<Option object_output="C:/Ziss/mwc-ng/trunk/crosscomp/.objs" />
 				<Option type="3" />
 				<Option compiler="avrgcc" />
 				<Option parameters="/c avrdude.exe  -p atmega328p -c arduino -P %ARDU_COM% -b 57600 -D -Uflash:w:mwc_ng.hex:i" />
@@ -37,9 +37,9 @@
 				</MakeCommands>
 			</Target>
 			<Target title="AfroFlight32">
-				<Option output="bin\stm32\mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\stm32\" />
-				<Option object_output="E:\!Work\Unsorted\--\mwc-ng\crosscomp\.objs" />
+				<Option output="bin/stm32/mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/stm32/" />
+				<Option object_output="E:/!Work/Unsorted/--/mwc-ng/crosscomp/.objs" />
 				<Option type="3" />
 				<Option compiler="armelfgcc" />
 				<Option parameters="/c STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn mwc_ng.hex -r --a 0x08000000" />
@@ -53,18 +53,18 @@
 					<Variable name="config" value="_NONE_" />
 				</Environment>
 				<MakeCommands>
-					<Build command="$make -f $makefile.stm BOARD=$board CONFIG=$config" />
-					<CompileFile command="$make -f $makefile.stm $file" />
-					<Clean command="$make -f $makefile.stm clean" />
+					<Build command="$make -f $makefile.stm32f1 BOARD=$board CONFIG=$config" />
+					<CompileFile command="$make -f $makefile.stm32f1 $file" />
+					<Clean command="$make -f $makefile.stm32f1 clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile.stm " />
-					<SilentBuild command="$make -f $makefile.stm BOARD=$board CONFIG=$config" />
+					<AskRebuildNeeded command="$make -q -f $makefile.stm32f1 " />
+					<SilentBuild command="$make -f $makefile.stm32f1 BOARD=$board CONFIG=$config" />
 				</MakeCommands>
 			</Target>
 			<Target title="Tarot450">
-				<Option output="bin\avr\mwc_ng.elf" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\avr\" />
-				<Option object_output="C:\Ziss\mwc-ng\trunk\crosscomp\.objs" />
+				<Option output="bin/avr/mwc_ng.elf" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/avr/" />
+				<Option object_output="C:/Ziss/mwc-ng/trunk/crosscomp/.objs" />
 				<Option type="3" />
 				<Option compiler="avrgcc" />
 				<Option parameters="/c avrdude.exe  -p atmega328p -c arduino -P %ARDU_COM% -b 57600 -D -Uflash:w:mwc_ng.hex:i" />
@@ -90,9 +90,9 @@
 				</MakeCommands>
 			</Target>
 			<Target title="minix">
-				<Option output="bin\stm32\mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\stm32\" />
-				<Option object_output="E:\!Work\Unsorted\--\mwc-ng\crosscomp\.objs" />
+				<Option output="bin/stm32/mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/stm32/" />
+				<Option object_output="E:/!Work/Unsorted/--/mwc-ng/crosscomp/.objs" />
 				<Option type="3" />
 				<Option compiler="armelfgcc" />
 				<Option parameters="/c STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn mwc_ng.hex -r --a 0x08000000" />
@@ -106,18 +106,18 @@
 					<Variable name="config" value="_MINIX_" />
 				</Environment>
 				<MakeCommands>
-					<Build command="$make -f $makefile.stm BOARD=$board CONFIG=$config" />
-					<CompileFile command="$make -f $makefile.stm $file" />
-					<Clean command="$make -f $makefile.stm clean" />
+					<Build command="$make -f $makefile.stm32f1 BOARD=$board CONFIG=$config" />
+					<CompileFile command="$make -f $makefile.stm32f1 $file" />
+					<Clean command="$make -f $makefile.stm32f1 clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile.stm " />
-					<SilentBuild command="$make -f $makefile.stm BOARD=$board CONFIG=$config" />
+					<AskRebuildNeeded command="$make -q -f $makefile.stm32f1" />
+					<SilentBuild command="$make -f $makefile.stm32f1 BOARD=$board CONFIG=$config" />
 				</MakeCommands>
 			</Target>
 			<Target title="shuricus">
-				<Option output="bin\stm32\mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\stm32\" />
-				<Option object_output="E:\!Work\Unsorted\--\mwc-ng\crosscomp\.objs" />
+				<Option output="bin/stm32/mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/stm32/" />
+				<Option object_output="E:/!Work/Unsorted/--/mwc-ng/crosscomp/.objs" />
 				<Option type="3" />
 				<Option compiler="armelfgcc" />
 				<Option parameters="/c STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn mwc_ng.hex -r --a 0x08000000" />
@@ -131,12 +131,37 @@
 					<Variable name="config" value="_SHURICUS_" />
 				</Environment>
 				<MakeCommands>
-					<Build command="$make -f $makefile.stm BOARD=$board CONFIG=$config" />
-					<CompileFile command="$make -f $makefile.stm $file" />
-					<Clean command="$make -f $makefile.stm clean" />
+					<Build command="$make -f $makefile.stm32f1 BOARD=$board CONFIG=$config" />
+					<CompileFile command="$make -f $makefile.stm32f1 $file" />
+					<Clean command="$make -f $makefile.stm32f1 clean" />
 					<DistClean command="$make -f $makefile distclean$target" />
-					<AskRebuildNeeded command="$make -q -f $makefile.stm " />
-					<SilentBuild command="$make -f $makefile.stm BOARD=$board CONFIG=$config" />
+					<AskRebuildNeeded command="$make -q -f $makefile.stm32f1" />
+					<SilentBuild command="$make -f $makefile.stm32f1 BOARD=$board CONFIG=$config" />
+				</MakeCommands>
+			</Target>
+			<Target title="stm32f3disc">
+				<Option output="bin/stm32/mwc_ng.elf" imp_lib=".a" def_file=".def" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/stm32/" />
+				<Option object_output="E:/!Work/Unsorted/--/mwc-ng/crosscomp/.objs" />
+				<Option type="3" />
+				<Option compiler="armelfgcc" />
+				<Option parameters="program STM32F303VC mwc_ng.bin  --adapter-name=ST-Link --port=SWD --adapter-clk=8000000 --erase=affected" />
+				<Option host_application="coflash.exe" />
+				<Option run_host_application_in_terminal="0" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Environment>
+					<Variable name="board" value="_STM32F3DISC_" />
+					<Variable name="config" value="_STM32F3DISC_" />
+				</Environment>
+				<MakeCommands>
+					<Build command="$make -f $makefile.stm32f3 BOARD=$board CONFIG=$config" />
+					<CompileFile command="$make -f $makefile.stm32f3 $file" />
+					<Clean command="$make -f $makefile.stm32f3 clean" />
+					<DistClean command="$make -f $makefile distclean$target" />
+					<AskRebuildNeeded command="$make -q -f $makefile.stm32f3 " />
+					<SilentBuild command="$make -f $makefile.stm32f3 BOARD=$board CONFIG=$config" />
 				</MakeCommands>
 			</Target>
 		</Build>
@@ -144,240 +169,255 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="Makefile.avr">
-			<Option virtualFolder="Makefiles\" />
+			<Option virtualFolder="Makefiles/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="Makefile.stm">
-			<Option virtualFolder="Makefiles\" />
+		<Unit filename="Makefile.stm32f1">
+			<Option virtualFolder="Makefiles/" />
 			<Option target="AfroFlight32" />
 			<Option target="minix" />
 			<Option target="shuricus" />
+			<Option target="stm32f3disc" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\HardwareSerial.cpp">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="Makefile.stm32f3">
+			<Option virtualFolder="Makefiles/" />
+			<Option target="stm32f3disc" />
+		</Unit>
+		<Unit filename="lib-avr/arduino/HardwareSerial.cpp">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\HardwareSerial.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/HardwareSerial.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\Print.cpp">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/Print.cpp">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\Print.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/Print.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\Stream.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/Stream.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\Tone.cpp">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/Tone.cpp">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WCharacter.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/WCharacter.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WConstants.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/WConstants.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WInterrupts.c">
+		<Unit filename="lib-avr/arduino/WInterrupts.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WMath.cpp">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/WMath.cpp">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WProgram.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/WProgram.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WString.cpp">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/WString.cpp">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\WString.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/WString.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\binary.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/binary.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\main.cpp">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/main.cpp">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\pins_arduino.c">
+		<Unit filename="lib-avr/arduino/pins_arduino.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\pins_arduino.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/pins_arduino.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring.c">
+		<Unit filename="lib-avr/arduino/wiring.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/wiring.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring_analog.c">
+		<Unit filename="lib-avr/arduino/wiring_analog.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring_digital.c">
+		<Unit filename="lib-avr/arduino/wiring_digital.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring_private.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/arduino/wiring_private.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring_pulse.c">
+		<Unit filename="lib-avr/arduino/wiring_pulse.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\arduino\wiring_shift.c">
+		<Unit filename="lib-avr/arduino/wiring_shift.c">
 			<Option compilerVar="CC" />
-			<Option virtualFolder="lib-avr\" />
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\avr_twi.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/avr_twi.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="lib-avr\avr_usart.h">
-			<Option virtualFolder="lib-avr\" />
+		<Unit filename="lib-avr/avr_usart.h">
+			<Option virtualFolder="lib-avr/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="src\AHRS.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/AHRS.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\Core.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/Core.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\FlightControl.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/FlightControl.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\Input.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/Input.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\MWC_Debug.h">
-			<Option virtualFolder="Misc\" />
+		<Unit filename="src/MWC_Debug.h">
+			<Option virtualFolder="Misc/" />
 		</Unit>
-		<Unit filename="src\MWC_Math.h">
-			<Option virtualFolder="Misc\" />
+		<Unit filename="src/MWC_Math.h">
+			<Option virtualFolder="Misc/" />
 		</Unit>
-		<Unit filename="src\MWC_global.h">
-			<Option virtualFolder="Core\" />
+		<Unit filename="src/MWC_global.h">
+			<Option virtualFolder="Core/" />
 		</Unit>
-		<Unit filename="src\MWC_ng.cpp">
-			<Option virtualFolder="Core\" />
+		<Unit filename="src/MWC_ng.cpp">
+			<Option virtualFolder="Core/" />
 		</Unit>
-		<Unit filename="src\MavLink.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/MavLink.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\Output.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/Output.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\PID.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/PID.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\Params.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/Params.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\RX.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/RX.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\Sensors.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/Sensors.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\Storage.h">
-			<Option virtualFolder="Subsystems\" />
+		<Unit filename="src/Storage.h">
+			<Option virtualFolder="Subsystems/" />
 		</Unit>
-		<Unit filename="src\conf\default.h">
-			<Option virtualFolder="Config\" />
+		<Unit filename="src/conf/default.h">
+			<Option virtualFolder="Config/" />
 			<Option target="ProMini" />
 			<Option target="AfroFlight32" />
+			<Option target="stm32f3disc" />
 		</Unit>
-		<Unit filename="src\conf\minix.h">
-			<Option virtualFolder="Config\" />
+		<Unit filename="src/conf/minix.h">
+			<Option virtualFolder="Config/" />
 			<Option target="minix" />
 			<Option target="shuricus" />
 		</Unit>
-		<Unit filename="src\conf\shuricus.h">
-			<Option virtualFolder="Config\" />
+		<Unit filename="src/conf/shuricus.h">
+			<Option virtualFolder="Config/" />
 		</Unit>
-		<Unit filename="src\conf\tarot450.h">
-			<Option virtualFolder="Config\" />
+		<Unit filename="src/conf/stm32fdisc_conf.h">
+			<Option virtualFolder="Config/" />
+			<Option target="stm32f3disc" />
+		</Unit>
+		<Unit filename="src/conf/tarot450.h">
+			<Option virtualFolder="Config/" />
 			<Option target="Tarot450" />
 		</Unit>
-		<Unit filename="src\config.h">
-			<Option virtualFolder="Config\" />
+		<Unit filename="src/config.h">
+			<Option virtualFolder="Config/" />
 		</Unit>
-		<Unit filename="src\hal\afroflight32.h">
-			<Option virtualFolder="HAL\afroflight32\" />
+		<Unit filename="src/hal/afroflight32.h">
+			<Option virtualFolder="HAL/afroflight32/" />
 		</Unit>
-		<Unit filename="src\hal\baseflight_startups\startup_stm32f10x_md.s">
-			<Option virtualFolder="HAL\afroflight32\" />
+		<Unit filename="src/hal/baseflight_startups/startup_stm32f10x_md.s">
+			<Option virtualFolder="HAL/afroflight32/" />
 		</Unit>
-		<Unit filename="src\hal\baseflight_startups\startup_stm32f10x_md_gcc.s">
-			<Option virtualFolder="HAL\afroflight32\" />
+		<Unit filename="src/hal/baseflight_startups/startup_stm32f10x_md_gcc.s">
+			<Option virtualFolder="HAL/afroflight32/" />
 		</Unit>
-		<Unit filename="src\hal\drv_i2c.h">
-			<Option virtualFolder="HAL\afroflight32\" />
+		<Unit filename="src/hal/drv_i2c.h">
+			<Option virtualFolder="HAL/afroflight32/" />
 			<Option target="AfroFlight32" />
 			<Option target="minix" />
 			<Option target="shuricus" />
+			<Option target="stm32f3disc" />
 		</Unit>
-		<Unit filename="src\hal\drv_uart.h">
-			<Option virtualFolder="HAL\afroflight32\" />
+		<Unit filename="src/hal/drv_uart.h">
+			<Option virtualFolder="HAL/afroflight32/" />
 		</Unit>
-		<Unit filename="src\hal\promini.h">
-			<Option virtualFolder="HAL\" />
+		<Unit filename="src/hal/promini.h">
+			<Option virtualFolder="HAL/" />
 			<Option target="ProMini" />
 			<Option target="Tarot450" />
+		</Unit>
+		<Unit filename="src/hal/stm32f3disc.h">
+			<Option virtualFolder="HAL/" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Extensions>
 			<code_completion />
@@ -385,16 +425,19 @@
 				<remote_debugging target="ProMini">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
-				<remote_debugging target="AfroFlight32">
+				<remote_debugging target="minix">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
-				<remote_debugging target="minix">
+				<remote_debugging target="stm32f3disc">
+					<options conn_type="0" serial_baud="115200" ip_address="localhost" ip_port="2009" additional_cmds="file mwc_ng.elf&#x0A;tbreak main" />
+				</remote_debugging>
+				<remote_debugging target="Tarot450">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
 				<remote_debugging target="shuricus">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
-				<remote_debugging target="Tarot450">
+				<remote_debugging target="AfroFlight32">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
 			</debugger>

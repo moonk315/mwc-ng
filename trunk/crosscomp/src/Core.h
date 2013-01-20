@@ -6,3 +6,6 @@
   #include "hal/afroflight32.h"
 #endif
 
+#if (BOARD == _STM32F3DISC_)
+  #include "hal/stm32f3disc.h"
+#endif

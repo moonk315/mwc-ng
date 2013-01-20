@@ -32,6 +32,8 @@
 #pragma GCC diagnostic warning "-Wextra"
 #pragma GCC diagnostic warning "-Wlogical-op"
 #pragma GCC diagnostic ignored "-Wredundant-decls"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#pragma GCC diagnostic ignored "-Wattributes"
 
 ////////////////////////////////////////////////////////////////////////////////
 ///
@@ -40,6 +42,7 @@
 #define _NONE_         000
 #define _PROMINI_      100
 #define _AFROFLIGHT32_ 110
+#define _STM32F3DISC_  115
 #define _PROMINI_HEX_  200
 #define _PPM_          300
 #define _PPM_SERIAL_   400
@@ -62,6 +65,7 @@
 #define _TAROT450_    2100
 #define _MINIX_       2200
 #define _SHURICUS_    2300
+#define _L3GD20_SPI_  2500
 
 #define STICK_STATE_TH_LOW     0
 #define STICK_STATE_TH_HIGH    1

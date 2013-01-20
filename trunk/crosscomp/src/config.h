@@ -26,6 +26,9 @@
 #if (CONFIG == _SHURICUS_)
   #include <conf/shuricus.h>
 #endif
+#if (CONFIG ==_STM32F3DISC_)
+  #include <conf/stm32fdisc_conf.h>
+#endif
 #if (CONFIG == _NONE_)
   #include <conf/default.h>
 #endif
