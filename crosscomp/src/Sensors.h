@@ -463,6 +463,53 @@ inline float Gyro_getLSB() {
 #endif
 
 // ************************************************************************************************************
+// L3GD20 three-axis digital output gyroscope
+// ************************************************************************************************************
+#if (GYRO == _L3GD20_SPI_)
+
+void L3GD20_Init(L3GD20_InitTypeDef *L3GD20_InitStruct) {
+  uint8_t ctrl1 = 0x00, ctrl4 = 0x00;
+  /* Configure MEMS: data rate, power mode, full scale and axes */
+  ctrl1 |= (uint8_t) (L3GD20_InitStruct->Power_Mode | L3GD20_InitStruct->Output_DataRate | \
+                    L3GD20_InitStruct->Axes_Enable | L3GD20_InitStruct->Band_Width);
+  ctrl4 |= (uint8_t) (L3GD20_InitStruct->BlockData_Update | L3GD20_InitStruct->Endianness | \
+                    L3GD20_InitStruct->Full_Scale);
+  /* Write value to MEMS CTRL_REG1 regsister */
+  L3GD20_CS_LOW();
+  SPI_Write(&ctrl1, L3GD20_CTRL_REG1_ADDR, 1);
+  L3GD20_CS_HIGH();
+
+  /* Write value to MEMS CTRL_REG4 regsister */
+  L3GD20_CS_LOW();
+  SPI_Write(&ctrl4, L3GD20_CTRL_REG4_ADDR, 1);
+  L3GD20_CS_HIGH();
+}
+
+
+void Gyro_init() {
+  L3GD20_InitTypeDef L3GD20_InitStructure;
+  //L3GD20_FilterConfigTypeDef L3GD20_FilterStructure;
+  /* Configure Mems L3GD20 */
+  L3GD20_InitStructure.Power_Mode = L3GD20_MODE_ACTIVE;
+  L3GD20_InitStructure.Output_DataRate = L3GD20_OUTPUT_DATARATE_3;
+  L3GD20_InitStructure.Axes_Enable = L3GD20_AXES_ENABLE;
+  L3GD20_InitStructure.Band_Width = L3GD20_BANDWIDTH_4;
+  L3GD20_InitStructure.BlockData_Update = L3GD20_BlockDataUpdate_Continous;
+  L3GD20_InitStructure.Endianness = L3GD20_BLE_LSB;
+  L3GD20_InitStructure.Full_Scale = L3GD20_FULLSCALE_2000;
+  L3GD20_Init(&L3GD20_InitStructure);
+}
+
+inline PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return 0;}
+
+void Gyro_getADC() {
+  gyro_common();
+}
+
+inline float Gyro_getLSB() {return 0.0f;}
+#endif
+
+// ************************************************************************************************************
 // Dummy Gyro
 // ************************************************************************************************************
 #if (GYRO == _NONE_)
