@@ -34,7 +34,7 @@ INC+= -Isrc
 INC+= -Ilib/MWC_PT -Ilib/MWC_MAVLINK
 INC+= -Ilib-arm/mvc_dsp
 INC+= -Ilib-stm32f3/nvram -Ilib-stm32f3/STM32F30x_StdPeriph_Driver/inc -Ilib-stm32f3/CMSIS/Include -Ilib-stm32f3/CMSIS/Device/ST/STM32F30x/Include
-INC+= -Ilib-stm32f3/STM32_USB-FS-Device_Driver/inc -Ilib-stm32f3/vcp
+INC+= -Ilib-stm32f3/STM32_USB-FS-Device_Driver/inc -Ilib-stm32f3/vcp -Ilib-stm32f3/STM32F30x_I2C_CPAL_Driver/inc
 INC+= -Isrc/hal/stm32f3disc_drv
 
 #
@@ -42,7 +42,7 @@ FPU = -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 CPU = -mthumb -mcpu=cortex-m4
 
 # Assembler, Compiler and Linker flags and linker script settings
-LINKER_FLAGS=-lm $(CPU) $(FPU) -Wl,--gc-sections -T$(LINK_SCRIPT) -static -Wl,-cref "-Wl,-Map=$(BIN_DIR)/$(OUT_FILE).map" -Wl,--defsym=malloc_getpagesize_P=0x1000
+LINKER_FLAGS=-lm -lstdc++  $(CPU) $(FPU) -Wl,--gc-sections -T$(LINK_SCRIPT) -static -Wl,-cref "-Wl,-Map=$(BIN_DIR)/$(OUT_FILE).map"
 ASSEMBLER_FLAGS=-c $(OPT) $(CPU) $(FPU) -x assembler-with-cpp $(INC)
 COMPILER_FLAGS=-c -g $(CPU) $(FPU) $(OPT) -Wall -fno-strict-aliasing -ffunction-sections -fdata-sections -mthumb -DSTM32F30X -DUSE_STDPERIPH_DRIVER \
   -DBOARD=$(BOARD) -DCONFIG=$(CONFIG) $(INC)
