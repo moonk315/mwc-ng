@@ -101,9 +101,10 @@ void _disable_spi_dma() {
 }
 
 static uint8_t _spi_xchange(uint8_t byte) {
-  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_TXE) == RESET) {}
+  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_TXE) == RESET);
   SPI_SendData8(L3GD20_SPI, byte);
-  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_RXNE) == RESET) {}
+  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_RXNE) == RESET);
+  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_BSY) == SET);
   return (uint8_t)SPI_ReceiveData8(L3GD20_SPI);
 }
 
@@ -145,6 +146,7 @@ static PT_THREAD(spi_read_buffer_pt(struct pt *pt, uint8_t reg, uint8_t *buff, u
   if(size > 0x01) reg |= (uint8_t)(MULTIPLEBYTE_CMD);
   SPI_SendData8(L3GD20_SPI, reg);
   PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_RXNE) == RESET));
+  PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_BSY) == SET));
   //SPI_ReceiveData8(L3GD20_SPI);
   always_read(SPI1->DR); // Clear RX flags
   always_read(SPI1->SR);
