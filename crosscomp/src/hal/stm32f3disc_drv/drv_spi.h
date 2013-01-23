@@ -1,7 +1,7 @@
 #ifndef DRV_SPI_H_INCLUDED
 #define DRV_SPI_H_INCLUDED
 
-DMA_InitTypeDef	DMA_InitStruct;
+DMA_InitTypeDef  DMA_InitStruct;
 
 inline void init_spi() {
   /* Enable the SPI periph */
@@ -57,28 +57,28 @@ inline void init_spi() {
   /* Deselect : Chip Select high */
   GPIO_SetBits(L3GD20_SPI_CS_GPIO_PORT, L3GD20_SPI_CS_PIN);
   /* Setup DMA */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-	DMA_StructInit(&DMA_InitStruct);
-	DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+  DMA_StructInit(&DMA_InitStruct);
+  DMA_InitStruct.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
   DMA_InitStruct.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-	DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	DMA_InitStruct.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
+  DMA_InitStruct.DMA_MemoryInc = DMA_MemoryInc_Enable;
+  DMA_InitStruct.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
   DMA_InitStruct.DMA_Mode = DMA_Mode_Normal;
-	DMA_InitStruct.DMA_M2M = DMA_M2M_Disable;
-	DMA_InitStruct.DMA_PeripheralBaseAddr =	(uint32_t)&L3GD20_SPI->DR;
-	DMA_InitStruct.DMA_MemoryBaseAddr = 0;
-	DMA_InitStruct.DMA_BufferSize =  0;
-	/* write */
-	DMA_InitStruct.DMA_Priority = DMA_Priority_Medium;
-	DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralDST;
-	DMA_Init(DMA1_Channel3, &DMA_InitStruct);
-	/* read */
-	DMA_InitStruct.DMA_Priority = DMA_Priority_High;
-	DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralSRC;
-	DMA_Init(DMA1_Channel2, &DMA_InitStruct);
-	/* enable DMA */
-	SPI_I2S_DMACmd(L3GD20_SPI, SPI_I2S_DMAReq_Rx, ENABLE);
-	SPI_I2S_DMACmd(L3GD20_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
+  DMA_InitStruct.DMA_M2M = DMA_M2M_Disable;
+  DMA_InitStruct.DMA_PeripheralBaseAddr =  (uint32_t)&L3GD20_SPI->DR;
+  DMA_InitStruct.DMA_MemoryBaseAddr = 0;
+  DMA_InitStruct.DMA_BufferSize =  0;
+  /* write */
+  DMA_InitStruct.DMA_Priority = DMA_Priority_Medium;
+  DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralDST;
+  DMA_Init(DMA1_Channel3, &DMA_InitStruct);
+  /* read */
+  DMA_InitStruct.DMA_Priority = DMA_Priority_High;
+  DMA_InitStruct.DMA_DIR = DMA_DIR_PeripheralSRC;
+  DMA_Init(DMA1_Channel2, &DMA_InitStruct);
+  /* enable DMA */
+  SPI_I2S_DMACmd(L3GD20_SPI, SPI_I2S_DMAReq_Rx, ENABLE);
+  SPI_I2S_DMACmd(L3GD20_SPI, SPI_I2S_DMAReq_Tx, ENABLE);
 }
 
 void _start_spi_dma(uint8_t* pBuffer, uint16_t NumByteToWrite) {
@@ -87,17 +87,17 @@ void _start_spi_dma(uint8_t* pBuffer, uint16_t NumByteToWrite) {
   DMA1_Channel3->CMAR = (uint32_t)pBuffer;
   DMA1_Channel2->CNDTR = NumByteToWrite;
   DMA1_Channel3->CNDTR = NumByteToWrite;
-	//
-	DMA_ClearFlag(DMA1_FLAG_GL2);
-	DMA_ClearFlag(DMA1_FLAG_GL3);
-	/* start */
-	DMA_Cmd(DMA1_Channel2, ENABLE);
-	DMA_Cmd(DMA1_Channel3, ENABLE);
+  //
+  DMA_ClearFlag(DMA1_FLAG_GL2);
+  DMA_ClearFlag(DMA1_FLAG_GL3);
+  /* start */
+  DMA_Cmd(DMA1_Channel2, ENABLE);
+  DMA_Cmd(DMA1_Channel3, ENABLE);
 }
 
 void _disable_spi_dma() {
-	DMA_Cmd(DMA1_Channel2, DISABLE);
-	DMA_Cmd(DMA1_Channel3, DISABLE);
+  DMA_Cmd(DMA1_Channel2, DISABLE);
+  DMA_Cmd(DMA1_Channel3, DISABLE);
 }
 
 static uint8_t _spi_xchange(uint8_t byte) {
@@ -108,8 +108,7 @@ static uint8_t _spi_xchange(uint8_t byte) {
 }
 
 void spi_write_buff(uint8_t* buff, uint8_t reg, uint16_t size) {
-  if(size > 0x01)
-    reg |= (uint8_t)MULTIPLEBYTE_CMD;
+  if(size > 0x01) reg |= (uint8_t)MULTIPLEBYTE_CMD;
   _spi_xchange(reg);
   while(size >= 0x01) {
     _spi_xchange(*buff);
@@ -122,10 +121,8 @@ inline void spi_write_byte(uint8_t reg, uint8_t val) {
 }
 
 void spi_read_buff(uint8_t* buff, uint8_t reg, uint16_t size) {
-  if(size > 0x01)
-    reg |= (uint8_t)(READWRITE_CMD | MULTIPLEBYTE_CMD);
-  else
-    reg |= (uint8_t)READWRITE_CMD;
+  reg |= (uint8_t)READWRITE_CMD;
+  if(size > 0x01) reg |= (uint8_t)(MULTIPLEBYTE_CMD);
   _spi_xchange(reg);
   while(size > 0x00) {
     *buff = _spi_xchange(0x00);
@@ -139,13 +136,18 @@ inline uint8_t spi_read_byte(uint8_t reg) {
   return buff;
 }
 
+#define always_read(x) asm(""::"r"(x))
+
 static PT_THREAD(spi_read_buffer_pt(struct pt *pt, uint8_t reg, uint8_t *buff, uint8_t size)) {
   PT_BEGIN(pt);
   PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_TXE) == RESET));
-  if(size > 0x01) reg |= (uint8_t)(READWRITE_CMD | MULTIPLEBYTE_CMD);
-  else reg |= (uint8_t)READWRITE_CMD;
+  reg |= (uint8_t)READWRITE_CMD;
+  if(size > 0x01) reg |= (uint8_t)(MULTIPLEBYTE_CMD);
   SPI_SendData8(L3GD20_SPI, reg);
   PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_RXNE) == RESET));
+  //SPI_ReceiveData8(L3GD20_SPI);
+  always_read(SPI1->DR); // Clear RX flags
+  always_read(SPI1->SR);
   _start_spi_dma(buff, size);
   PT_WAIT_WHILE(pt, DMA_GetCurrDataCounter(DMA1_Channel2));
   _disable_spi_dma();
@@ -154,3 +156,4 @@ static PT_THREAD(spi_read_buffer_pt(struct pt *pt, uint8_t reg, uint8_t *buff, u
 
 
 #endif // DRV_SPI_H_INCLUDED
+
