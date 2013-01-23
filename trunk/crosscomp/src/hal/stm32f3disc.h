@@ -76,6 +76,9 @@ typedef const unsigned char prog_uchar;
 
 //#include "drv_uart.h"
 
+extern uint16_t twi_err_cnt __attribute__((alias("i2c_err_cnt")));
+
+
 TIM_ICInitTypeDef TIM_ICInitStructure = { 0, };
 GPIO_InitTypeDef GPIO_InitStructure = { 0, };
 TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure = { 0, };
@@ -83,6 +86,9 @@ NVIC_InitTypeDef NVIC_InitStructure = { 0, };
 TIM_OCInitTypeDef TIM_OCInitStructure = { 0, };
 EXTI_InitTypeDef EXTI_InitStructure = { 0, };
 SPI_InitTypeDef  SPI_InitStructure= { 0, };
+
+#include "stm32f3disc_drv\drv_i2c.h"
+#include "stm32f3disc_drv\drv_spi.h"
 
 inline void GUI_serial_open(uint32_t baud) {
 }
@@ -185,9 +191,6 @@ void PWMOut(uint8_t ch, uint16_t val) {
 void PWCOut(uint8_t ch, uint16_t val) {
 }
 
-
-uint16_t twi_err_cnt;
-
 inline void StartBatteryVoltageMeasurement() {
   ADC_StartConversion(ADC1);
 }
@@ -273,154 +276,12 @@ void init_usb () {
   USB_Config();
 }
 
-inline void init_spi() {
-  /* Enable the SPI periph */
-  RCC_APB2PeriphClockCmd(L3GD20_SPI_CLK, ENABLE);
-
-  /* Enable SCK, MOSI and MISO GPIO clocks */
-  RCC_AHBPeriphClockCmd(L3GD20_SPI_SCK_GPIO_CLK | L3GD20_SPI_MISO_GPIO_CLK | L3GD20_SPI_MOSI_GPIO_CLK, ENABLE);
-
-  /* Enable CS  GPIO clock */
-  RCC_AHBPeriphClockCmd(L3GD20_SPI_CS_GPIO_CLK, ENABLE);
-
-  /* Enable INT1 GPIO clock */
-  RCC_AHBPeriphClockCmd(L3GD20_SPI_INT1_GPIO_CLK, ENABLE);
-
-  /* Enable INT2 GPIO clock */
-  RCC_AHBPeriphClockCmd(L3GD20_SPI_INT2_GPIO_CLK, ENABLE);
-
-  GPIO_PinAFConfig(L3GD20_SPI_SCK_GPIO_PORT, L3GD20_SPI_SCK_SOURCE, L3GD20_SPI_SCK_AF);
-  GPIO_PinAFConfig(L3GD20_SPI_MISO_GPIO_PORT, L3GD20_SPI_MISO_SOURCE, L3GD20_SPI_MISO_AF);
-  GPIO_PinAFConfig(L3GD20_SPI_MOSI_GPIO_PORT, L3GD20_SPI_MOSI_SOURCE, L3GD20_SPI_MOSI_AF);
-
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;//GPIO_PuPd_DOWN;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-  /* SPI SCK pin configuration */
-  GPIO_InitStructure.GPIO_Pin = L3GD20_SPI_SCK_PIN;
-  GPIO_Init(L3GD20_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
-
-  /* SPI  MOSI pin configuration */
-  GPIO_InitStructure.GPIO_Pin =  L3GD20_SPI_MOSI_PIN;
-  GPIO_Init(L3GD20_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
-
-  /* SPI MISO pin configuration */
-  GPIO_InitStructure.GPIO_Pin = L3GD20_SPI_MISO_PIN;
-  GPIO_Init(L3GD20_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
-
-  /* SPI configuration -------------------------------------------------------*/
-  SPI_I2S_DeInit(L3GD20_SPI);
-  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;
-  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-  SPI_InitStructure.SPI_CRCPolynomial = 7;
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-  SPI_Init(L3GD20_SPI, &SPI_InitStructure);
-
-  /* Configure the RX FIFO Threshold */
-  SPI_RxFIFOThresholdConfig(L3GD20_SPI, SPI_RxFIFOThreshold_QF);
-  /* Enable SPI1  */
-  SPI_Cmd(L3GD20_SPI, ENABLE);
-
-  /* Configure GPIO PIN for Lis Chip select */
-  GPIO_InitStructure.GPIO_Pin = L3GD20_SPI_CS_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(L3GD20_SPI_CS_GPIO_PORT, &GPIO_InitStructure);
-
-  /* Deselect : Chip Select high */
-  GPIO_SetBits(L3GD20_SPI_CS_GPIO_PORT, L3GD20_SPI_CS_PIN);
-
-  /* Configure GPIO PINs to detect Interrupts */
-  GPIO_InitStructure.GPIO_Pin = L3GD20_SPI_INT1_PIN;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
-  GPIO_Init(L3GD20_SPI_INT1_GPIO_PORT, &GPIO_InitStructure);
-
-  GPIO_InitStructure.GPIO_Pin = L3GD20_SPI_INT2_PIN;
-  GPIO_Init(L3GD20_SPI_INT2_GPIO_PORT, &GPIO_InitStructure);
-}
-
-static uint8_t SPI_SendByte(uint8_t byte) {
-  /* Loop while DR register in not empty */
-  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_TXE) == RESET) {}
-  /* Send a Byte through the SPI peripheral */
-  SPI_SendData8(L3GD20_SPI, byte);
-
-  /* Wait to receive a Byte */
-  while (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_RXNE) == RESET) {}
-  /* Return the Byte read from the SPI bus */
-  return (uint8_t)SPI_ReceiveData8(L3GD20_SPI);
-}
-
-void SPI_Write(uint8_t* pBuffer, uint8_t WriteAddr, uint16_t NumByteToWrite)
-{
-  /* Configure the MS bit:
-       - When 0, the address will remain unchanged in multiple read/write commands.
-       - When 1, the address will be auto incremented in multiple read/write commands.
-  */
-  if(NumByteToWrite > 0x01) {
-    WriteAddr |= (uint8_t)MULTIPLEBYTE_CMD;
-  }
-  /* Send the Address of the indexed register */
-  SPI_SendByte(WriteAddr);
-  /* Send the data that will be written into the device (MSB First) */
-  while(NumByteToWrite >= 0x01) {
-    SPI_SendByte(*pBuffer);
-    NumByteToWrite--;
-    pBuffer++;
-  }
-}
-
-inline void spi_write_byte(uint8_t reg, uint8_t val) {
-  SPI_Write(&val, reg, 1);
-}
-
-void SPI_Read(uint8_t* pBuffer, uint8_t ReadAddr, uint16_t NumByteToRead)
-{
-  if(NumByteToRead > 0x01) {
-    ReadAddr |= (uint8_t)(READWRITE_CMD | MULTIPLEBYTE_CMD);
-  } else  {
-    ReadAddr |= (uint8_t)READWRITE_CMD;
-  }
-  /* Send the Address of the indexed register */
-  SPI_SendByte(ReadAddr);
-  /* Receive the data that will be read from the device (MSB First) */
-  while(NumByteToRead > 0x00) {
-    /* Send dummy byte (0x00) to generate the SPI clock to L3GD20 (Slave device) */
-    *pBuffer = SPI_SendByte(DUMMY_BYTE);
-    NumByteToRead--;
-    pBuffer++;
-  }
-}
-
-inline uint8_t spi_read_byte(uint8_t reg) {
-  uint8_t buff;
-  SPI_Read(&buff, reg, 1);
-  return buff;
-}
-
-static PT_THREAD(spi_read_buffer_pt(struct pt *pt, uint8_t add, uint8_t reg, uint8_t *buff, uint8_t size)) {
-  PT_BEGIN(pt);
-  //i2cReadBuffer_start(add, reg, size, buff);
-  //PT_WAIT_WHILE(pt, i2cReadBuffer_busy());
-  PT_END(pt);
-}
-
 inline void Board_Init() {
   init_led();
   init_systick();
   init_usb();
   init_spi();
+  I2C_Init();
   RCC_ClearFlag();
 }
 

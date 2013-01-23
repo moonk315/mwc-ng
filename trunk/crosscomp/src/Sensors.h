@@ -50,6 +50,12 @@ static union {
   struct {
     int16_t x, z, y;
   } hmc5883;
+  struct {
+    int16_t x, y, z;
+  } lsm303dlhc;
+  struct {
+    int16_t x, z, y;
+  } l3gd20;
 } sensor_buff;
 
 static inline int16_t bswap_16(int16_t x) {
@@ -312,6 +318,100 @@ void ACC_getADC () {
 #endif
 
 // ************************************************************************************************************
+// I2C Accelerometer LSM303DLHC
+// ************************************************************************************************************
+#if (ACC == _LSM303DLHC_)
+
+#define LSM303DLHC_I2C_ADDRESS               0x32
+#define LSM303DLHC_CTRL_REG1_A               0x20  /* Control register 1 acceleration */
+#define LSM303DLHC_CTRL_REG2_A               0x21  /* Control register 2 acceleration */
+#define LSM303DLHC_CTRL_REG3_A               0x22  /* Control register 3 acceleration */
+#define LSM303DLHC_CTRL_REG4_A               0x23  /* Control register 4 acceleration */
+#define LSM303DLHC_CTRL_REG5_A               0x24  /* Control register 5 acceleration */
+#define LSM303DLHC_CTRL_REG6_A               0x25  /* Control register 6 acceleration */
+#define LSM303DLHC_REFERENCE_A               0x26  /* Reference register acceleration */
+#define LSM303DLHC_STATUS_REG_A              0x27  /* Status register acceleration */
+#define LSM303DLHC_OUT_X_L_A                 0x28  /* Output Register X acceleration */
+#define LSM303DLHC_OUT_X_H_A                 0x29  /* Output Register X acceleration */
+#define LSM303DLHC_OUT_Y_L_A                 0x2A  /* Output Register Y acceleration */
+#define LSM303DLHC_OUT_Y_H_A                 0x2B  /* Output Register Y acceleration */
+#define LSM303DLHC_OUT_Z_L_A                 0x2C  /* Output Register Z acceleration */
+#define LSM303DLHC_OUT_Z_H_A                 0x2D  /* Output Register Z acceleration */
+#define LSM303DLHC_FIFO_CTRL_REG_A           0x2E  /* Fifo control Register acceleration */
+#define LSM303DLHC_FIFO_SRC_REG_A            0x2F  /* Fifo src Register acceleration */
+
+#define LSM303DLHC_X_ENABLE                ((uint8_t)0x01)
+#define LSM303DLHC_Y_ENABLE                ((uint8_t)0x02)
+#define LSM303DLHC_Z_ENABLE                ((uint8_t)0x04)
+#define LSM303DLHC_AXES_ENABLE             ((uint8_t)0x07)
+#define LSM303DLHC_AXES_DISABLE            ((uint8_t)0x00)
+
+#define LSM303DLHC_ODR_1_HZ                ((uint8_t)0x10)  /*!< Output Data Rate = 1 Hz */
+#define LSM303DLHC_ODR_10_HZ               ((uint8_t)0x20)  /*!< Output Data Rate = 10 Hz */
+#define LSM303DLHC_ODR_25_HZ               ((uint8_t)0x30)  /*!< Output Data Rate = 25 Hz */
+#define LSM303DLHC_ODR_50_HZ               ((uint8_t)0x40)  /*!< Output Data Rate = 50 Hz */
+#define LSM303DLHC_ODR_100_HZ              ((uint8_t)0x50)  /*!< Output Data Rate = 100 Hz */
+#define LSM303DLHC_ODR_200_HZ              ((uint8_t)0x60)  /*!< Output Data Rate = 200 Hz */
+#define LSM303DLHC_ODR_400_HZ              ((uint8_t)0x70)  /*!< Output Data Rate = 400 Hz */
+#define LSM303DLHC_ODR_1620_HZ_LP          ((uint8_t)0x80)  /*!< Output Data Rate = 1620 Hz only in Low Power Mode */
+#define LSM303DLHC_ODR_1344_HZ             ((uint8_t)0x90)  /*!< Output Data Rate = 1344 Hz in Normal mode and 5376 Hz in Low Power Mode */
+
+#define LSM303DLHC_HR_ENABLE               ((uint8_t)0x08)
+#define LSM303DLHC_HR_DISABLE              ((uint8_t)0x00)
+
+
+#define LSM303DLHC_FULLSCALE_2G            ((uint8_t)0x00)  /*!< ▒2 g */
+#define LSM303DLHC_FULLSCALE_4G            ((uint8_t)0x10)  /*!< ▒4 g */
+#define LSM303DLHC_FULLSCALE_8G            ((uint8_t)0x20)  /*!< ▒8 g */
+#define LSM303DLHC_FULLSCALE_16G           ((uint8_t)0x30)  /*!< ▒16 g */
+
+#define LSM303DLHC_BlockUpdate_Continous   ((uint8_t)0x00) /*!< Continuos Update */
+#define LSM303DLHC_BlockUpdate_Single      ((uint8_t)0x80) /*!< Single Update: output registers not updated until MSB and LSB reading */
+
+#define LSM303DLHC_BLE_LSB                 ((uint8_t)0x00) /*!< Little Endian: data LSB @ lower address */
+#define LSM303DLHC_BLE_MSB	               ((uint8_t)0x40) /*!< Big Endian: data MSB @ lower address */
+
+#define LSM303DLHC_HPM_NORMAL_MODE_RES     ((uint8_t)0x00)
+#define LSM303DLHC_HPM_REF_SIGNAL          ((uint8_t)0x40)
+#define LSM303DLHC_HPM_NORMAL_MODE         ((uint8_t)0x80)
+#define LSM303DLHC_HPM_AUTORESET_INT       ((uint8_t)0xC0)
+
+#define LSM303DLHC_HPFCF_8                 ((uint8_t)0x00)
+#define LSM303DLHC_HPFCF_16                ((uint8_t)0x10)
+#define LSM303DLHC_HPFCF_32                ((uint8_t)0x20)
+#define LSM303DLHC_HPFCF_64                ((uint8_t)0x30)
+#define LSM303DLHC_HIGHPASSFILTER_DISABLE  ((uint8_t)0x00)
+#define LSM303DLHC_HIGHPASSFILTER_ENABLE   ((uint8_t)0x08)
+#define LSM303DLHC_HPF_CLICK_DISABLE       ((uint8_t)0x00)
+#define LSM303DLHC_HPF_CLICK_ENABLE	       ((uint8_t)0x04)
+#define LSM303DLHC_HPF_AOI1_DISABLE        ((uint8_t)0x00)
+#define LSM303DLHC_HPF_AOI1_ENABLE	       ((uint8_t)0x01)
+#define LSM303DLHC_HPF_AOI2_DISABLE        ((uint8_t)0x00)
+#define LSM303DLHC_HPF_AOI2_ENABLE	       ((uint8_t)0x02)
+
+
+void ACC_init () {
+  __delay_ms(10);
+  i2c_write_byte(LSM303DLHC_I2C_ADDRESS, LSM303DLHC_CTRL_REG1_A, LSM303DLHC_AXES_ENABLE | LSM303DLHC_ODR_50_HZ);
+  i2c_write_byte(LSM303DLHC_I2C_ADDRESS, LSM303DLHC_CTRL_REG4_A, LSM303DLHC_HR_ENABLE | LSM303DLHC_FULLSCALE_8G| LSM303DLHC_BlockUpdate_Single | LSM303DLHC_BLE_LSB);
+  i2c_write_byte(LSM303DLHC_I2C_ADDRESS, LSM303DLHC_CTRL_REG2_A, LSM303DLHC_HPM_NORMAL_MODE | LSM303DLHC_HPFCF_16 | LSM303DLHC_HPF_AOI1_DISABLE | LSM303DLHC_HPF_AOI2_DISABLE);
+  imu.acc_1g = 4096;
+}
+
+inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, LSM303DLHC_I2C_ADDRESS, LSM303DLHC_OUT_X_L_A | 0x80, sensor_buff.raw, 6);
+}
+
+void ACC_getADC () {
+  if (!i2c_trn_error()) {
+    ACC_ORIENTATION(sensor_buff.lsm303dlhc.x, sensor_buff.lsm303dlhc.y, sensor_buff.lsm303dlhc.z);
+    acc_common();
+  }
+}
+
+#endif
+
+// ************************************************************************************************************
 // Dummy ACC
 // ************************************************************************************************************
 #if (ACC == _NONE_)
@@ -466,47 +566,29 @@ inline float Gyro_getLSB() {
 // L3GD20 three-axis digital output gyroscope
 // ************************************************************************************************************
 #if (GYRO == _L3GD20_SPI_)
-
-void L3GD20_Init(L3GD20_InitTypeDef *L3GD20_InitStruct) {
-  uint8_t ctrl1 = 0x00, ctrl4 = 0x00;
-  /* Configure MEMS: data rate, power mode, full scale and axes */
-  ctrl1 |= (uint8_t) (L3GD20_InitStruct->Power_Mode | L3GD20_InitStruct->Output_DataRate | \
-                    L3GD20_InitStruct->Axes_Enable | L3GD20_InitStruct->Band_Width);
-  ctrl4 |= (uint8_t) (L3GD20_InitStruct->BlockData_Update | L3GD20_InitStruct->Endianness | \
-                    L3GD20_InitStruct->Full_Scale);
-  /* Write value to MEMS CTRL_REG1 regsister */
-  L3GD20_CS_LOW();
-  SPI_Write(&ctrl1, L3GD20_CTRL_REG1_ADDR, 1);
-  L3GD20_CS_HIGH();
-
-  /* Write value to MEMS CTRL_REG4 regsister */
-  L3GD20_CS_LOW();
-  SPI_Write(&ctrl4, L3GD20_CTRL_REG4_ADDR, 1);
-  L3GD20_CS_HIGH();
-}
-
-
 void Gyro_init() {
-  L3GD20_InitTypeDef L3GD20_InitStructure;
-  //L3GD20_FilterConfigTypeDef L3GD20_FilterStructure;
-  /* Configure Mems L3GD20 */
-  L3GD20_InitStructure.Power_Mode = L3GD20_MODE_ACTIVE;
-  L3GD20_InitStructure.Output_DataRate = L3GD20_OUTPUT_DATARATE_3;
-  L3GD20_InitStructure.Axes_Enable = L3GD20_AXES_ENABLE;
-  L3GD20_InitStructure.Band_Width = L3GD20_BANDWIDTH_4;
-  L3GD20_InitStructure.BlockData_Update = L3GD20_BlockDataUpdate_Continous;
-  L3GD20_InitStructure.Endianness = L3GD20_BLE_LSB;
-  L3GD20_InitStructure.Full_Scale = L3GD20_FULLSCALE_2000;
-  L3GD20_Init(&L3GD20_InitStructure);
+  uint8_t ctrl1 = (uint8_t)(L3GD20_MODE_ACTIVE | L3GD20_OUTPUT_DATARATE_3 | L3GD20_AXES_ENABLE | L3GD20_BANDWIDTH_4);
+  uint8_t ctrl4 = (uint8_t)(L3GD20_BlockDataUpdate_Single | L3GD20_BLE_LSB | L3GD20_FULLSCALE_2000);
+  L3GD20_CS_LOW();
+  spi_write_byte(L3GD20_CTRL_REG1_ADDR, ctrl1);
+  L3GD20_CS_HIGH();
+  L3GD20_CS_LOW();
+  spi_write_byte(L3GD20_CTRL_REG4_ADDR, ctrl4);
+  L3GD20_CS_HIGH();
 }
 
-inline PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {return 0;}
+inline PT_THREAD(ThreadGyro_GetADC_pt(struct pt *pt)) {
+  L3GD20_CS_LOW();
+  return spi_read_buffer_pt(pt, L3GD20_OUT_X_L_ADDR, sensor_buff.raw, 6);
+}
 
 void Gyro_getADC() {
+  L3GD20_CS_HIGH();
+  GYRO_ORIENTATION(sensor_buff.l3gd20.x, sensor_buff.l3gd20.y, sensor_buff.l3gd20.z);
   gyro_common();
 }
 
-inline float Gyro_getLSB() {return 0.0f;}
+inline float Gyro_getLSB() {return 14.285f;}
 #endif
 
 // ************************************************************************************************************
@@ -611,6 +693,95 @@ void Mag_calibrate_gain_end() {
   ahrs.setup.mag_gain.y = (HMC5883_POS_BIAS_Y * HMC5883_GAIN) / abs(imu.mag.fr.y);
   ahrs.setup.mag_gain.z = (HMC5883_POS_BIAS_Z * HMC5883_GAIN) / abs(imu.mag.fr.z);
 }
+#endif
+
+
+// ************************************************************************************************************
+// I2C Compass LSM303DLHC
+// ************************************************************************************************************
+#if  (MAG == _LSM303DLHC_)
+
+#define LSM303DLHC_MAG_I2C_ADDRESS          0x3C
+#define LSM303DLHC_ODR_0_75_HZ              ((uint8_t) 0x00)  /*!< Output Data Rate = 0.75 Hz */
+#define LSM303DLHC_ODR_1_5_HZ               ((uint8_t) 0x04)  /*!< Output Data Rate = 1.5 Hz */
+#define LSM303DLHC_ODR_3_0_HZ               ((uint8_t) 0x08)  /*!< Output Data Rate = 3 Hz */
+#define LSM303DLHC_ODR_7_5_HZ               ((uint8_t) 0x0C)  /*!< Output Data Rate = 7.5 Hz */
+#define LSM303DLHC_ODR_15_HZ                ((uint8_t) 0x10)  /*!< Output Data Rate = 15 Hz */
+#define LSM303DLHC_ODR_30_HZ                ((uint8_t) 0x14)  /*!< Output Data Rate = 30 Hz */
+#define LSM303DLHC_ODR_75_HZ                ((uint8_t) 0x18)  /*!< Output Data Rate = 75 Hz */
+#define LSM303DLHC_ODR_220_HZ               ((uint8_t) 0x1C)  /*!< Output Data Rate = 220 Hz */
+
+#define  LSM303DLHC_FS_1_3_GA               ((uint8_t) 0x20)  /*!< Full scale = ▒1.3 Gauss */
+#define  LSM303DLHC_FS_1_9_GA               ((uint8_t) 0x40)  /*!< Full scale = ▒1.9 Gauss */
+#define  LSM303DLHC_FS_2_5_GA               ((uint8_t) 0x60)  /*!< Full scale = ▒2.5 Gauss */
+#define  LSM303DLHC_FS_4_0_GA               ((uint8_t) 0x80)  /*!< Full scale = ▒4.0 Gauss */
+#define  LSM303DLHC_FS_4_7_GA               ((uint8_t) 0xA0)  /*!< Full scale = ▒4.7 Gauss */
+#define  LSM303DLHC_FS_5_6_GA               ((uint8_t) 0xC0)  /*!< Full scale = ▒5.6 Gauss */
+#define  LSM303DLHC_FS_8_1_GA               ((uint8_t) 0xE0)  /*!< Full scale = ▒8.1 Gauss */
+
+#define LSM303DLHC_M_SENSITIVITY_XY_1_3Ga     1100  /*!< magnetometer X Y axes sensitivity for 1.3 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_XY_1_9Ga     855   /*!< magnetometer X Y axes sensitivity for 1.9 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_XY_2_5Ga     670   /*!< magnetometer X Y axes sensitivity for 2.5 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_XY_4Ga       450   /*!< magnetometer X Y axes sensitivity for 4 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_XY_4_7Ga     400   /*!< magnetometer X Y axes sensitivity for 4.7 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_XY_5_6Ga     330   /*!< magnetometer X Y axes sensitivity for 5.6 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_XY_8_1Ga     230   /*!< magnetometer X Y axes sensitivity for 8.1 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_1_3Ga      980   /*!< magnetometer Z axis sensitivity for 1.3 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_1_9Ga      760   /*!< magnetometer Z axis sensitivity for 1.9 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_2_5Ga      600   /*!< magnetometer Z axis sensitivity for 2.5 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_4Ga        400   /*!< magnetometer Z axis sensitivity for 4 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_4_7Ga      355   /*!< magnetometer Z axis sensitivity for 4.7 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_5_6Ga      295   /*!< magnetometer Z axis sensitivity for 5.6 Ga full scale [LSB/Ga] */
+#define LSM303DLHC_M_SENSITIVITY_Z_8_1Ga      205   /*!< magnetometer Z axis sensitivity for 8.1 Ga full scale [LSB/Ga] */
+
+#define LSM303DLHC_CONTINUOS_CONVERSION      ((uint8_t) 0x00)   /*!< Continuous-Conversion Mode */
+#define LSM303DLHC_SINGLE_CONVERSION         ((uint8_t) 0x01)   /*!< Single-Conversion Mode */
+#define LSM303DLHC_SLEEP                     ((uint8_t) 0x02)   /*!< Sleep Mode */
+
+#define LSM303DLHC_TEMPSENSOR_ENABLE         ((uint8_t) 0x80)   /*!< Temp sensor Enable */
+#define LSM303DLHC_TEMPSENSOR_DISABLE        ((uint8_t) 0x00)   /*!< Temp sensor Disable */
+
+/* Magnetic field Registers */
+#define LSM303DLHC_CRA_REG_M                 0x00  /* Control register A magnetic field */
+#define LSM303DLHC_CRB_REG_M                 0x01  /* Control register B magnetic field */
+#define LSM303DLHC_MR_REG_M                  0x02  /* Control register MR magnetic field */
+#define LSM303DLHC_OUT_X_H_M                 0x03  /* Output Register X magnetic field */
+#define LSM303DLHC_OUT_X_L_M                 0x04  /* Output Register X magnetic field */
+#define LSM303DLHC_OUT_Z_H_M                 0x05  /* Output Register Z magnetic field */
+#define LSM303DLHC_OUT_Z_L_M                 0x06  /* Output Register Z magnetic field */
+#define LSM303DLHC_OUT_Y_H_M                 0x07  /* Output Register Y magnetic field */
+#define LSM303DLHC_OUT_Y_L_M                 0x08  /* Output Register Y magnetic field */
+
+
+void Mag_init() {
+  uint8_t cra_regm = 0x00, crb_regm = 0x00, mr_regm = 0x00;
+  /* Configure MEMS: temp and Data rate */
+  cra_regm |= (uint8_t) (LSM303DLHC_TEMPSENSOR_DISABLE | LSM303DLHC_ODR_75_HZ);
+  /* Configure MEMS: full Scale */
+  crb_regm |= (uint8_t) (LSM303DLHC_FS_2_5_GA);
+  /* Configure MEMS: working mode */
+  mr_regm |= (uint8_t) (LSM303DLHC_CONTINUOS_CONVERSION);
+  /* Write value to Mag MEMS CRA_REG regsister */
+  i2c_write_byte(LSM303DLHC_MAG_I2C_ADDRESS, LSM303DLHC_CRA_REG_M, cra_regm);
+  /* Write value to Mag MEMS CRB_REG regsister */
+  i2c_write_byte(LSM303DLHC_MAG_I2C_ADDRESS, LSM303DLHC_CRB_REG_M, crb_regm);
+  /* Write value to Mag MEMS MR_REG regsister */
+  i2c_write_byte(LSM303DLHC_MAG_I2C_ADDRESS, LSM303DLHC_MR_REG_M, mr_regm);
+}
+
+static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
+  return i2c_read_buffer_pt(pt, LSM303DLHC_MAG_I2C_ADDRESS, LSM303DLHC_OUT_X_H_M, sensor_buff.raw, 6);
+}
+
+void Mag_getADC() {
+  if (!i2c_trn_error()) {
+    MAG_ORIENTATION(bswap_16(sensor_buff.lsm303dlhc.x), bswap_16(sensor_buff.lsm303dlhc.y), bswap_16(sensor_buff.lsm303dlhc.z));
+  } else StatusLEDToggle();
+}
+
+void Mag_calibrate_gain_start() {}
+
+void Mag_calibrate_gain_end() {}
 #endif
 
 // ************************************************************************************************************

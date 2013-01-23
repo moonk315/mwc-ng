@@ -191,7 +191,7 @@ static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   PT_WAIT_UNTIL(pt, timer_expired(&timer_inner_ctrl, dt));
   current_time_us += INNER_CTRL_LOOP_TIME;
   current_time_ms += (INNER_CTRL_LOOP_TIME / 1000);
-  DebugLEDToggle();
+  //DebugLEDToggle();
   if (GYRO  != _NONE_) {
     PT_SEM_WAIT(pt, &i2c_bus_mutex);
     PT_SPAWN(pt, &thread_gyro_read_pt, ThreadGyro_GetADC_pt(&thread_gyro_read_pt));
@@ -225,6 +225,7 @@ static PT_THREAD(thread_outer_ctrl(struct pt *pt, uint16_t dt)) {
 static PT_THREAD(thread_acc_ctrl(struct pt *pt, uint16_t dt)) {
   PT_BEGIN(pt);
   PT_WAIT_UNTIL(pt, timer_expired(&timer_acc_ctrl, dt));
+  DebugLEDToggle();
   if (ACC  != _NONE_) {
     PT_SEM_WAIT(pt, &i2c_bus_mutex);
     PT_SPAWN(pt, &thread_acc_read_pt, ThreadACC_GetADC_pt(&thread_acc_read_pt));

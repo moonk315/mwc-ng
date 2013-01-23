@@ -16,8 +16,8 @@
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
@@ -65,8 +65,8 @@
 
 ------ After configuring CPAL Firmware Library, you should follow these steps to use the Firmware correctly :
 
-      -1-  STRUCTURE INITIALIZATION 
-      Start by initializing the Device. To perform this action, the global variable PPPx_DevStructure declared 
+      -1-  STRUCTURE INITIALIZATION
+      Start by initializing the Device. To perform this action, the global variable PPPx_DevStructure declared
       in CPAL Firmware as CPAL_InitTypeDef (I2C1_DevStructure for I2C1, I2C2_DevStructure for I2C2 ...) must be used.
       There are two ways to proceed :
 
@@ -84,8 +84,8 @@
             I2Cx_DevStructure.wCPAL_Options                             = 0        (all options disabled)
             I2Cx_DevStructure.wCPAL_Timeout                             = CPAL_TIMEOUT_DEFAULT
             I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_Mode                = I2C_Mode_I2C
-            I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_AnalogFilter        = I2C_AnalogFilter_Enable       
-            I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_DigitalFilter       = 0x00                         
+            I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_AnalogFilter        = I2C_AnalogFilter_Enable
+            I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_DigitalFilter       = 0x00
             I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_OwnAddress1         = 0
             I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_Ack                 = I2C_Ack_Enable
             I2Cx_DevStructure.pCPAL_I2C_Struct->I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit
@@ -100,13 +100,13 @@
           - One or two CPAL_TransferTypeDef variables (one for Tx and one for Rx).
           - Use the extern structure provided by the CPAL library: PPPx_InitStructure (ie. I2C1_DevStructure).
         Fill in all the fields for these structures (one by one).
-        Use the pointers to these structures to fill in the fields pCPAL_PPP_Struct and pCPAL_TransferTx and/or 
-        pCPAL_TransferRx of the PPPx_DevStructure. 
-        After that CPAL_State must be set to CPAL_STATE_DISABLED. 
+        Use the pointers to these structures to fill in the fields pCPAL_PPP_Struct and pCPAL_TransferTx and/or
+        pCPAL_TransferRx of the PPPx_DevStructure.
+        After that CPAL_State must be set to CPAL_STATE_DISABLED.
         Finally, call the CPAL_PPP_Init() with pointer to the PPPx_DevStructure as argument.
 
           Example:
-           // Declare local structures 
+           // Declare local structures
            I2C_InitTypeDef         I2C1_InitStructure;
            CPAL_TransferTypeDef    TX_Transfer, RX_Transfer;
            // Fill in all the fields of to these structures
@@ -133,7 +133,7 @@
            I2C1_DevStructure.wCPAL_State = CPAL_STATE_DISABLED;
            ....
            CPAL_I2C_Init(&I2C1_DevStructure);
-  
+
       -2- DEVICE CONFIGURATION
       Call the function CPAL_PPP_Init() to configure the selected device with the selected configuration by calling
       CPAL_PPP_Init(). This function also enables device clock and initialize all related peripherals ( GPIO, DMA , IT and NVIC ).
@@ -141,31 +141,31 @@
       performed and CPAL_State is set to CPAL_STATE_READY.
       This function returns CPAL_PASS state when the operation is correctly performed, or CPAL_FAIL when the current state of the
       device doesn't allow configuration (ie. state different from READY, DISABLED or ERROR).
-      After calling this function, you may check on the new state of device, when it is equal to CPAL_STATE_READY, Transfer operations 
+      After calling this function, you may check on the new state of device, when it is equal to CPAL_STATE_READY, Transfer operations
       can be started, otherwise you can call CPAL_PPP_DeInit() to deinitialize device and call CPAL_PPP_Init() once again.
 
-      -3- 1- READ / WRITE OPERATIONS 
-      Call the function CPAL_PPP_Write() or CPAL_PPP_Read() to perform transfer operations. 
-      These functions handle communication events using device event interrupts (independently of programming model used: DMA, 
-      Interrupt). These functions start preparing communication (send start condition, send salve address in case of 
-      master mode ...) if connection is established between devices CPAL_State is set CPAL_STATE_BUSY_XX and data transfer starts. 
-      By default, Error interrupts are enabled to manage device errors (Error interrupts can be disabled by affecting 
-      CPAL_OPT_I2C_ERRIT_DISABLE to wCPAL_Options). When transfer is completed successfully, CPAL_State is set to CPAL_STATE_READY 
+      -3- 1- READ / WRITE OPERATIONS
+      Call the function CPAL_PPP_Write() or CPAL_PPP_Read() to perform transfer operations.
+      These functions handle communication events using device event interrupts (independently of programming model used: DMA,
+      Interrupt). These functions start preparing communication (send start condition, send salve address in case of
+      master mode ...) if connection is established between devices CPAL_State is set CPAL_STATE_BUSY_XX and data transfer starts.
+      By default, Error interrupts are enabled to manage device errors (Error interrupts can be disabled by affecting
+      CPAL_OPT_I2C_ERRIT_DISABLE to wCPAL_Options). When transfer is completed successfully, CPAL_State is set to CPAL_STATE_READY
       and another operation can be started.
       These functions return CPAL_PASS if the current state of the device allows starting a new operation and the operation is correctly
-      started (but not finished). It returns CPAL_FAIL when the state of the device doesn't allow starting a new communication (ie. 
+      started (but not finished). It returns CPAL_FAIL when the state of the device doesn't allow starting a new communication (ie.
       BUSY, DISABLED, ERROR) or when an error occurs during operation start.
       Once operation is started, user application may perform other tasks while CPAL is sending/receiving data on device through interrupt
-      or DMA. 
+      or DMA.
 
       -3- 2- Listen Mode for Slave
       This mode allows slave device to start a communication without knowing in advance the nature of the operation (read or write).
-      Slave enter in idle state and wait until it receive its own address, CPAL_State is set CPAL_STATE_BUSY. In accordance to the type 
-      of received request from master device, the slave device state is changed to CPAL_STATE_BUSY_RX and CPAL_I2C_SLAVE_READ_UserCallback 
+      Slave enter in idle state and wait until it receive its own address, CPAL_State is set CPAL_STATE_BUSY. In accordance to the type
+      of received request from master device, the slave device state is changed to CPAL_STATE_BUSY_RX and CPAL_I2C_SLAVE_READ_UserCallback
       is called for a read request or state is changed to CPAL_STATE_BUSY_TX and CPAL_I2C_SLAVE_WRITE_UserCallback for a write request.
       In these callbacks user must configure DMA, interrupts (Prepare DMA channel, DMA request and I2C interrupts) and transfer parameters.
-      To configure DMA and Interrupts user can call "CPAL_I2C_Enable_DMA_IT" function which is implemented in Communication layer of CPAL Library. 
-      Listen mode is enabled by uncommenting "CPAL_I2C_LISTEN_MODE" define in "cpal_conf.h" file. When this mode is enabled "CPAL_I2C_Read" and 
+      To configure DMA and Interrupts user can call "CPAL_I2C_Enable_DMA_IT" function which is implemented in Communication layer of CPAL Library.
+      Listen mode is enabled by uncommenting "CPAL_I2C_LISTEN_MODE" define in "cpal_conf.h" file. When this mode is enabled "CPAL_I2C_Read" and
       "CPAL_I2C_Write" functions are replaced by one function "CPAL_I2C_Listen".
 
       -4- DEVICE DEINITIALIZATION
@@ -189,7 +189,7 @@
 
           ** CPAL_I2C_TXTC_UserCallback(CPAL_InitTypeDef* pDevInitStruct)
           ** CPAL_I2C_RXTC_UserCallback(CPAL_InitTypeDef* pDevInitStruct)
-               These functions are called when a transfer is complete when using Interrupt programming model or DMA 
+               These functions are called when a transfer is complete when using Interrupt programming model or DMA
                programming model.
 
           ** CPAL_I2C_DMATXTC_UserCallback(CPAL_InitTypeDef* pDevInitStruct)
@@ -211,7 +211,7 @@
                This function is called when an Address Event interrupt occurred and General Call Address Flag is set
                (available in Slave mode only and when the option CPAL_OPT_I2C_GENCALL is enabled).
 
-          ** CPAL_I2C_DUALF_UserCallback(CPAL_InitTypeDef* pDevInitStruct) 
+          ** CPAL_I2C_DUALF_UserCallback(CPAL_InitTypeDef* pDevInitStruct)
                This function is called when an Address Event interrupt occurred and Dual Address Flag is set
               (available in Slave mode only and when the option CPAL_OPT_I2C_DUALADDR is enabled).
 
@@ -252,7 +252,7 @@
         -c- Timeout User Callbacks :
           ** CPAL_TIMEOUT_UserCallback(void)
                This function is called when a Timeout occurred in communication.
-      
+
           ** CPAL_TIMEOUT_INIT()
               This function allows to configure and enable the counting peripheral/function (ie. SysTick Timer)
               It is called into all CPAL_PPP_Init() functions.
@@ -265,7 +265,7 @@
                WARNING: DO NOT IMPLEMENT THIS FUNCTION (already implemented in CPAL drivers)
                This function is already implemented in the CPAL drivers (stm32f37x_i2c_cpal.c file). It should be called periodically
                (using the count mechanism interrupt for example). This function checks all PPP devices and
-               manages timeout conditions. In case of timeout occurring, this function calls the 
+               manages timeout conditions. In case of timeout occurring, this function calls the
                CPAL_TIMEOUT_UserCallback() function that may be implemented by user to manage the cases of
                timeout errors (ie. reset the device/microcontroller...).
                In order to facilitate implementation, this function (instead to be called periodically by user
@@ -278,8 +278,8 @@
                             is used to handle timeout mechanism :
                #ifndef CPAL_I2C_TIMEOUT_Manager
                  void CPAL_I2C_TIMEOUT_Manager(void);
-               #else   
-                 void SysTick_Handler(void);  
+               #else
+                 void SysTick_Handler(void);
                #endif
 
      To implement Transfer and Error Callbacks, you should comment relative defines in Section 4 and implement Callback function (body) into
@@ -289,7 +289,7 @@
 
              -1- Comment the relative define in this file :
                           //#define CPAL_I2C_TX_UserCallback        (void)
-                        
+
              -2- Add CPAL_I2C_TX_UserCallback code source in application file ( example : main.c )
                           void CPAL_I2C_TX_UserCallback (CPAL_InitTypeDef* pDevInitStruct)
                           {
@@ -362,7 +362,7 @@
 //#define CPAL_I2C_LISTEN_MODE
 
 /* Enable the use of DMA Programming Model */
-//#define CPAL_I2C_DMA_PROGMODEL
+#define CPAL_I2C_DMA_PROGMODEL
 
 /* Enable the use of IT Programming Model */
 #define CPAL_I2C_IT_PROGMODEL
@@ -442,14 +442,9 @@
                  */
 
 
-#define _CPAL_TIMEOUT_INIT()           SysTick_Config((SystemCoreClock / 1000));\
-                                       NVIC_SetPriority (SysTick_IRQn, 0) 
-                                       /*<! Configure and enable the systick timer
-                                       to generate an interrupt when counter value
-                                       reaches 0. In the Systick interrupt handler
-                                       the Timeout Error function is called. Time base is 1 ms */
+#define _CPAL_TIMEOUT_INIT()           {}
 
-#define _CPAL_TIMEOUT_DEINIT()         SysTick->CTRL = 0        /*<! Disable the systick timer */
+#define _CPAL_TIMEOUT_DEINIT()         {}
 
 
 //#define CPAL_I2C_TIMEOUT_Manager       SysTick_Handler         /*<! This callback is used to handle Timeout error.
@@ -457,10 +452,10 @@
 //                                                                     is called to handle this error */
 #ifndef CPAL_I2C_TIMEOUT_Manager
    void CPAL_I2C_TIMEOUT_Manager(void);
-#else   
-   void SysTick_Handler(void);  
+#else
+   void SysTick_Handler(void);
 #endif /* CPAL_I2C_TIMEOUT_Manager */
-   
+
 /*#define CPAL_TIMEOUT_UserCallback        (void)      */            /*<! Comment this line and implement the callback body in your
                                                                       application in order to use the Timeout Callback.
                                                                       It is strongly advised to implement this callback, since it
@@ -482,12 +477,12 @@
 /*-----------------------------------------------------------------------------------------------------------------------*/
 
 /*   -- Section 5 :             **** NVIC Priority Group Selection and Interrupt Priority Offset ****
-  
+
   Description: This section allows user to select NVIC Priority Group and configure Interrupt Priority Offset.
                To change CPAL_NVIC_PRIOGROUP uncomment wanted Priority Group and comment others. Only one
                define is possible.
                By default Priority Offset of I2Cx device (ERR, EVT, DMA) are set to 0 */
-               
+
 /* !!!! Note : With STM32F30X family NVIC Priority Group Selection is not used !!!! */
 
 /*-----------NVIC Group Priority-------------*/
@@ -534,11 +529,11 @@
 
                    #ifdef __GNUC__
                 // With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
-                // set to 'Yes') calls __io_putchar() 
+                // set to 'Yes') calls __io_putchar()
                     #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
                    #else
                     #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-                   #endif 
+                   #endif
 
     WARNING      Be aware that enabling this feature may slow down the communication process, increase the code size
                  significantly, and may in some cases cause communication errors (when print/display mechanism is too slow)*/

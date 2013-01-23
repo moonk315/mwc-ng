@@ -66,6 +66,7 @@
 #define _MINIX_       2200
 #define _SHURICUS_    2300
 #define _L3GD20_SPI_  2500
+#define _LSM303DLHC_  2600
 
 #define STICK_STATE_TH_LOW     0
 #define STICK_STATE_TH_HIGH    1
