@@ -120,7 +120,7 @@ static void ahrs_calc_euler(){
     _cos = Gpz * invmag;
     //if (_cos < 0.0) _cos = -_cos;
     Mfx =  ahrs.est_mag.x * _cos + Mpz * _sin;
-    ahrs.eul_ref.yaw = _atan2(-Mfy, Mfx);
+    ahrs.eul_ref.yaw = -_atan2(-Mfy, Mfx);
   }
 }
 
