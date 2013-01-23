@@ -164,8 +164,8 @@ static void apply_acc_cf(){
 }
 
 static void apply_mag_cf(){
-  float ax = ahrs.mag_mag.x - 47.36787796f;
-  float ay = ahrs.mag_mag.y + 7.765872955f;
+  float ax = ahrs.mag_mag.x;// - 47.36787796f;
+  float ay = ahrs.mag_mag.y;// + 7.765872955f;
   float az = ahrs.mag_mag.z;
   float norm = v3_norm(ax, ay, az);
   ax *= norm;
