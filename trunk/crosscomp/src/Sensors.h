@@ -781,7 +781,11 @@ void Mag_getADC() {
 
 void Mag_calibrate_gain_start() {}
 
-void Mag_calibrate_gain_end() {}
+void Mag_calibrate_gain_end() {
+  ahrs.setup.mag_gain.x = 1.0f;
+  ahrs.setup.mag_gain.y = 1.0f;
+  ahrs.setup.mag_gain.z = 1.0f;
+}
 #endif
 
 // ************************************************************************************************************
