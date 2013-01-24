@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<mavlink>
-        <include>minimal.xml</include>
-<messages>
-</messages>
-</mavlink>
