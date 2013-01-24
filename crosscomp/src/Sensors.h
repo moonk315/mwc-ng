@@ -52,9 +52,12 @@ static union {
   } hmc5883;
   struct {
     int16_t x, y, z;
-  } lsm303dlhc;
+  } lsm303dlhc_acc;
   struct {
     int16_t x, z, y;
+  } lsm303dlhc_mag;
+  struct {
+    int16_t x, y, z;
   } l3gd20;
 } sensor_buff;
 
@@ -404,7 +407,7 @@ inline PT_THREAD(ThreadACC_GetADC_pt(struct pt *pt)) {
 
 void ACC_getADC () {
   if (!i2c_trn_error()) {
-    ACC_ORIENTATION(sensor_buff.lsm303dlhc.x, sensor_buff.lsm303dlhc.y, sensor_buff.lsm303dlhc.z);
+    ACC_ORIENTATION(sensor_buff.lsm303dlhc_acc.x, sensor_buff.lsm303dlhc_acc.y, sensor_buff.lsm303dlhc_acc.z);
     acc_common();
   }
 }
@@ -775,7 +778,7 @@ static PT_THREAD(ThreadMag_GetADC_pt(struct pt *pt)) {
 
 void Mag_getADC() {
   if (!i2c_trn_error()) {
-    MAG_ORIENTATION(bswap_16(sensor_buff.lsm303dlhc.x), bswap_16(sensor_buff.lsm303dlhc.y), bswap_16(sensor_buff.lsm303dlhc.z));
+    MAG_ORIENTATION(bswap_16(sensor_buff.lsm303dlhc_mag.x), bswap_16(sensor_buff.lsm303dlhc_mag.y), bswap_16(sensor_buff.lsm303dlhc_mag.z));
   } else StatusLEDToggle();
 }
 

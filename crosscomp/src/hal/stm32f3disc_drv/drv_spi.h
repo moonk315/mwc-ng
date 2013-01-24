@@ -58,7 +58,7 @@ inline void init_spi() {
   SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
   SPI_InitStructure.SPI_CRCPolynomial = 7;
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
@@ -156,8 +156,6 @@ inline uint8_t spi_read_byte(uint8_t reg) {
   return buff;
 }
 
-#define always_read(x) asm(""::"r"(x))
-
 static PT_THREAD(spi_read_buffer_pt(struct pt *pt, uint8_t reg, uint8_t *buff, uint8_t size)) {
   PT_BEGIN(pt);
   PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_TXE) == RESET));
@@ -166,9 +164,7 @@ static PT_THREAD(spi_read_buffer_pt(struct pt *pt, uint8_t reg, uint8_t *buff, u
   SPI_SendData8(L3GD20_SPI, reg);
   PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_RXNE) == RESET));
   PT_WAIT_WHILE(pt, (SPI_I2S_GetFlagStatus(L3GD20_SPI, SPI_I2S_FLAG_BSY) == SET));
-  //SPI_ReceiveData8(L3GD20_SPI);
-  always_read(SPI1->DR); // Clear RX flags
-  always_read(SPI1->SR);
+  SPI_ReceiveData8(L3GD20_SPI);
   _start_spi_dma(buff, size);
   PT_WAIT_WHILE(pt, DMA_GetCurrDataCounter(DMA1_Channel2));
   _disable_spi_dma();
