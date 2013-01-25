@@ -53,10 +53,9 @@ static volatile uint32_t* OutputChannels[] = {
 
 static void init_pwm(bool useServos) {
   // Clocks
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOF, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8 | RCC_APB2Periph_TIM15 | RCC_APB2Periph_TIM17, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA | RCC_AHBPeriph_GPIOB | RCC_AHBPeriph_GPIOC | RCC_AHBPeriph_GPIOD | RCC_AHBPeriph_GPIOF, ENABLE);
   // GPIO
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -79,10 +78,10 @@ static void init_pwm(bool useServos) {
   GPIO_Init(GPIOF, &GPIO_InitStructure);
   // Remap
   GPIO_PinAFConfig(GPIOB, GPIO_PinSource5,  GPIO_AF_10);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource12, GPIO_AF_2);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource13, GPIO_AF_2);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource14, GPIO_AF_2);
-  GPIO_PinAFConfig(GPIOB, GPIO_PinSource15, GPIO_AF_2);
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_2);
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_2);
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource14, GPIO_AF_2);
+  GPIO_PinAFConfig(GPIOD, GPIO_PinSource15, GPIO_AF_2);
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource15, GPIO_AF_2);
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource7, GPIO_AF_4);
   GPIO_PinAFConfig(GPIOC, GPIO_PinSource8, GPIO_AF_4);
@@ -129,8 +128,7 @@ static void init_pwm(bool useServos) {
   TIM_Cmd(TIM8, ENABLE);
   TIM_Cmd(TIM15, ENABLE);
   TIM_Cmd(TIM17, ENABLE);
-  // Sync Timers
-  //TIM1->CNT = 0;
+  //
   TIM_CtrlPWMOutputs(TIM4, ENABLE);
   TIM_CtrlPWMOutputs(TIM8, ENABLE);
   TIM_CtrlPWMOutputs(TIM15, ENABLE);
