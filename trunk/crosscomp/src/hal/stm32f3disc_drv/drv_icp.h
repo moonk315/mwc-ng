@@ -56,7 +56,7 @@ static struct TIM_Channel {
 #if (RX == _PPM_SERIAL_)
 ISR(TIM1_UP_TIM16_IRQHandler) {
   if (TIM_GetITStatus(TIM16, TIM_IT_CC1) == SET) {
-    rx_ppm_serial_callback(TIM_GetCapture1(TIM2));
+    rx_ppm_serial_callback(TIM_GetCapture1(TIM16));
     TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
   }
 }
@@ -97,7 +97,7 @@ static void TIMXX_IRQHandler(TIM_TypeDef *tim) {
   }
 }
 
-ISR(TIM1_IRQHandler) {
+ISR(TIM1_CC_IRQHandler) {
   TIMXX_IRQHandler(TIM1);
 }
 
@@ -115,6 +115,9 @@ ISR(TIM1_UP_TIM16_IRQHandler) {
 #endif
 
 inline void AttachPPMSerial() {
+  // Clocks
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
   // GPIO
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -145,14 +148,14 @@ inline void AttachPPMSerial() {
   TIM_ICInit(TIM16, &TIM_ICInitStructure);
   // TIM16_CH1 capture compare interrupt enable
   TIM_ITConfig(TIM16, TIM_IT_CC1, ENABLE);
-  TIM_Cmd(TIM2, ENABLE);
+  TIM_Cmd(TIM16, ENABLE);
 }
 
 inline void AttachPPM() {
   // Clocks
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 | RCC_APB1Periph_TIM3, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 | RCC_APB2Periph_TIM16, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA | RCC_AHBPeriph_GPIOB | RCC_AHBPeriph_GPIOC, ENABLE);
   // GPIO
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
@@ -161,7 +164,7 @@ inline void AttachPPM() {
   //
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_0 | GPIO_Pin_1;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_4;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_8 | GPIO_Pin_9;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
