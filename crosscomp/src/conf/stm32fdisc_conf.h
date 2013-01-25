@@ -10,7 +10,7 @@
 #define PWM_ESC_MIN_THROTTLE  1000
 #define PWM_ESC_MAX_THROTTLE  2000
 // RX
-#define RX    _NONE_
+#define RX    _PPM_SERIAL_
 // Sensors
 #define ACC  _LSM303DLHC_
 #define GYRO _L3GD20_SPI_
