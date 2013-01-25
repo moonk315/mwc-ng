@@ -72,11 +72,6 @@ typedef const unsigned char prog_uchar;
 #define BEEP_GPIO   GPIOE
 #define BEEP_PIN    GPIO_Pin_11
 
-//#define USB_DISCONNECT                      GPIOE
-//#define USB_DISCONNECT_PIN                  GPIO_Pin_14
-//#define RCC_AHBPeriph_GPIO_DISCONNECT       RCC_AHBPeriph_GPIOE
-
-
 // Helpful macros
 #define LED0_TOGGLE              digitalToggle(LED0_GPIO, LED0_PIN);
 #define LED0_OFF                 digitalLo(LED0_GPIO, LED0_PIN);
@@ -90,7 +85,40 @@ typedef const unsigned char prog_uchar;
 #define BEEP_OFF                 digitalLo(BEEP_GPIO, BEEP_PIN);
 #define BEEP_ON                  digitalHi(BEEP_GPIO, BEEP_PIN);
 
-//#include "drv_uart.h"
+/******************************************************************************/
+/*            Cortex-M4 Processor Exceptions Handlers                         */
+/******************************************************************************/
+void NMI_Handler(void) {
+}
+
+void HardFault_Handler(void) {
+  /* Go to infinite loop when Hard Fault exception occurs */
+  while (1);
+}
+
+void MemManage_Handler(void) {
+  /* Go to infinite loop when Memory Manage exception occurs */
+  while (1);
+}
+
+void BusFault_Handler(void){
+  /* Go to infinite loop when Bus Fault exception occurs */
+  while (1);
+}
+
+void UsageFault_Handler(void){
+  while (1);
+}
+
+void SVC_Handler(void){
+}
+
+void DebugMon_Handler(void){
+}
+
+void PendSV_Handler(void){
+}
+/******************************************************************************/
 
 extern uint16_t twi_err_cnt __attribute__((alias("i2c_err_cnt")));
 
@@ -225,14 +253,14 @@ inline void init_adc() {
   ADC_StartCalibration(ADC1);
   while(ADC_GetCalibrationStatus(ADC1) != RESET );
   //calibration_value = ADC_GetCalibrationValue(ADC1);
-  //
+  /* Common config */
   ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
   ADC_CommonInitStructure.ADC_Clock = ADC_Clock_AsynClkMode;
   ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
   ADC_CommonInitStructure.ADC_DMAMode = ADC_DMAMode_OneShot;
   ADC_CommonInitStructure.ADC_TwoSamplingDelay = 0;
   ADC_CommonInit(ADC1, &ADC_CommonInitStructure);
-  //
+  /* Channel config */
   ADC_InitStructure.ADC_ContinuousConvMode = ADC_ContinuousConvMode_Disable;
   ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
   ADC_InitStructure.ADC_ExternalTrigConvEvent = ADC_ExternalTrigConvEvent_0;
@@ -290,38 +318,32 @@ void USB_Cable_Config (uint8_t NewState) {
 void init_usb () {
  /* Enable the PWR clock */
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
   /* Enable the SYSCFG module clock (used for the USB disconnect feature) */
-
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-
   /* Enable the USB disconnect GPIO clock */
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIO_DISCONNECT, ENABLE);
-
  /*Set PA11,12 as IN - USB_DM,DP*/
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
-
+ /* GPIO config */
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-
+ /* Force host re-enumeration */
   GPIO_ResetBits(GPIOA, GPIO_Pin_12);
   __delay_ms(2000);
-
+ /* GPIO config */
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
-
   /*SET PA11,12 for USB: USB_DM,DP*/
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, GPIO_AF_14);
   GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, GPIO_AF_14);
-
   /* Configure the EXTI line 18 connected internally to the USB IP */
   EXTI_ClearITPendingBit(EXTI_Line18);
   EXTI_InitStructure.EXTI_Line = EXTI_Line18; /*USB resume from suspend mode*/
