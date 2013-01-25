@@ -38,15 +38,6 @@
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
 /* Exported define -----------------------------------------------------------*/
-#define CURSOR_STEP     20
-
-#define DOWN            1
-#define LEFT            2
-#define RIGHT           3
-#define UP              4
-
-
-
 /* Exported functions ------------------------------------------------------- */
 void Set_System(void);
 void Set_USBClock(void);
