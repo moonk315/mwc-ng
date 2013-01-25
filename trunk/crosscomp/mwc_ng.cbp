@@ -423,6 +423,14 @@
 			<Option virtualFolder="HAL/stm32fdisc/" />
 			<Option target="stm32f3disc" />
 		</Unit>
+		<Unit filename="src/hal/stm32f3disc_drv/drv_icp.h">
+			<Option virtualFolder="HAL/stm32fdisc/" />
+			<Option target="stm32f3disc" />
+		</Unit>
+		<Unit filename="src/hal/stm32f3disc_drv/drv_pwm.h">
+			<Option virtualFolder="HAL/stm32fdisc/" />
+			<Option target="stm32f3disc" />
+		</Unit>
 		<Unit filename="src/hal/stm32f3disc_drv/drv_spi.h">
 			<Option virtualFolder="HAL/stm32fdisc/" />
 			<Option target="stm32f3disc" />
@@ -430,22 +438,22 @@
 		<Extensions>
 			<code_completion />
 			<debugger>
-				<remote_debugging target="minix">
+				<remote_debugging target="stm32f3disc">
+					<options conn_type="0" serial_baud="115200" ip_address="localhost" ip_port="2009" additional_cmds="file mwc_ng.elf&#x0A;tbreak main" />
+				</remote_debugging>
+				<remote_debugging target="AfroFlight32">
+					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
+				</remote_debugging>
+				<remote_debugging target="shuricus">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
 				<remote_debugging target="Tarot450">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
+				<remote_debugging target="minix">
+					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
+				</remote_debugging>
 				<remote_debugging target="ProMini">
-					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
-				</remote_debugging>
-				<remote_debugging target="AfroFlight32">
-					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
-				</remote_debugging>
-				<remote_debugging target="stm32f3disc">
-					<options conn_type="0" serial_baud="115200" ip_address="localhost" ip_port="2009" additional_cmds="file mwc_ng.elf&#x0A;tbreak main" />
-				</remote_debugging>
-				<remote_debugging target="shuricus">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
 			</debugger>
