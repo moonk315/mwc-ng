@@ -206,7 +206,7 @@ static PT_THREAD(thread_inner_ctrl(struct pt *pt, uint16_t dt)) {
   PID_loop_inner();
   Output_loop_400hz();
   for (uint8_t i = 0; i < 3; i++)
-    imu.gyro_ahrs.raw[i] += (((int32_t)imu.gyro_raw.raw[i] << 8)  - imu.gyro_ahrs.raw[i]) >> 4;
+    imu.gyro_ahrs.raw[i] += (((int32_t)imu.gyro_raw.raw[i] << 8)  - imu.gyro_ahrs.raw[i]) >> 2;
   PT_END(pt);
 }
 
