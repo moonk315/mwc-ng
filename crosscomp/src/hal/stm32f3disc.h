@@ -1,7 +1,6 @@
 /**
  * MultiWii NG 0.1 - 2012
  * HAL for STM32f3Discovery
- * http://code.google.com/p/afrodevices/wiki/AfroFlight32
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,6 +105,8 @@ SPI_InitTypeDef  SPI_InitStructure= { 0, };
 
 #include "stm32f3disc_drv\drv_i2c.h"
 #include "stm32f3disc_drv\drv_spi.h"
+#include "stm32f3disc_drv\drv_pwm.h"
+#include "stm32f3disc_drv\drv_icp.h"
 
 inline void GUI_serial_open(uint32_t baud) {
 }
@@ -202,12 +203,6 @@ inline void BeepToggle() {
 void Board_Idle() {
 };
 
-void PWMOut(uint8_t ch, uint16_t val) {
-}
-
-void PWCOut(uint8_t ch, uint16_t val) {
-}
-
 inline void StartBatteryVoltageMeasurement() {
   ADC_StartConversion(ADC1);
 }
@@ -298,6 +293,7 @@ inline void Board_Init() {
   init_systick();
   init_usb();
   init_spi();
+  init_pwm(false);
   I2C_Init();
   RCC_ClearFlag();
 }

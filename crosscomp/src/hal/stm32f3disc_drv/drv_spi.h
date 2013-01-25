@@ -1,7 +1,6 @@
 /**
  * MultiWii NG 0.1 - 2012
  * HAL for STM32f3Discovery: SPI
- * http://code.google.com/p/afrodevices/wiki/AfroFlight32
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
