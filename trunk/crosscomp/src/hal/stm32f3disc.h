@@ -286,7 +286,7 @@ inline uint8_t IsBatteryVoltageMeasurementFinished() {
 
 int16_t GetBatteryVoltage() {
   static int16_t lpf;
-  int16_t val = (ADC_GetConversionValue(ADC1) << 3);
+  int16_t val = (ADC_GetConversionValue(ADC1) << 1);
   lpf += (val - lpf) >> 2;
   return lpf;
 }
