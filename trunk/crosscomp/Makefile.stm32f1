@@ -31,7 +31,7 @@ LINK_SCRIPT=stm32f1_flash.ld
 
 # Include
 INC+= -Isrc
-INC+= -Ilib/MWC_PT -Ilib/MWC_MAVLINK
+INC+= -Ilib/MWC_PT -Ilib/MWC_MavLink
 INC+= -Ilib-arm/mvc_dsp
 INC+= -Ilib-stm32f1/nvram -Ilib-stm32f1/STM32F10x_StdPeriph_Driver/inc -Ilib-stm32f1/CMSIS/CM3/CoreSupport -Ilib-stm32f1/CMSIS/CM3/DeviceSupport/ST/STM32F10x
 
