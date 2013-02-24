@@ -47,7 +47,7 @@ inline void PID_loop_inner() {
   if (pid.locked) return;
   //
   pid.ctrl.roll   = update_pid16(pid.rt.outer_pid.roll ,  imu.gyro.eul.roll,  &pid.active_profile->inner.roll,  &pid.rt.inner.roll)  >> 5;
-  pid.ctrl.pitch  = update_pid16(pid.rt.outer_pid.pitch,  imu.gyro.eul.pitch, &pid.active_profile->inner.roll,  &pid.rt.inner.pitch) >> 5;
+  pid.ctrl.pitch  = update_pid16(pid.rt.outer_pid.pitch,  imu.gyro.eul.pitch, &pid.active_profile->inner.pitch,  &pid.rt.inner.pitch) >> 5;
   pid.ctrl.yaw    = update_pid16(pid.rt.outer_pid.yaw,    imu.gyro.eul.yaw,   &pid.active_profile->inner.yaw,   &pid.rt.inner.yaw)   >> 5;
   pid.ctrl.throttle = update_pid16(pid.rt.outer_pid.throttle,   0,   &pid.active_profile->inner.throttle,   &pid.rt.inner.throttle);
 
