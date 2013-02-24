@@ -28,7 +28,7 @@
 
 #include "stm32f30x.h"
 #include "stm32f30x_conf.h"
-#include "stm32f3disc_drv\stm32f3_discovery_l3gd20.h"
+#include "stm32f3disc_drv/stm32f3_discovery_l3gd20.h"
 #include <nvram.h>
 #include <vcp.h>
 
@@ -131,10 +131,10 @@ TIM_OCInitTypeDef TIM_OCInitStructure = { 0, };
 EXTI_InitTypeDef EXTI_InitStructure = { 0, };
 SPI_InitTypeDef  SPI_InitStructure= { 0, };
 
-#include "stm32f3disc_drv\drv_i2c.h"
-#include "stm32f3disc_drv\drv_spi.h"
-#include "stm32f3disc_drv\drv_pwm.h"
-#include "stm32f3disc_drv\drv_icp.h"
+#include "stm32f3disc_drv/drv_i2c.h"
+#include "stm32f3disc_drv/drv_spi.h"
+#include "stm32f3disc_drv/drv_pwm.h"
+#include "stm32f3disc_drv/drv_icp.h"
 
 inline void GUI_serial_open(uint32_t baud) {
 }
