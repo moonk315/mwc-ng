@@ -88,7 +88,7 @@ inline void pack_heartbeat() {
     system_state);
 }
 
-inline void pack_sys_status() {
+static void pack_sys_status() {
   uint32_t sensors = 0;
   if (ACC  != _NONE_) sensors |=_BV(1);
   if (MAG  != _NONE_) sensors |=_BV(2);
@@ -109,7 +109,7 @@ inline void pack_sys_status() {
     0);
 }
 
-inline void pack_attitude() {
+static void pack_attitude() {
   mavlink_msg_attitude_pack_inline(mavlink_system.sysid,  mavlink_system.compid, &mav.snd_msg, current_time_ms,
     ahrs.eul_ref.roll,
     -ahrs.eul_ref.pitch,
@@ -119,7 +119,7 @@ inline void pack_attitude() {
     ahrs_get_yaw_speed());
 }
 
-inline void pack_raw_imu() {
+static void pack_raw_imu() {
   mavlink_msg_raw_imu_pack_inline(mavlink_system.sysid,  mavlink_system.compid, &mav.snd_msg, current_time_us,
     imu.acc.fr.x,
     imu.acc.fr.y,
@@ -132,7 +132,7 @@ inline void pack_raw_imu() {
     imu.mag.fr.z);
 }
 
-inline void pack_param_value() {
+static void pack_param_value() {
   // map types
   uint8_t param_type  = MAVLINK_TYPE_FLOAT;
   /*
@@ -154,7 +154,7 @@ inline void pack_param_value() {
     mav.param_idx);
 }
 
-inline void pack_rc_channels_raw() {
+static void pack_rc_channels_raw() {
   mavlink_msg_rc_channels_raw_pack_inline(mavlink_system.sysid,  mavlink_system.compid, &mav.snd_msg,
     current_time_ms,
     (RX / 100),
@@ -169,7 +169,7 @@ inline void pack_rc_channels_raw() {
     255);
 }
 
-inline void pack_rc_channels_scaled() {
+static void pack_rc_channels_scaled() {
   mavlink_msg_rc_channels_scaled_pack_inline(mavlink_system.sysid,  mavlink_system.compid, &mav.snd_msg,
     current_time_ms,
     (RX / 100),
@@ -184,7 +184,7 @@ inline void pack_rc_channels_scaled() {
     255);
 }
 
-inline void pack_servo_output_raw() {
+static void pack_servo_output_raw() {
   mavlink_msg_servo_output_raw_pack_inline(mavlink_system.sysid,  mavlink_system.compid, &mav.snd_msg,
     current_time_ms,
     (FRAME / 100),
@@ -204,7 +204,7 @@ inline void pack_msg_command_ack() {
     mav.cmd_result);
 }
 
-inline void mav_link_process_command() {
+static void mav_link_process_command() {
   mav.last_command = mavlink_command_long->command;
   mav.cmd_result = MAV_RESULT_ACCEPTED;
   switch (mav.last_command) {

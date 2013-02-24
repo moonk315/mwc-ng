@@ -24,7 +24,7 @@ inline void beep(uint8_t pattern) {
   flight.beep_pattern_req = pattern;
 }
 
- inline void process_idle_state() {
+ static void process_idle_state() {
   if (imu.acc_off_cal || imu.gyro_off_cal ) {
     blink_led(LED_PATTERN_CALIBRATION_START);
     flight.sys_state = SYS_STATE_CALIBRATING;
@@ -65,7 +65,7 @@ int16_t get_trim_val(int8_t val, int16_t trim) {
   return trim;
 }
 
-inline void process_level_trim_state() {
+static void process_level_trim_state() {
   blink_led(LED_PATTERN_SLOW_BLINK);
   if (input.stick_state == STICK_STATE_EXIT_TRIM) {
     flight.sys_state = SYS_STATE_IDLE;

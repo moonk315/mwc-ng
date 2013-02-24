@@ -289,7 +289,7 @@ void Board_Idle() {
   avr_UsartPollWrite_0();
 };
 
-inline void Board_Init() {
+void Board_Init() {
   // Timer0
   OCR0A = 2; OCR0B = 2;
   TCCR0A = (_BV(COM0A1) | _BV(COM0B1) | _BV(WGM00));
