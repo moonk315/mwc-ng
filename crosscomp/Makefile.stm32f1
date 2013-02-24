@@ -87,9 +87,10 @@ DEPS := $(patsubst %.o,%.d,$(OBJS))
 
 all: $(BIN_DIR)/$(OUT_FILE).elf
 	@$(OBJCOPY) -O ihex "$(BIN_DIR)/$(OUT_FILE).elf" "$(BIN_DIR)/$(OUT_FILE).hex"
+	@$(OBJCOPY) -O binary "$(BIN_DIR)/$(OUT_FILE).elf" "$(BIN_DIR)/$(OUT_FILE).bin"
 	@$(OBJDUMP) -h -d -C "$(BIN_DIR)/$(OUT_FILE).elf" > "$(BIN_DIR)/$(OUT_FILE).asm"
 	@$(SIZE)  -t "$(BIN_DIR)/$(OUT_FILE).elf"
-	@cp "$(BIN_DIR)/$(OUT_FILE).hex" "$(BIN_DIR)/$(call lc,$(patsubst _%_,%,$(BOARD)))_$(call lc,$(patsubst _%_,%,$(CONFIG))).hex"
+	@cp -f "$(BIN_DIR)/$(OUT_FILE).hex" "$(BIN_DIR)/$(call lc,$(patsubst _%_,%,$(BOARD)))_$(call lc,$(patsubst _%_,%,$(CONFIG))).hex"
 
 upload: all
 	cmd /c start STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn $(BIN_DIR)/$(OUT_FILE).hex -r --a 0x08000000

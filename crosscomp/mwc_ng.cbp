@@ -95,8 +95,8 @@
 				<Option object_output="E:/!Work/Unsorted/--/mwc-ng/crosscomp/.objs" />
 				<Option type="3" />
 				<Option compiler="armelfgcc" />
-				<Option parameters="/c STMFlashLoader.exe -c --pn 8  --br 256000 -i STM32_Med-density_64K  -e --all -d --v --fn mwc_ng.hex -r --a 0x08000000" />
-				<Option host_application="%COMSPEC%" />
+				<Option parameters="program STM32F100RB mwc_ng.bin --adapter-name=ST-Link --port=SWD --adapter-clk=8000000 --erase=affected" />
+				<Option host_application="coflash.exe" />
 				<Option run_host_application_in_terminal="1" />
 				<Compiler>
 					<Add option="-g" />
@@ -438,22 +438,22 @@
 		<Extensions>
 			<code_completion />
 			<debugger>
-				<remote_debugging target="stm32f3disc">
-					<options conn_type="0" serial_baud="115200" ip_address="localhost" ip_port="2009" additional_cmds="file mwc_ng.elf&#x0A;tbreak main" />
-				</remote_debugging>
-				<remote_debugging target="AfroFlight32">
-					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
-				</remote_debugging>
 				<remote_debugging target="shuricus">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
 				<remote_debugging target="Tarot450">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
+				<remote_debugging target="stm32f3disc">
+					<options conn_type="0" serial_baud="115200" ip_address="localhost" ip_port="2009" additional_cmds="file mwc_ng.elf&#x0A;tbreak main" />
+				</remote_debugging>
+				<remote_debugging target="ProMini">
+					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
+				</remote_debugging>
 				<remote_debugging target="minix">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
-				<remote_debugging target="ProMini">
+				<remote_debugging target="AfroFlight32">
 					<options conn_type="0" serial_baud="115200" additional_cmds_before="file mwc_ng.elf&#x0A;tbreak main" />
 				</remote_debugging>
 			</debugger>
