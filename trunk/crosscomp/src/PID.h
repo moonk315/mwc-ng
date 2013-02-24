@@ -43,7 +43,7 @@ void reset_pid_state() {
   memset(&pid.ctrl, 0, sizeof(pid.ctrl));
 };
 
-inline void PID_loop_inner() {
+static void PID_loop_inner() {
   if (pid.locked) return;
   //
   pid.ctrl.roll   = update_pid16(pid.rt.outer_pid.roll ,  imu.gyro.eul.roll,  &pid.active_profile->inner.roll,  &pid.rt.inner.roll)  >> 5;
@@ -53,7 +53,7 @@ inline void PID_loop_inner() {
 
 }
 
-inline void PID_loop_outer() {
+static void PID_loop_outer() {
   if (!pid.locked) {
     pid.rt.outer_pid.roll =  update_pid16((input.ctrl.roll + pid.ictrl_last.roll) << 1,   ahrs.ctrl_ref.roll,  &pid.active_profile->outer.roll,   &pid.rt.outer.roll) ;
     pid.rt.outer_pid.pitch = update_pid16((input.ctrl.pitch + pid.ictrl_last.pitch) << 1, ahrs.ctrl_ref.pitch, &pid.active_profile->outer.pitch,  &pid.rt.outer.pitch);
@@ -68,7 +68,7 @@ inline void PID_loop_outer() {
 #define D(x)  ((uint8_t) x)
 #define FF(x) ((uint8_t) round(x * 128.0f))
 
-inline void PID_Init() {
+static void PID_Init() {
   pid.setup.profile[0].inner.roll.P = P(12.0);
   pid.setup.profile[0].inner.roll.I = I(0.080);
   pid.setup.profile[0].inner.roll.i_windup = 64000;// -16000*2;

@@ -61,7 +61,7 @@ static union {
   } l3gd20;
 } sensor_buff;
 
-static inline int16_t bswap_16(int16_t x) {
+static int16_t bswap_16(int16_t x) {
   union {
     int16_t x;
     struct {
